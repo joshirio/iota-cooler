@@ -1,0 +1,3 @@
+[submodule "utils/iota-cooler-smidgen"]
+	path = utils/iota-cooler-smidgen
+	url = https://github.com/joshirio/iota-cooler-smidgen
