@@ -24,6 +24,7 @@ public:
 
 private slots:
     void aboutQtActionTriggered();
+    void aboutActionTriggered();
     void helpActionTriggered();
     void settingsActionTriggered();
     void promoteActionTriggered();

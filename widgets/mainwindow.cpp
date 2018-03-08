@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
+#include "aboutdialog.h"
 #include "../utils/definitionholder.h"
 
 #include <QtWidgets/QMenuBar>
@@ -27,6 +28,12 @@ MainWindow::~MainWindow()
 void MainWindow::aboutQtActionTriggered()
 {
     qApp->aboutQt();
+}
+
+void MainWindow::aboutActionTriggered()
+{
+    AboutDialog a(this);
+    a.exec();
 }
 
 void MainWindow::helpActionTriggered()
@@ -94,6 +101,8 @@ void MainWindow::createConnections()
             this, &MainWindow::aboutQtActionTriggered);
     connect(m_helpAction, &QAction::triggered,
             this, &MainWindow::helpActionTriggered);
+    connect(m_aboutAction, &QAction::triggered,
+            this, &MainWindow::aboutActionTriggered);
     connect(m_settingsAction, &QAction::triggered,
             this, &MainWindow::settingsActionTriggered);
     connect(m_promoteAction, &QAction::triggered,

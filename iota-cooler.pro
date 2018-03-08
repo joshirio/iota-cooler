@@ -34,7 +34,8 @@ SOURCES += \
     utils/qtsingleapplication/qtlockedfile_win.cpp \
     utils/qtsingleapplication/qtlockedfile.cpp \
     utils/qtsingleapplication/qtsingleapplication.cpp \
-    utils/qtsingleapplication/qtsinglecoreapplication.cpp
+    utils/qtsingleapplication/qtsinglecoreapplication.cpp \
+    widgets/aboutdialog.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -44,8 +45,10 @@ HEADERS += \
     utils/qtsingleapplication/qtlocalpeer.h \
     utils/qtsingleapplication/qtlockedfile.h \
     utils/qtsingleapplication/qtsingleapplication.h \
-    utils/qtsingleapplication/qtsinglecoreapplication.h
+    utils/qtsingleapplication/qtsinglecoreapplication.h \
+    widgets/aboutdialog.h
 
 FORMS += \
         widgets/mainwindow.ui \
-    widgets/settingsdialog.ui
+    widgets/settingsdialog.ui \
+    widgets/aboutdialog.ui
