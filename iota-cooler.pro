@@ -42,7 +42,9 @@ SOURCES += \
     utils/qtsingleapplication/qtlockedfile.cpp \
     utils/qtsingleapplication/qtsingleapplication.cpp \
     utils/qtsingleapplication/qtsinglecoreapplication.cpp \
-    widgets/aboutdialog.cpp
+    widgets/aboutdialog.cpp \
+    components/abstracttangleapi.cpp \
+    components/smidgentangleapi.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -53,7 +55,9 @@ HEADERS += \
     utils/qtsingleapplication/qtlockedfile.h \
     utils/qtsingleapplication/qtsingleapplication.h \
     utils/qtsingleapplication/qtsinglecoreapplication.h \
-    widgets/aboutdialog.h
+    widgets/aboutdialog.h \
+    components/abstracttangleapi.h \
+    components/smidgentangleapi.h
 
 FORMS += \
         widgets/mainwindow.ui \

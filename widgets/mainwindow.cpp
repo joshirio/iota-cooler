@@ -69,7 +69,7 @@ void MainWindow::createMenus()
 
     m_toolsMenu = ui->menuBar->addMenu(tr("&Tools"));
     m_promoteAction = new QAction(tr("Promote transaction..."));
-    m_promoteAction->setShortcut(tr("CTRL+P"));
+    m_promoteAction->setShortcut(tr("CTRL+M"));
     m_toolsMenu->addAction(m_promoteAction);
     m_reattachAction = new QAction(tr("Reattach transaction..."));
     m_reattachAction->setShortcut(tr("CTRL+A"));
