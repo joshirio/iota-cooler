@@ -10,7 +10,7 @@
 
 QString DefinitionHolder::VERSION = "1.0";
 QString DefinitionHolder::NAME = "IOTAcooler";
-QString DefinitionHolder::ORG = "iota-cooler";
+QString DefinitionHolder::ORG = "iotacooler.github.io";
 QString DefinitionHolder::UPDATE_URL = "https://joshirio.github.io/iotacooler/update/iotacooler/updates";
 QString DefinitionHolder::DOWNLOAD_URL = "https://joshirio.github.io/iotacooler/update.html";
 QString DefinitionHolder::HELP_URL = "https://github.com/joshirio/iota-cooler/wiki";
@@ -21,4 +21,5 @@ bool DefinitionHolder::WIN_PORTABLE = false;
 QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));
+QString DefinitionHolder::DEFAULT_NODE = "https://nodes.thetangle.org:443";
 

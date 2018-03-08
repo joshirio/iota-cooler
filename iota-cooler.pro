@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,11 +26,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         widgets/mainwindow.cpp \
-    utils/definitionholder.cpp
+    utils/definitionholder.cpp \
+    widgets/settingsdialog.cpp \
+    components/settingsmanager.cpp \
+    utils/qtsingleapplication/qtlocalpeer.cpp \
+    utils/qtsingleapplication/qtlockedfile_unix.cpp \
+    utils/qtsingleapplication/qtlockedfile_win.cpp \
+    utils/qtsingleapplication/qtlockedfile.cpp \
+    utils/qtsingleapplication/qtsingleapplication.cpp \
+    utils/qtsingleapplication/qtsinglecoreapplication.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
-    utils/definitionholder.h
+    utils/definitionholder.h \
+    widgets/settingsdialog.h \
+    components/settingsmanager.h \
+    utils/qtsingleapplication/qtlocalpeer.h \
+    utils/qtsingleapplication/qtlockedfile.h \
+    utils/qtsingleapplication/qtsingleapplication.h \
+    utils/qtsingleapplication/qtsinglecoreapplication.h
 
 FORMS += \
-        widgets/mainwindow.ui
+        widgets/mainwindow.ui \
+    widgets/settingsdialog.ui

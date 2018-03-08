@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "settingsdialog.h"
 #include "../utils/definitionholder.h"
 
 #include <QtWidgets/QMenuBar>
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     m_menuBar = ui->menuBar;
+    ui->mainToolBar->hide();
 
     createMenus();
     createConnections();
@@ -35,7 +37,8 @@ void MainWindow::helpActionTriggered()
 
 void MainWindow::settingsActionTriggered()
 {
-    //TODO
+    SettingsDialog d(this);
+    d.exec();
 }
 
 void MainWindow::promoteActionTriggered()

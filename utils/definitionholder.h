@@ -17,7 +17,6 @@ public:
     static QString NAME;           /**< Software name                      */
     static QString COPYRIGHT;      /**< Software copyright                 */
     static QString ORG;            /**< Organization name used in settings */
-    static QString DOMAIN_NAME;    /**< Domain name used in settings       */
     static QString UPDATE_URL;     /**< Url where to check for updates     */
     static QString DOWNLOAD_URL;   /**< Url where to download the software */
     static QString HELP_URL;       /**< Url to help or wiki pages          */
@@ -25,6 +24,7 @@ public:
     static bool APP_STORE;         /**< Deployment target is an app store  */
     static bool APPIMAGE_LINUX;    /**< Deployment target is an AppImage   */
     static bool WIN_PORTABLE;      /**< Deployment is portable Windows app */
+    static QString DEFAULT_NODE;   /**< Default IOTA node for IRI requests */
 
 private:
     DefinitionHolder() {} //static only
