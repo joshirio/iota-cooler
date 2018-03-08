@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
 #include "aboutdialog.h"
+#include "promotereattachdialog.h"
 #include "../utils/definitionholder.h"
 
 #include <QtWidgets/QMenuBar>
@@ -51,12 +52,16 @@ void MainWindow::settingsActionTriggered()
 
 void MainWindow::promoteActionTriggered()
 {
-    //TODO
+    PromoteReattachDialog d(this);
+    d.setPromoteView();
+    d.exec();
 }
 
 void MainWindow::reattachActionTriggered()
 {
-    //TODO
+    PromoteReattachDialog d(this);
+    d.setReattachView();
+    d.exec();
 }
 
 void MainWindow::createMenus()

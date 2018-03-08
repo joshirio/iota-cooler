@@ -1,6 +1,7 @@
 #include "smidgentangleapi.h"
 
-SmidgenTangleAPI::SmidgenTangleAPI()
+SmidgenTangleAPI::SmidgenTangleAPI(QObject *parent) :
+    AbstractTangleAPI(parent)
 {
 
 }

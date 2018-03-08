@@ -44,7 +44,8 @@ SOURCES += \
     utils/qtsingleapplication/qtsinglecoreapplication.cpp \
     widgets/aboutdialog.cpp \
     components/abstracttangleapi.cpp \
-    components/smidgentangleapi.cpp
+    components/smidgentangleapi.cpp \
+    widgets/promotereattachdialog.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -57,12 +58,14 @@ HEADERS += \
     utils/qtsingleapplication/qtsinglecoreapplication.h \
     widgets/aboutdialog.h \
     components/abstracttangleapi.h \
-    components/smidgentangleapi.h
+    components/smidgentangleapi.h \
+    widgets/promotereattachdialog.h
 
 FORMS += \
         widgets/mainwindow.ui \
     widgets/settingsdialog.ui \
-    widgets/aboutdialog.ui
+    widgets/aboutdialog.ui \
+    widgets/promotereattachdialog.ui
 
 ICON = resources/icons/iotacooler.icns # for mac
 RC_FILE = resources/iotacooler.rc # for windows

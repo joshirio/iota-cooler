@@ -8,11 +8,13 @@
 #ifndef SMIDGENTANGLEAPI_H
 #define SMIDGENTANGLEAPI_H
 
+#include "abstracttangleapi.h"
 
 class SmidgenTangleAPI : public AbstractTangleAPI
 {
+    Q_OBJECT
 public:
-    SmidgenTangleAPI();
+    explicit SmidgenTangleAPI(QObject *parent = nullptr);
 };
 
 #endif // SMIDGENTANGLEAPI_H
