@@ -53,6 +53,9 @@
           <property name="text">
            <string>Create a &amp;new wallet file</string>
           </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -62,6 +65,12 @@
           </property>
           <property name="text">
            <string>&amp;Open an existing wallet file</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

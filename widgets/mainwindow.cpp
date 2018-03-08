@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     m_menuBar = ui->menuBar;
     ui->mainToolBar->hide();
+    ui->openWalletButton->setFocus();
 
     createMenus();
     createConnections();

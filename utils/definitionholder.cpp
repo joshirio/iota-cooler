@@ -21,5 +21,5 @@ bool DefinitionHolder::WIN_PORTABLE = false;
 QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));
-QString DefinitionHolder::DEFAULT_NODE = "https://nodes.thetangle.org:443";
+QString DefinitionHolder::DEFAULT_NODE = "http://field.carriota.com:80"; //TODO: change to SSL version once carriota fixes its cert
 

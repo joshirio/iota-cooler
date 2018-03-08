@@ -8,7 +8,14 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = iota-cooler
+macx {
+    TARGET = IOTAcooler
+}
+
+unix:!macx|win32 {
+    TARGET = iota-cooler
+}
+
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -52,3 +59,9 @@ FORMS += \
         widgets/mainwindow.ui \
     widgets/settingsdialog.ui \
     widgets/aboutdialog.ui
+
+ICON = resources/icons/iotacooler.icns # for mac
+RC_FILE = resources/iotacooler.rc # for windows
+
+RESOURCES += \
+    resources/resources.qrc
