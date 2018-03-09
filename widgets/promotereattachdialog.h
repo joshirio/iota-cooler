@@ -40,8 +40,6 @@ private slots:
 
 private:
     Ui::PromoteReattachDialog *ui;
-    QPushButton *m_okButton;
-    QPushButton *m_cancelButton;
 };
 
 #endif // PROMOTEREATTACHDIALOG_H

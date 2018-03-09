@@ -78,6 +78,10 @@ or visit the IOTAcooler wiki on GitHub for examples.</string>
          </item>
          <item>
           <widget class="QPushButton" name="promoteButton">
+           <property name="toolTip">
+            <string>Only active if the transaction hash is valid:&lt;br /&gt;
+&lt;b&gt;81 characters&lt;/b&gt; consisting of [A-Z9]</string>
+           </property>
            <property name="text">
             <string>&amp;Promote</string>
            </property>
@@ -146,11 +150,35 @@ or visit the IOTAcooler wiki on GitHub for examples.</string>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>435</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton">
+       <property name="text">
+        <string>&amp;OK</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

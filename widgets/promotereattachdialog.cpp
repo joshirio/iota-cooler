@@ -14,14 +14,14 @@ PromoteReattachDialog::PromoteReattachDialog(QWidget *parent) :
     ui(new Ui::PromoteReattachDialog)
 {
     ui->setupUi(this);
-    m_okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    m_cancelButton = ui->buttonBox->button(QDialogButtonBox::Cancel);
-    m_okButton->setAutoDefault(false);
-    m_cancelButton->setAutoDefault(false);
+    ui->okButton->setAutoDefault(false);
+    ui->okButton->setDefault(false);
+    ui->cancelButton->setAutoDefault(false);
+    ui->cancelButton->setDefault(false);
 
-    connect(m_okButton, &QPushButton::clicked,
+    connect(ui->okButton, &QPushButton::clicked,
             this, &PromoteReattachDialog::okButtonClicked);
-    connect(m_cancelButton, &QPushButton::clicked,
+    connect(ui->cancelButton, &QPushButton::clicked,
             this, &PromoteReattachDialog::cancelButtonClicked);
     connect(ui->promoteButton, &QPushButton::clicked,
             this, &PromoteReattachDialog::promoteButtonClicked);
@@ -64,7 +64,7 @@ void PromoteReattachDialog::promoteLineEditChanged()
 {
     QString txHash = ui->promoteLineEdit->text().trimmed().toUpper();
     //check if tx is valid
-    QRegularExpression reg("[A-Z9]{81}");
+    QRegularExpression reg("^[A-Z9]{81}$");
     bool valid = reg.match(txHash).hasMatch();
     ui->promoteButton->setEnabled(valid);
 }
@@ -76,5 +76,5 @@ void PromoteReattachDialog::promoteButtonClicked()
     ui->promoteButton->hide();
     ui->promoteLineEdit->hide();
     ui->tailTxHashLabel->hide();
-    m_okButton->setEnabled(false);
+    ui->okButton->setEnabled(false);
 }
