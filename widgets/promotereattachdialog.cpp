@@ -1,5 +1,6 @@
 #include "promotereattachdialog.h"
 #include "ui_promotereattachdialog.h"
+#include "../components/smidgentangleapi.h"
 
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
@@ -27,6 +28,13 @@ PromoteReattachDialog::PromoteReattachDialog(QWidget *parent) :
             this, &PromoteReattachDialog::promoteButtonClicked);
     connect(ui->promoteLineEdit, &QLineEdit::textChanged,
             this, &PromoteReattachDialog::promoteLineEditChanged);
+
+    //IOTA API
+    m_tangleAPI = new SmidgenTangleAPI(this);
+    connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
+            this, &PromoteReattachDialog::tangleAPIRequestFinished);
+    connect(m_tangleAPI, &AbstractTangleAPI::requestError,
+            this, &PromoteReattachDialog::tangleAPIRequestError);
 }
 
 PromoteReattachDialog::~PromoteReattachDialog()
@@ -77,4 +85,16 @@ void PromoteReattachDialog::promoteButtonClicked()
     ui->promoteLineEdit->hide();
     ui->tailTxHashLabel->hide();
     ui->okButton->setEnabled(false);
+}
+
+void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
+                                                     const QString &message)
+{
+
+}
+
+void PromoteReattachDialog::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
+                                                  const QString &message)
+{
+
 }

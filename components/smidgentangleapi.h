@@ -15,6 +15,12 @@ class SmidgenTangleAPI : public AbstractTangleAPI
     Q_OBJECT
 public:
     explicit SmidgenTangleAPI(QObject *parent = nullptr);
+
+    void startAPIRequest(RequestType request, const QStringList &argList);
+    void stopCurrentAPIRequest();
+
+private:
+    RequestType m_currentRequest;
 };
 
 #endif // SMIDGENTANGLEAPI_H

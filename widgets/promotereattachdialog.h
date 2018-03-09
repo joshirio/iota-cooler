@@ -9,6 +9,7 @@
 #define PROMOTEREATTACHDIALOG_H
 
 #include <QDialog>
+#include "../components/abstracttangleapi.h"
 
 namespace Ui {
 class PromoteReattachDialog;
@@ -37,9 +38,14 @@ private slots:
     void cancelButtonClicked();
     void promoteLineEditChanged();
     void promoteButtonClicked();
+    void tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
+                                  const QString &message);
+    void tangleAPIRequestError(AbstractTangleAPI::RequestType request,
+                               const QString &message);
 
 private:
     Ui::PromoteReattachDialog *ui;
+    AbstractTangleAPI *m_tangleAPI;
 };
 
 #endif // PROMOTEREATTACHDIALOG_H

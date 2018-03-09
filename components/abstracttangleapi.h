@@ -19,15 +19,43 @@ class AbstractTangleAPI : public QObject
 public:
     explicit AbstractTangleAPI(QObject *parent = nullptr);
 
+    /**
+     * @brief The RequestType enum
+     */
     enum RequestType {
-        GET_BALANCE,
-        PROMOTE,
-        REATTACH,
-        MULTISIG_TRANSFER
+        NO_REQUEST, /**< Invalid request status */
+        GET_BALANCE, /**< Get balance of an address */
+        PROMOTE, /**< Promote a transaction */
+        REATTACH, /**< Reattach a transaction */
+        MULTISIG_TRANSFER /**< make a transfer from a multisig address */
     };
 
-signals:
+    /**
+     * @brief Start an IOTA API request
+     * @param request - the API command
+     * @param argList - extra command arguments
+     */
+    virtual void startAPIRequest(RequestType request, const QStringList &argList) = 0;
 
+    /**
+     * @brief Stop the current ongoing API request, if any
+     */
+    virtual void stopCurrentAPIRequest() = 0;
+
+signals:
+    /**
+     * @brief Current request finished successfully
+     * @param request - the API command used
+     * @param responseMessage - output of the API request
+     */
+    void requestFinished(RequestType request, const QString &responseMessage);
+
+    /**
+     * @brief Current request failed with error
+     * @param request - the API command used
+     * @param errorMessage - error output of the API request
+     */
+    void requestError(RequestType request, const QString &errorMessage);
 };
 
 #endif // ABSTRACTTANGLEAPI_H
