@@ -32,8 +32,16 @@ public:
      */
     void setReattachView();
 
+private slots:
+    void okButtonClicked();
+    void cancelButtonClicked();
+    void promoteLineEditChanged();
+    void promoteButtonClicked();
+
 private:
     Ui::PromoteReattachDialog *ui;
+    QPushButton *m_okButton;
+    QPushButton *m_cancelButton;
 };
 
 #endif // PROMOTEREATTACHDIALOG_H
