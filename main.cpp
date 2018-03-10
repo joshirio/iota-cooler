@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
                       ":/languages");
     IOTAcoolerApp.installTranslator(&qtTranslator);
     QTranslator myappTranslator;
-    myappTranslator.load("symphytum_" + QLocale::system().name(), ":/languages");
+    myappTranslator.load("iotacooler_" + QLocale::system().name(), ":/languages");
     IOTAcoolerApp.installTranslator(&myappTranslator);
 
     //init gui
