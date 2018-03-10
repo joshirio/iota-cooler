@@ -64,7 +64,7 @@ void PromoteReattachDialog::okButtonClicked()
 
 void PromoteReattachDialog::cancelButtonClicked()
 {
-    //TODO: should stop current operation (promote or reattach)
+    m_tangleAPI->stopCurrentAPIRequest();
     this->reject();
 }
 
@@ -85,6 +85,13 @@ void PromoteReattachDialog::promoteButtonClicked()
     ui->promoteLineEdit->hide();
     ui->tailTxHashLabel->hide();
     ui->okButton->setEnabled(false);
+
+    //promote
+    QString tailTxHash = ui->promoteLineEdit->text().trimmed();
+    QStringList args;
+    args.append(tailTxHash);
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::RequestType::Promote,
+                                 args);
 }
 
 void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,

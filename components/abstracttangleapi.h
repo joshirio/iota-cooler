@@ -23,11 +23,11 @@ public:
      * @brief The RequestType enum
      */
     enum RequestType {
-        NO_REQUEST, /**< Invalid request status */
-        GET_BALANCE, /**< Get balance of an address */
-        PROMOTE, /**< Promote a transaction */
-        REATTACH, /**< Reattach a transaction */
-        MULTISIG_TRANSFER /**< make a transfer from a multisig address */
+        NoRequest, /**< Invalid request status */
+        GetBalance, /**< Get balance of an address */
+        Promote, /**< Promote a transaction */
+        Reattach, /**< Reattach a transaction */
+        MultisigTransfer /**< make a transfer from a multisig address */
     };
 
     /**

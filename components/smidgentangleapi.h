@@ -9,18 +9,28 @@
 #define SMIDGENTANGLEAPI_H
 
 #include "abstracttangleapi.h"
+#include <QtCore/QProcess>
 
 class SmidgenTangleAPI : public AbstractTangleAPI
 {
     Q_OBJECT
 public:
     explicit SmidgenTangleAPI(QObject *parent = nullptr);
+    ~SmidgenTangleAPI();
 
     void startAPIRequest(RequestType request, const QStringList &argList);
     void stopCurrentAPIRequest();
 
+private slots:
+    void processError(QProcess::ProcessError error);
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void processReadyReadOutput();
+
 private:
     RequestType m_currentRequest;
+    QProcess *m_process;
+    QStringList m_requestArgs;
+    QString m_processOutput;
 };
 
 #endif // SMIDGENTANGLEAPI_H
