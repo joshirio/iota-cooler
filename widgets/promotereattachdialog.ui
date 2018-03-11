@@ -31,7 +31,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="tailTxHashLabel">
+          <widget class="QLabel" name="tailTxHashLabelPromote">
            <property name="toolTip">
             <string>The &lt;b&gt;tail transaction&lt;/b&gt; is the first transaction (at index 0) of a bundle.&lt;br /&gt;
 Please enter the hash of the first transaction in order to promote the bundle with all its transactions.&lt;br /&gt;
@@ -145,19 +145,129 @@ or visit the IOTAcooler wiki on GitHub for examples.</string>
       </layout>
      </widget>
      <widget class="QWidget" name="page_2">
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>30</y>
-         <width>201</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Reattach a transaction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Reattach a transaction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="tailTxHashLabelReattach">
+           <property name="toolTip">
+            <string>The &lt;b&gt;tail transaction&lt;/b&gt; is the first transaction (at index 0) of a bundle.&lt;br /&gt;
+Please enter the hash of the first transaction in order to promote the bundle with all its transactions.&lt;br /&gt;
+To find the tail transaction use a tangle explorer like thetangle.org &lt;br /&gt;
+or visit the IOTAcooler wiki on GitHub for examples.</string>
+           </property>
+           <property name="text">
+            <string>Tail transaction hash:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="reattachLineEdit">
+           <property name="toolTip">
+            <string>The &lt;b&gt;tail transaction&lt;/b&gt; is the first transaction (at index 0) of a bundle.&lt;br /&gt;
+Please enter the hash of the first transaction in order to promote the bundle with all its transactions.&lt;br /&gt;
+To find the tail transaction use a tangle explorer like thetangle.org &lt;br /&gt;
+or visit the IOTAcooler wiki on GitHub for examples.</string>
+           </property>
+           <property name="placeholderText">
+            <string>first (index 0) tx hash of bundle</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="reattachButton">
+           <property name="toolTip">
+            <string>Only active if the transaction hash is valid:&lt;br /&gt;
+&lt;b&gt;81 characters&lt;/b&gt; consisting of [A-Z9]</string>
+           </property>
+           <property name="text">
+            <string>&amp;Reattach</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="reattachStatusLabel">
+           <property name="text">
+            <string>Reattaching...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QProgressBar" name="reattachProgressBar">
+           <property name="maximum">
+            <number>0</number>
+           </property>
+           <property name="value">
+            <number>-1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="reattachResultLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>r</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>82</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

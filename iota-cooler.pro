@@ -45,7 +45,8 @@ SOURCES += \
     widgets/aboutdialog.cpp \
     components/abstracttangleapi.cpp \
     components/smidgentangleapi.cpp \
-    widgets/promotereattachdialog.cpp
+    widgets/promotereattachdialog.cpp \
+    utils/utilsiota.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -59,7 +60,8 @@ HEADERS += \
     widgets/aboutdialog.h \
     components/abstracttangleapi.h \
     components/smidgentangleapi.h \
-    widgets/promotereattachdialog.h
+    widgets/promotereattachdialog.h \
+    utils/utilsiota.h
 
 FORMS += \
         widgets/mainwindow.ui \

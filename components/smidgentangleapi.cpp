@@ -50,6 +50,11 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         if (argList.size() > 0)
             extraArgs.append(argList.at(0)); //tail tx hash
         break;
+    case Reattach:
+        command = "reattach";
+        if (argList.size() > 0)
+            extraArgs.append(argList.at(0)); //tail tx hash
+        break;
     case GetBalance:
         command = "get-balance";
         extraArgs = m_requestArgs;
@@ -162,6 +167,40 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 error = true;
             } else if (result.contains("Invalid transaction")) {
                 errorMessage = tr("The entered transaction hash in not a valid transaction!");
+                error = true;
+            } else if (result.contains("No valid transaction hash given")) {
+                errorMessage = tr("The entered data is not a valid transaction hash!"
+                                  "<br />Allowed format: 81 long character string of A-Z and 9");
+                error = true;
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case Reattach:
+            if (result.contains("Successfully")) {
+                QString bundleHash = "";
+                QStringList s = result.split("Bundle:", QString::SkipEmptyParts);
+                if (s.size() >= 2) {
+                    bundleHash = s.at(1);
+                    bundleHash = bundleHash.trimmed();
+                }
+                message = tr("Transaction successfully reattached!"
+                             "<br /> New bundle hash: "
+                             "<a href='https://thetangle.org/bundle/%1'>%1</a>")
+                        .arg(bundleHash);
+            } else if (result.contains("Invalid tail")) {
+                errorMessage = tr("The entered transaction hash in not a tail transaction hash!"
+                                  "<br />Use <a href='https://thetangle.org'>thetangle.org</a> "
+                                  "to find the hash of the first transaction (bundle index 0).");
+                error = true;
+            } else if (result.contains("Invalid Bundle")) {
+                errorMessage = tr("The entered transaction hash in not a valid transaction!");
+                error = true;
+            } else if (result.contains("No valid transaction hash given")) {
+                errorMessage = tr("The entered data is not a valid transaction hash!"
+                                  "<br />Allowed format: 81 long character string of A-Z and 9");
                 error = true;
             } else {
                 //unexpected response

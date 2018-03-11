@@ -1,6 +1,7 @@
 #include "promotereattachdialog.h"
 #include "ui_promotereattachdialog.h"
 #include "../components/smidgentangleapi.h"
+#include "../utils/utilsiota.h"
 
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
@@ -8,7 +9,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QDialogButtonBox>
-#include <QtCore/QRegularExpression>
 
 PromoteReattachDialog::PromoteReattachDialog(QWidget *parent) :
     QDialog(parent),
@@ -28,6 +28,10 @@ PromoteReattachDialog::PromoteReattachDialog(QWidget *parent) :
             this, &PromoteReattachDialog::promoteButtonClicked);
     connect(ui->promoteLineEdit, &QLineEdit::textChanged,
             this, &PromoteReattachDialog::promoteLineEditChanged);
+    connect(ui->reattachButton, &QPushButton::clicked,
+            this, &PromoteReattachDialog::reattachButtonClicked);
+    connect(ui->reattachLineEdit, &QLineEdit::textChanged,
+            this, &PromoteReattachDialog::reattachLineEditChanged);
 
     //IOTA API
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -55,6 +59,11 @@ void PromoteReattachDialog::setPromoteView()
 void PromoteReattachDialog::setReattachView()
 {
     ui->stackedWidget->setCurrentIndex(1);
+    ui->reattachResultLabel->clear();
+    ui->reattachResultLabel->hide();
+    ui->reattachProgressBar->hide();
+    ui->reattachStatusLabel->hide();
+    ui->reattachButton->setEnabled(false);
 }
 
 void PromoteReattachDialog::okButtonClicked()
@@ -72,8 +81,7 @@ void PromoteReattachDialog::promoteLineEditChanged()
 {
     QString txHash = ui->promoteLineEdit->text().trimmed().toUpper();
     //check if tx is valid
-    QRegularExpression reg("^[A-Z9]{81}$");
-    bool valid = reg.match(txHash).hasMatch();
+    bool valid = UtilsIOTA::isValidTxHash(txHash);
     ui->promoteButton->setEnabled(valid);
 }
 
@@ -84,7 +92,7 @@ void PromoteReattachDialog::promoteButtonClicked()
     ui->promoteProgressBar->show();
     ui->promoteButton->hide();
     ui->promoteLineEdit->hide();
-    ui->tailTxHashLabel->hide();
+    ui->tailTxHashLabelPromote->hide();
     ui->okButton->setEnabled(false);
 
     //promote
@@ -92,6 +100,32 @@ void PromoteReattachDialog::promoteButtonClicked()
     QStringList args;
     args.append(tailTxHash);
     m_tangleAPI->startAPIRequest(AbstractTangleAPI::RequestType::Promote,
+                                 args);
+}
+
+void PromoteReattachDialog::reattachLineEditChanged()
+{
+    QString txHash = ui->reattachLineEdit->text().trimmed().toUpper();
+    //check if tx is valid
+    bool valid = UtilsIOTA::isValidTxHash(txHash);
+    ui->reattachButton->setEnabled(valid);
+}
+
+void PromoteReattachDialog::reattachButtonClicked()
+{
+    ui->reattachResultLabel->clear();
+    ui->reattachStatusLabel->show();
+    ui->reattachProgressBar->show();
+    ui->reattachButton->hide();
+    ui->reattachLineEdit->hide();
+    ui->tailTxHashLabelReattach->hide();
+    ui->okButton->setEnabled(false);
+
+    //reattach
+    QString tailTxHash = ui->reattachLineEdit->text().trimmed();
+    QStringList args;
+    args.append(tailTxHash);
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::RequestType::Reattach,
                                  args);
 }
 
@@ -108,10 +142,16 @@ void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestT
         ui->promoteProgressBar->hide();
         ui->promoteButton->show();
         ui->promoteLineEdit->show();
-        ui->tailTxHashLabel->show();
+        ui->tailTxHashLabelPromote->show();
         break;
     case AbstractTangleAPI::RequestType::Reattach:
-        //ui->reattachResultLabel
+        ui->reattachResultLabel->setText(message);
+        ui->reattachResultLabel->show();
+        ui->reattachStatusLabel->hide();
+        ui->reattachProgressBar->hide();
+        ui->reattachButton->show();
+        ui->reattachLineEdit->show();
+        ui->tailTxHashLabelReattach->show();
         break;
     default:
         break;

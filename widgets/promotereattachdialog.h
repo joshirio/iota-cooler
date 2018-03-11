@@ -38,6 +38,8 @@ private slots:
     void cancelButtonClicked();
     void promoteLineEditChanged();
     void promoteButtonClicked();
+    void reattachLineEditChanged();
+    void reattachButtonClicked();
     void tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
                                   const QString &message);
     void tangleAPIRequestError(AbstractTangleAPI::RequestType request,
