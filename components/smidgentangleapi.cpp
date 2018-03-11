@@ -28,14 +28,14 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     QString smidgenPath;
 
 #ifdef Q_OS_WIN
-    smidgenPath =  "smidgen.exe";
+    smidgenPath =  "iotacooler-smidgen.exe";
 #endif
 #ifdef Q_OS_OSX
     smidgenPath = QString("/Applications/IOTAcooler.app/Contents/MacOS/");
-    smidgenPath.append("smidgen");
+    smidgenPath.append("iotacooler-smidgen");
 #endif
 #ifdef Q_OS_LINUX
-    smidgenPath = "./smidgen-linux";
+    smidgenPath = "./iotacooler-smidgen";
 #endif
 
     //init command and etra args
