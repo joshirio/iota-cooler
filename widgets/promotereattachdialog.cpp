@@ -79,6 +79,7 @@ void PromoteReattachDialog::promoteLineEditChanged()
 
 void PromoteReattachDialog::promoteButtonClicked()
 {
+    ui->promoteResultLabel->clear();
     ui->promoteStatusLabel->show();
     ui->promoteProgressBar->show();
     ui->promoteButton->hide();
@@ -97,11 +98,28 @@ void PromoteReattachDialog::promoteButtonClicked()
 void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
                                                      const QString &message)
 {
+    ui->okButton->setEnabled(true);
 
+    switch (request) {
+    case AbstractTangleAPI::RequestType::Promote:
+        ui->promoteResultLabel->setText(message);
+        ui->promoteResultLabel->show();
+        ui->promoteStatusLabel->hide();
+        ui->promoteProgressBar->hide();
+        ui->promoteButton->show();
+        ui->promoteLineEdit->show();
+        ui->tailTxHashLabel->show();
+        break;
+    case AbstractTangleAPI::RequestType::Reattach:
+        //ui->reattachResultLabel
+        break;
+    default:
+        break;
+    }
 }
 
 void PromoteReattachDialog::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
                                                   const QString &message)
 {
-
+    tangleAPIRequestFinished(request, message);
 }

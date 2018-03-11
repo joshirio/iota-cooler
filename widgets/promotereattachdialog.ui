@@ -112,8 +112,20 @@ or visit the IOTAcooler wiki on GitHub for examples.</string>
        </item>
        <item>
         <widget class="QLabel" name="promoteResultLabel">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
          <property name="text">
           <string>r</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>

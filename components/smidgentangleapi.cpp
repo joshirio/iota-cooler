@@ -40,13 +40,20 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
 
     //init command and etra args
     QStringList extraArgs; //extra arguments for specific command
+    m_currentRequest = request;
     switch (m_currentRequest) {
     case NoRequest:
         //skip
         break;
+    case Promote:
+        command = "promote";
+        if (argList.size() > 0)
+            extraArgs.append(argList.at(0)); //tail tx hash
+        break;
     case GetBalance:
         command = "get-balance";
         extraArgs = m_requestArgs;
+        //TODO: just an example rm this
         extraArgs.append("RF9TQPFMGIWUTFWYHLVTDAUIKPGEKWIFBVELXVESPIMFPMQPPXHANGGYBJ9THRXRFFHWRQGQSNPVGJBJDXHNKNNSVY");
         extraArgs.append("--provider");
         extraArgs.append(DefinitionHolder::DEFAULT_NODE);
@@ -90,6 +97,7 @@ void SmidgenTangleAPI::processError(QProcess::ProcessError error)
     //if process has been killed (request is cleared)
     if (m_currentRequest == NoRequest) return;
 
+    RequestType request = m_currentRequest;
     QString errorMessage;
 
     switch (error) {
@@ -119,8 +127,9 @@ void SmidgenTangleAPI::processError(QProcess::ProcessError error)
 
     //clean request args
     m_requestArgs.clear();
+    m_currentRequest = NoRequest;
 
-    emit requestError(m_currentRequest, errorMessage);
+    emit requestError(request, errorMessage);
 }
 
 void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -130,20 +139,54 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
     //copy request args and clean them for future requests
     QStringList requestArgs = m_requestArgs;
     m_requestArgs.clear();
+    RequestType request = m_currentRequest;
+    m_currentRequest = NoRequest;
 
     bool error = false;
-    QString errorMessage;
+    QString errorMessage, message;
 
     if (exitStatus == QProcess::NormalExit) {
         QString result = m_processOutput;
 
-        //TODO handle requests (switch)
-
-        if (error) {
-            //TODO: create helpful error message
-            emit requestError(m_currentRequest, errorMessage);
+        switch (request) {
+        case Promote:
+            if (result.contains("successfully")) {
+                message = tr("Transaction successfully promoted!");
+            } else if (result.contains("too old")) {
+                errorMessage = tr("Transaction too old, try to reattach it!");
+                error = true;
+            } else if (result.contains("not a tail")) {
+                errorMessage = tr("The entered transaction hash in not a tail transaction hash!"
+                                  "<br />Use <a href='https://thetangle.org'>thetangle.org</a> "
+                                  "to find the hash of the first transaction (bundle index 0).");
+                error = true;
+            } else if (result.contains("Invalid transaction")) {
+                errorMessage = tr("The entered transaction hash in not a valid transaction!");
+                error = true;
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        default:
+            //unexpected response
+            errorMessage = result;
+            error = true;
+            break;
         }
+    } else {
+        //unexpected response
+        errorMessage = tr("Process finished with non zero exit code (crash).");
+        error = true;
     }
+
+    if (error) {
+        emit requestError(request, errorMessage);
+    } else {
+        emit requestFinished(request, message);
+    }
+
 }
 
 void SmidgenTangleAPI::processReadyReadOutput()
