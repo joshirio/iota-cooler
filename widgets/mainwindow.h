@@ -29,11 +29,19 @@ private slots:
     void settingsActionTriggered();
     void promoteActionTriggered();
     void reattachActionTriggered();
+    void newWalletButtonClicked();
+    void openWalletButtonClicked();
 
 private:
     void createMenus();
     void createConnections();
     void loadSettings();
+
+    /**
+     * @brief Ask user if the device is a online or offline signer
+     * and store/restore choice
+     */
+    void checkDeviceRole();
 
     Ui::MainWindow *ui;
 

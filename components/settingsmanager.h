@@ -9,6 +9,7 @@
 #define SETTINGSMANAGER_H
 
 #include <QObject>
+#include "../utils/utilsiota.h"
 
 class QSettings;
 
@@ -46,6 +47,18 @@ public:
      * @param url - node url (protocol://host:port)
      */
     void setDefaultIOTANodeUrl(const QString &url);
+
+    /**
+     * @brief Get current role for the device
+     * @return UtilsIOTA::DeviceRole -  role (enum)
+     */
+    UtilsIOTA::DeviceRole getDeviceRole();
+
+    /**
+     * @brief Set current device role
+     * @param role - UtilsIOTA::DeviceRole (enum)
+     */
+    void setDeviceRole(UtilsIOTA::DeviceRole role);
 
 private:
     QSettings *m_settings;

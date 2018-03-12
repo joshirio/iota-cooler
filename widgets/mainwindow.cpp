@@ -10,6 +10,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QUrl>
+#include <QtWidgets/QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -67,6 +68,33 @@ void MainWindow::reattachActionTriggered()
     d.exec();
 }
 
+void MainWindow::newWalletButtonClicked()
+{
+    checkDeviceRole();
+
+    //only online role allowed
+    SettingsManager sm(this);
+    UtilsIOTA::DeviceRole role = sm.getDeviceRole();
+    if (role == UtilsIOTA::DeviceRole::OfflineSigner) {
+        int r = QMessageBox::warning(this, tr("Online role is required"),
+                             tr("Creating wallets requires an axctive internet connection!"
+                                "<br />Current device role is <b>offline signer</b>."
+                                "<br><b>Do you want to change current device role to online signer?</b>"),
+                             QMessageBox::Yes | QMessageBox::No);
+        if (r == QMessageBox::Yes) {
+            sm.setDeviceRole(UtilsIOTA::DeviceRole::OnlineSigner);
+        } else {
+            //not allowed
+            return;
+        }
+    }
+}
+
+void MainWindow::openWalletButtonClicked()
+{
+    checkDeviceRole();
+}
+
 void MainWindow::createMenus()
 {
     m_fileMenu = ui->menuBar->addMenu(tr("&File"));
@@ -118,6 +146,10 @@ void MainWindow::createConnections()
             this, &MainWindow::promoteActionTriggered);
     connect(m_reattachAction, &QAction::triggered,
             this, &MainWindow::reattachActionTriggered);
+    connect(ui->newWalletButton, &QPushButton::clicked,
+            this, &MainWindow::newWalletButtonClicked);
+    connect(ui->openWalletButton, &QPushButton::clicked,
+            this, &MainWindow::openWalletButtonClicked);
 }
 
 void MainWindow::loadSettings()
@@ -126,4 +158,37 @@ void MainWindow::loadSettings()
 
     //default node
     UtilsIOTA::currentNodeUrl = sm.getDefaultIOTANodeUrl();
+}
+
+void MainWindow::checkDeviceRole()
+{
+    SettingsManager sm(this);
+    UtilsIOTA::DeviceRole role = sm.getDeviceRole();
+    if (role == UtilsIOTA::DeviceRole::Undefined) {
+        QMessageBox box(this);
+        box.setIcon(QMessageBox::Question);
+        box.setWindowTitle(tr("Device Role"));
+        box.setText("Welcome to IOTAcooler, the cold transaction signer."
+                    "<br />A cold storage wallet has two components:"
+                    "<br />1. An online wallet, to prepare and broadcast transactions"
+                    "<br />2. An offline signer, which sings transaction only, "
+                    "while keeping the seed (private key) offline"
+                    "<br /><b>Which role should this device take?</b> ");
+        QPushButton *onlineButton = box.addButton(tr("Online wallet"),
+                                                         QMessageBox::NoRole);
+        QPushButton *offlineButton = box.addButton(tr("Offline signer"),
+                                                    QMessageBox::YesRole);
+        box.addButton(QMessageBox::Abort);
+        box.setDefaultButton(onlineButton);
+        box.setWindowModality(Qt::WindowModal);
+        box.exec();
+
+        if (box.clickedButton() == onlineButton) {
+            sm.setDeviceRole(UtilsIOTA::DeviceRole::OnlineSigner);
+        } else if (box.clickedButton() == offlineButton) {
+            sm.setDeviceRole(UtilsIOTA::DeviceRole::OfflineSigner);
+        } else {
+            qApp->quit();
+        }
+    }
 }

@@ -15,6 +15,16 @@ class UtilsIOTA
 public:
     static bool isValidTxHash(const QString &txHash);
     static QString currentNodeUrl;
+
+    /**
+     * @brief The DeviceRole enum
+     */
+    enum DeviceRole {
+        Undefined, /**< Undefined role */
+        OnlineSigner, /**< Device broadcasts and prepare transactions */
+        OfflineSigner /**< Device only signs transactions securely offline */
+    };
+
 private:
     UtilsIOTA();
 };

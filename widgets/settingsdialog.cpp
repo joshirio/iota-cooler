@@ -40,16 +40,27 @@ void SettingsDialog::nodeLineEditEdited()
     }
 }
 
+void SettingsDialog::deviceRoleComboBoxChanged(int index)
+{
+    sm->setDeviceRole((UtilsIOTA::DeviceRole)
+                      index);
+}
+
 void SettingsDialog::createConnections()
 {
     connect(ui->defaultNodeButton, &QPushButton::clicked,
             this, &SettingsDialog::defaultNodeButtonClicked);
     connect(ui->nodeLineEdit, &QLineEdit::editingFinished,
             this, &SettingsDialog::nodeLineEditEdited);
+    connect(ui->deviceRoleComboBox,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+            this, &SettingsDialog::deviceRoleComboBoxChanged);
 }
 
 void SettingsDialog::loadSettings()
 {
     QString nodeUrl = sm->getDefaultIOTANodeUrl();
     ui->nodeLineEdit->setText(nodeUrl);
+
+    ui->deviceRoleComboBox->setCurrentIndex((int) sm->getDeviceRole());
 }

@@ -27,6 +27,7 @@ public:
 private slots:
     void defaultNodeButtonClicked();
     void nodeLineEditEdited();
+    void deviceRoleComboBoxChanged(int index);
 
 private:
     void createConnections();

@@ -54,3 +54,21 @@ QString SettingsManager::getDefaultIOTANodeUrl()
 
     return url;
 }
+
+UtilsIOTA::DeviceRole SettingsManager::getDeviceRole()
+{
+    UtilsIOTA::DeviceRole role;
+
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    role = (UtilsIOTA::DeviceRole) m_settings->value("deviceRole", 0).toInt();
+    m_settings->endGroup();
+
+    return role;
+}
+
+void SettingsManager::setDeviceRole(UtilsIOTA::DeviceRole role)
+{
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    m_settings->setValue("deviceRole", (int) role);
+    m_settings->endGroup();
+}

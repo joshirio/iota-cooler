@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>203</height>
+    <width>490</width>
+    <height>214</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="toolTip">
         <string>URL of a public IRI node to use for API requests</string>
@@ -29,7 +29,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QLineEdit" name="nodeLineEdit">
        <property name="toolTip">
         <string>URL of a public IRI node to use for API requests</string>
@@ -39,12 +39,61 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="defaultNodeButton">
        <property name="text">
         <string>&amp;Default</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="toolTip">
+        <string>The role of the current device in use:&lt;br /&gt;
+&lt;b&gt;Online signer:&lt;/b&gt; device only prepares and broadcasts transactions&lt;br /&gt;
+&lt;b&gt;Offline signer:&lt;/b&gt; device only signs transactions, while offline, to keep  the private key safe from remote attackers</string>
+       </property>
+       <property name="text">
+        <string>Device role:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="deviceRoleComboBox">
+       <property name="toolTip">
+        <string>The role of the current device in use:&lt;br /&gt;
+&lt;b&gt;Online signer:&lt;/b&gt; device only prepares and broadcasts transactions&lt;br /&gt;
+&lt;b&gt;Offline signer:&lt;/b&gt; device only signs transactions, while offline, to keep  the private key safe from remote attackers</string>
+       </property>
+       <item>
+        <property name="text">
+         <string/>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Online signer</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Offline signer</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
