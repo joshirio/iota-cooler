@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
 #include "aboutdialog.h"
+#include "createwalletwizard.h"
 #include "promotereattachdialog.h"
 #include "../utils/definitionholder.h"
 #include "../utils/utilsiota.h"
@@ -14,13 +15,15 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_createWalletWidget(0)
 {
     ui->setupUi(this);
     m_menuBar = ui->menuBar;
     ui->mainToolBar->hide();
     ui->openWalletButton->setFocus();
 
+    loadWidgets();
     createMenus();
     createConnections();
     loadSettings();
@@ -88,11 +91,20 @@ void MainWindow::newWalletButtonClicked()
             return;
         }
     }
+
+    //setup view
+    ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
 }
 
 void MainWindow::openWalletButtonClicked()
 {
     checkDeviceRole();
+}
+
+void MainWindow::loadWidgets()
+{
+    m_createWalletWidget = new CreateWalletWizard(this);
+    ui->stackedWidget->addWidget(m_createWalletWidget);
 }
 
 void MainWindow::createMenus()

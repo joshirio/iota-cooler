@@ -46,7 +46,8 @@ SOURCES += \
     components/abstracttangleapi.cpp \
     components/smidgentangleapi.cpp \
     widgets/promotereattachdialog.cpp \
-    utils/utilsiota.cpp
+    utils/utilsiota.cpp \
+    widgets/createwalletwizard.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -61,13 +62,15 @@ HEADERS += \
     components/abstracttangleapi.h \
     components/smidgentangleapi.h \
     widgets/promotereattachdialog.h \
-    utils/utilsiota.h
+    utils/utilsiota.h \
+    widgets/createwalletwizard.h
 
 FORMS += \
         widgets/mainwindow.ui \
     widgets/settingsdialog.ui \
     widgets/aboutdialog.ui \
-    widgets/promotereattachdialog.ui
+    widgets/promotereattachdialog.ui \
+    widgets/createwalletwizard.ui
 
 ICON = resources/icons/iotacooler.icns # for mac
 RC_FILE = resources/iotacooler.rc # for windows

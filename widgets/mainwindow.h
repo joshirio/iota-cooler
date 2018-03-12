@@ -33,6 +33,7 @@ private slots:
     void openWalletButtonClicked();
 
 private:
+    void loadWidgets();
     void createMenus();
     void createConnections();
     void loadSettings();
@@ -56,6 +57,7 @@ private:
     QAction *m_promoteAction;
     QAction *m_reattachAction;
     QAction *m_helpAction;
+    QWidget *m_createWalletWidget;
 };
 
 #endif // MAINWINDOW_H
