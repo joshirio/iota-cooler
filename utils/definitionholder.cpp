@@ -8,17 +8,17 @@
 // Static variables initialization
 //-----------------------------------------------------------------------------
 
-QString DefinitionHolder::VERSION = "1.0";
-QString DefinitionHolder::NAME = "IOTAcooler";
-QString DefinitionHolder::ORG = "iotacooler.github.io";
-QString DefinitionHolder::UPDATE_URL = "https://joshirio.github.io/iotacooler/update/iotacooler/updates";
-QString DefinitionHolder::DOWNLOAD_URL = "https://joshirio.github.io/iotacooler/update.html";
-QString DefinitionHolder::HELP_URL = "https://github.com/joshirio/iota-cooler/wiki";
-int DefinitionHolder::SOFTWARE_BUILD = 1;
-bool DefinitionHolder::APP_STORE = false;
-bool DefinitionHolder::APPIMAGE_LINUX = false;
-bool DefinitionHolder::WIN_PORTABLE = false;
-QString DefinitionHolder::COPYRIGHT =
+const QString DefinitionHolder::VERSION = "1.0";
+const QString DefinitionHolder::NAME = "IOTAcooler";
+const QString DefinitionHolder::ORG = "iotacooler.github.io";
+const QString DefinitionHolder::UPDATE_URL = "https://joshirio.github.io/iotacooler/update/iotacooler/updates";
+const QString DefinitionHolder::DOWNLOAD_URL = "https://joshirio.github.io/iotacooler/update.html";
+const QString DefinitionHolder::HELP_URL = "https://github.com/joshirio/iota-cooler/wiki";
+const int DefinitionHolder::SOFTWARE_BUILD = 1;
+const bool DefinitionHolder::APP_STORE = false;
+const bool DefinitionHolder::APPIMAGE_LINUX = false;
+const bool DefinitionHolder::WIN_PORTABLE = false;
+const QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));
-QString DefinitionHolder::DEFAULT_NODE = "https://field.carriota.com:443";
+const QString DefinitionHolder::DEFAULT_NODE = "https://field.carriota.com:443";

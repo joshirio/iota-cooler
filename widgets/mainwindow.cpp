@@ -4,6 +4,8 @@
 #include "aboutdialog.h"
 #include "promotereattachdialog.h"
 #include "../utils/definitionholder.h"
+#include "../utils/utilsiota.h"
+#include "../components/settingsmanager.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
@@ -20,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createMenus();
     createConnections();
+    loadSettings();
 }
 
 MainWindow::~MainWindow()
@@ -115,4 +118,12 @@ void MainWindow::createConnections()
             this, &MainWindow::promoteActionTriggered);
     connect(m_reattachAction, &QAction::triggered,
             this, &MainWindow::reattachActionTriggered);
+}
+
+void MainWindow::loadSettings()
+{
+    SettingsManager sm(this);
+
+    //default node
+    UtilsIOTA::currentNodeUrl = sm.getDefaultIOTANodeUrl();
 }

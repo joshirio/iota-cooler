@@ -1,5 +1,6 @@
 #include "smidgentangleapi.h"
 #include "../utils/definitionholder.h"
+#include "../utils/utilsiota.h"
 
 SmidgenTangleAPI::SmidgenTangleAPI(QObject *parent) :
     AbstractTangleAPI(parent), m_currentRequest(RequestType::NoRequest)
@@ -60,14 +61,15 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         extraArgs = m_requestArgs;
         //TODO: just an example rm this
         extraArgs.append("RF9TQPFMGIWUTFWYHLVTDAUIKPGEKWIFBVELXVESPIMFPMQPPXHANGGYBJ9THRXRFFHWRQGQSNPVGJBJDXHNKNNSVY");
-        extraArgs.append("--provider");
-        extraArgs.append(DefinitionHolder::DEFAULT_NODE);
+
         break;
     }
 
     //init args
     args.append(command);
     args.append(extraArgs);
+    args.append("--provider");
+    args.append(UtilsIOTA::currentNodeUrl);
 
     m_processOutput.clear();
     m_process->start(smidgenPath, args);

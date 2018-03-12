@@ -33,6 +33,7 @@ private slots:
 private:
     void createMenus();
     void createConnections();
+    void loadSettings();
 
     Ui::MainWindow *ui;
 

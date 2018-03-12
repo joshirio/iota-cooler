@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include "../utils/definitionholder.h"
+#include "../utils/utilsiota.h"
 #include "../components/settingsmanager.h"
 
 #include <QtWidgets/QPushButton>
@@ -33,6 +34,7 @@ void SettingsDialog::nodeLineEditEdited()
     QString url = ui->nodeLineEdit->text().trimmed();
     if (url.contains("://")) {
         sm->setDefaultIOTANodeUrl(url);
+        UtilsIOTA::currentNodeUrl = url;
     } else {
         ui->nodeLineEdit->undo();
     }

@@ -14,6 +14,7 @@ class UtilsIOTA
 {
 public:
     static bool isValidTxHash(const QString &txHash);
+    static QString currentNodeUrl;
 private:
     UtilsIOTA();
 };
