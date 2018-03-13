@@ -23,6 +23,14 @@ public:
     explicit CreateWalletWizard(QWidget *parent = 0);
     ~CreateWalletWizard();
 
+signals:
+    /** Emitted when user cancels the wizard */
+    void walletCreationCancelled();
+
+private slots:
+    void infoNextButtonClicked();
+    void infoCancelButtonClicked();
+
 private:
     Ui::CreateWalletWizard *ui;
 };

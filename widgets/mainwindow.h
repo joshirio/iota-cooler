@@ -14,6 +14,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class CreateWalletWizard;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ private slots:
     void reattachActionTriggered();
     void newWalletButtonClicked();
     void openWalletButtonClicked();
+    void newWalletWizardCancelled();
 
 private:
     void loadWidgets();
@@ -57,7 +60,7 @@ private:
     QAction *m_promoteAction;
     QAction *m_reattachAction;
     QAction *m_helpAction;
-    QWidget *m_createWalletWidget;
+    CreateWalletWizard *m_createWalletWidget;
 };
 
 #endif // MAINWINDOW_H

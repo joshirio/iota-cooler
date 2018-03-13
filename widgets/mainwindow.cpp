@@ -101,6 +101,11 @@ void MainWindow::openWalletButtonClicked()
     checkDeviceRole();
 }
 
+void MainWindow::newWalletWizardCancelled()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -162,6 +167,10 @@ void MainWindow::createConnections()
             this, &MainWindow::newWalletButtonClicked);
     connect(ui->openWalletButton, &QPushButton::clicked,
             this, &MainWindow::openWalletButtonClicked);
+
+    //wallet creation wizard
+    connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCancelled,
+            this, &MainWindow::newWalletWizardCancelled);
 }
 
 void MainWindow::loadSettings()
