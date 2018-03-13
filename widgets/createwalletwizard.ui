@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>299</height>
+    <width>494</width>
+    <height>277</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -115,7 +115,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="wSaveBrowseButton">
+          <widget class="QPushButton" name="wConfBrowseButton">
            <property name="text">
             <string>&amp;Browse</string>
            </property>
@@ -228,6 +228,66 @@ Your offline multisig seed is never stored in the wallet file.</string>
            </property>
            <property name="text">
             <string>&amp;Next</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_3">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10104; Wallet file initialization [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Your wallet file has been successfully configured.&lt;br /&gt;
+The next step requires the &lt;b&gt;offline signer&lt;/b&gt; device to initialize your wallet file.&lt;br /&gt;&lt;br /&gt;
+Please close the application and open your newly created wallet file with IOTAcooler on your &lt;b&gt;offline&lt;/b&gt; device, in order to proceed.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>109</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="wInitOnlineQuitButton">
+           <property name="text">
+            <string>&amp;Quit</string>
            </property>
           </widget>
          </item>

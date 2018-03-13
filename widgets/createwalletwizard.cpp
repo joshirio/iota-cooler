@@ -3,6 +3,10 @@
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QFileDialog>
+#include <QtCore/QStandardPaths>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QApplication>
 
 CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     QWidget(parent),
@@ -16,6 +20,18 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::infoCancelButtonClicked);
     connect(ui->wConfCancelButton, &QPushButton::clicked,
             this, &CreateWalletWizard::infoCancelButtonClicked);
+    connect(ui->wConfBrowseButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wConfBrowseButtonClicked);
+    connect(ui->wPathLineEdit, &QLineEdit::textChanged,
+            this, &CreateWalletWizard::wConfUpdateNextButtonState);
+    connect(ui->wpLineEdit, &QLineEdit::textChanged,
+            this, &CreateWalletWizard::wConfUpdateNextButtonState);
+    connect(ui->wp2LineEdit, &QLineEdit::textChanged,
+            this, &CreateWalletWizard::wConfUpdateNextButtonState);
+    connect(ui->wConfNextButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wConfNextButtonClicked);
+    connect(ui->wInitOnlineQuitButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wInitOnlineQuitButtonClicked);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -32,4 +48,39 @@ void CreateWalletWizard::infoCancelButtonClicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
     emit walletCreationCancelled();
+}
+
+void CreateWalletWizard::wConfBrowseButtonClicked()
+{
+    QString documentsDir = QStandardPaths::standardLocations(
+                QStandardPaths::DocumentsLocation).at(0);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Wallet File"),
+                                                    documentsDir + "/" + "coldwallet",
+                                                    tr("IOTAcooler Wallet(*.icwl)"));
+    if (fileName.isEmpty())
+        return;
+    if (!fileName.contains(".icwl"))
+        fileName.append(".icwl");
+    ui->wPathLineEdit->setText(fileName);
+}
+
+void CreateWalletWizard::wConfUpdateNextButtonState()
+{
+    //check pass equal
+    bool passValid = ui->wpLineEdit->text() == ui->wp2LineEdit->text();
+
+    ui->wConfNextButton->setEnabled(passValid &&
+                                    (!ui->wPathLineEdit->text().trimmed().isEmpty()));
+}
+
+void CreateWalletWizard::wConfNextButtonClicked()
+{
+    //TODO: wallet file write WalletManager::createandInitWallet?
+
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+void CreateWalletWizard::wInitOnlineQuitButtonClicked()
+{
+    qApp->quit();
 }

@@ -30,6 +30,10 @@ signals:
 private slots:
     void infoNextButtonClicked();
     void infoCancelButtonClicked();
+    void wConfBrowseButtonClicked();
+    void wConfUpdateNextButtonState();
+    void wConfNextButtonClicked();
+    void wInitOnlineQuitButtonClicked();
 
 private:
     Ui::CreateWalletWizard *ui;
