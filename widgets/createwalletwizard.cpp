@@ -68,6 +68,7 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 {
     //check pass equal
     bool passValid = ui->wpLineEdit->text() == ui->wp2LineEdit->text();
+    passValid = passValid && (!ui->wpLineEdit->text().trimmed().isEmpty());
 
     ui->wConfNextButton->setEnabled(passValid &&
                                     (!ui->wPathLineEdit->text().trimmed().isEmpty()));
