@@ -14,6 +14,8 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::infoNextButtonClicked);
     connect(ui->infoCancelButtonClicked, &QPushButton::clicked,
             this, &CreateWalletWizard::infoCancelButtonClicked);
+    connect(ui->wConfCancelButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::infoCancelButtonClicked);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -28,5 +30,6 @@ void CreateWalletWizard::infoNextButtonClicked()
 
 void CreateWalletWizard::infoCancelButtonClicked()
 {
+    ui->stackedWidget->setCurrentIndex(0);
     emit walletCreationCancelled();
 }

@@ -137,7 +137,7 @@
        <item>
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>&lt;a href=&quot;https://thetangle.org/address/WQEEXMP9FMHOVTTAHFDRRXMWBDRXUKPQJUQFSVBFJNSDRHKCPZLBHVQYCEPTFNRAQQDM9SPLADPIEGDIXASNJUSMUW&quot;&gt;Support IOTAcooler by donating some IOTA&lt;/a&gt;</string>
+          <string>&lt;a href=&quot;https://thetangle.org/address/WQEEXMP9FMHOVTTAHFDRRXMWBDRXUKPQJUQFSVBFJNSDRHKCPZLBHVQYCEPTFNRAQQDM9SPLADPIEGDIXASNJUSMUW&quot;&gt;Support IOTAcooler by donating IOTA&lt;/a&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
