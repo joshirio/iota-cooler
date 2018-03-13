@@ -47,7 +47,8 @@ SOURCES += \
     components/smidgentangleapi.cpp \
     widgets/promotereattachdialog.cpp \
     utils/utilsiota.cpp \
-    widgets/createwalletwizard.cpp
+    widgets/createwalletwizard.cpp \
+    utils/Qt-AES/qaesencryption.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -63,7 +64,8 @@ HEADERS += \
     components/smidgentangleapi.h \
     widgets/promotereattachdialog.h \
     utils/utilsiota.h \
-    widgets/createwalletwizard.h
+    widgets/createwalletwizard.h \
+    utils/Qt-AES/qaesencryption.h
 
 FORMS += \
         widgets/mainwindow.ui \
