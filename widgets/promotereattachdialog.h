@@ -46,8 +46,13 @@ private slots:
                                const QString &message);
 
 private:
+    void promoteFinishedViewState(const QString &result);
+    void reattachFinishedViewState(const QString &result);
+
     Ui::PromoteReattachDialog *ui;
     AbstractTangleAPI *m_tangleAPI;
+    int m_promoteCounter; /**< Promoting counter, usually 5 txs */
+    QString m_currentPromoteTxHash; /** Cached tx hash for multiple promotes */
 };
 
 #endif // PROMOTEREATTACHDIALOG_H

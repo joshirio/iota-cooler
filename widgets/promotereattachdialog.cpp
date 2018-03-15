@@ -12,7 +12,8 @@
 
 PromoteReattachDialog::PromoteReattachDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::PromoteReattachDialog)
+    ui(new Ui::PromoteReattachDialog),
+    m_promoteCounter(0)
 {
     ui->setupUi(this);
     ui->okButton->setAutoDefault(false);
@@ -96,9 +97,13 @@ void PromoteReattachDialog::promoteButtonClicked()
     ui->okButton->setEnabled(false);
 
     //promote
+    m_promoteCounter = 5; // promote 5 times
     QString tailTxHash = ui->promoteLineEdit->text().trimmed();
+    m_currentPromoteTxHash = tailTxHash;
     QStringList args;
-    args.append(tailTxHash);
+    args.append(m_currentPromoteTxHash);
+    m_promoteCounter--;
+    ui->promoteProgressBar->setValue(1);
     m_tangleAPI->startAPIRequest(AbstractTangleAPI::RequestType::Promote,
                                  args);
 }
@@ -132,26 +137,24 @@ void PromoteReattachDialog::reattachButtonClicked()
 void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
                                                      const QString &message)
 {
-    ui->okButton->setEnabled(true);
-
     switch (request) {
     case AbstractTangleAPI::RequestType::Promote:
-        ui->promoteResultLabel->setText(message);
-        ui->promoteResultLabel->show();
-        ui->promoteStatusLabel->hide();
-        ui->promoteProgressBar->hide();
-        ui->promoteButton->show();
-        ui->promoteLineEdit->show();
-        ui->tailTxHashLabelPromote->show();
+        //promoted at least 5 times
+        if (m_promoteCounter > 0) {
+            QStringList args;
+            args.append(m_currentPromoteTxHash);
+            m_promoteCounter--;
+            ui->promoteProgressBar->setValue(ui->promoteProgressBar->value() + 1);
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::RequestType::Promote,
+                                         args);
+        } else {
+            ui->okButton->setEnabled(true);
+            promoteFinishedViewState(message);
+        }
         break;
     case AbstractTangleAPI::RequestType::Reattach:
-        ui->reattachResultLabel->setText(message);
-        ui->reattachResultLabel->show();
-        ui->reattachStatusLabel->hide();
-        ui->reattachProgressBar->hide();
-        ui->reattachButton->show();
-        ui->reattachLineEdit->show();
-        ui->tailTxHashLabelReattach->show();
+        ui->okButton->setEnabled(true);
+        reattachFinishedViewState(message);
         break;
     default:
         break;
@@ -161,5 +164,38 @@ void PromoteReattachDialog::tangleAPIRequestFinished(AbstractTangleAPI::RequestT
 void PromoteReattachDialog::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
                                                   const QString &message)
 {
-    tangleAPIRequestFinished(request, message);
+    ui->okButton->setEnabled(true);
+
+    switch (request) {
+    case AbstractTangleAPI::RequestType::Promote:
+        promoteFinishedViewState(message);
+        break;
+    case AbstractTangleAPI::RequestType::Reattach:
+        reattachFinishedViewState(message);
+        break;
+    default:
+        break;
+    }
+}
+
+void PromoteReattachDialog::promoteFinishedViewState(const QString &result)
+{
+    ui->promoteResultLabel->setText(result);
+    ui->promoteResultLabel->show();
+    ui->promoteStatusLabel->hide();
+    ui->promoteProgressBar->hide();
+    ui->promoteButton->show();
+    ui->promoteLineEdit->show();
+    ui->tailTxHashLabelPromote->show();
+}
+
+void PromoteReattachDialog::reattachFinishedViewState(const QString &result)
+{
+    ui->reattachResultLabel->setText(result);
+    ui->reattachResultLabel->show();
+    ui->reattachStatusLabel->hide();
+    ui->reattachProgressBar->hide();
+    ui->reattachButton->show();
+    ui->reattachLineEdit->show();
+    ui->tailTxHashLabelReattach->show();
 }
