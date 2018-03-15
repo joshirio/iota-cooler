@@ -79,7 +79,10 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 
 void CreateWalletWizard::wConfNextButtonClicked()
 {
-    //TODO: wallet file write WalletManager::createandInitWallet? then ::saveWallet()
+    //TODO: handle connections for wallet read/write err
+    m_walletManager->unlockWallet(ui->wpLineEdit->text());
+    m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed());
+    m_walletManager->lockWallet();
 
     ui->stackedWidget->setCurrentIndex(2);
 }
