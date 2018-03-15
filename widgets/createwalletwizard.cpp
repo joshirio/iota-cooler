@@ -1,5 +1,6 @@
 #include "createwalletwizard.h"
 #include "ui_createwalletwizard.h"
+#include "../components/walletmanager.h"
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
@@ -13,6 +14,8 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     ui(new Ui::CreateWalletWizard)
 {
     ui->setupUi(this);
+
+    m_walletManager = &WalletManager::getInstance();
 
     connect(ui->infoNextButtonClicked, &QPushButton::clicked,
             this, &CreateWalletWizard::infoNextButtonClicked);
@@ -76,7 +79,7 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 
 void CreateWalletWizard::wConfNextButtonClicked()
 {
-    //TODO: wallet file write WalletManager::createandInitWallet?
+    //TODO: wallet file write WalletManager::createandInitWallet? then ::saveWallet()
 
     ui->stackedWidget->setCurrentIndex(2);
 }

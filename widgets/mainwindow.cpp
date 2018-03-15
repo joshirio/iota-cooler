@@ -7,11 +7,13 @@
 #include "../utils/definitionholder.h"
 #include "../utils/utilsiota.h"
 #include "../components/settingsmanager.h"
+#include "../components/walletmanager.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QUrl>
 #include <QtWidgets/QMessageBox>
+#include <QtGui/QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    WalletManager::getInstance().destroy();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->accept();
 }
 
 void MainWindow::aboutQtActionTriggered()

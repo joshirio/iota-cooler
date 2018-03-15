@@ -11,6 +11,8 @@
 
 #include <QWidget>
 
+class WalletManager;
+
 namespace Ui {
 class CreateWalletWizard;
 }
@@ -37,6 +39,7 @@ private slots:
 
 private:
     Ui::CreateWalletWizard *ui;
+    WalletManager *m_walletManager;
 };
 
 #endif // CREATEWALLETWIZARD_H

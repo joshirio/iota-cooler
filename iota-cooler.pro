@@ -48,7 +48,8 @@ SOURCES += \
     widgets/promotereattachdialog.cpp \
     utils/utilsiota.cpp \
     widgets/createwalletwizard.cpp \
-    utils/Qt-AES/qaesencryption.cpp
+    utils/Qt-AES/qaesencryption.cpp \
+    components/walletmanager.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -65,7 +66,8 @@ HEADERS += \
     widgets/promotereattachdialog.h \
     utils/utilsiota.h \
     widgets/createwalletwizard.h \
-    utils/Qt-AES/qaesencryption.h
+    utils/Qt-AES/qaesencryption.h \
+    components/walletmanager.h
 
 FORMS += \
         widgets/mainwindow.ui \
