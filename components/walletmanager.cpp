@@ -1,6 +1,10 @@
 #include "walletmanager.h"
+#include "../utils/definitionholder.h"
+#include "../utils/Qt-AES/qaesencryption.h"
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
 
 WalletManager* WalletManager::m_instance = 0;
 
@@ -33,7 +37,34 @@ void WalletManager::createAndInitWallet(const QString &filePath)
 {
     checkLock();
 
+    QFile destFile(filePath);
+    QString errorMessage;
+
+    if (!destFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        errorMessage = tr("Failed to open create file %1: %2")
+                .arg(filePath).arg(destFile.errorString());
+        emit walletWriteError(errorMessage);
+        return;
+    }
+
     //TODO
+    QString datachecksumString;
+    QString aesIvVector;
+    QByteArray aesWalletData;
+
+    //TODO
+    datachecksumString = "";
+    aesIvVector = "";
+    aesWalletData.append("test");
+
+    QTextStream out(&destFile);
+    out << m_magicString << "\n";
+    out << "version:" << DefinitionHolder::WALLET_VERSION << "\n";
+    out << "data_checksum:" << datachecksumString << "\n";
+    out << "aes_iv:" << aesIvVector << "\n";
+    out << "aes_wallet_data:" << aesWalletData.toBase64();
+
+    destFile.close();
 }
 
 void WalletManager::checkLock()
@@ -45,7 +76,7 @@ void WalletManager::checkLock()
 WalletManager::WalletManager(QObject *parent) :
     QObject(parent), m_currentWalletOp(NoOp)
 {
-
+    m_magicString = "IOTACOOL";
 }
 
 WalletManager::~WalletManager()

@@ -8,6 +8,8 @@
 #ifndef DEFINITIONHOLDER_H
 #define DEFINITIONHOLDER_H
 
+#include <QtCore/QtGlobal>
+
 class QString;
 
 class DefinitionHolder
@@ -25,6 +27,7 @@ public:
     static const bool APPIMAGE_LINUX;    /**< Deployment target is an AppImage   */
     static const bool WIN_PORTABLE;      /**< Deployment is portable Windows app */
     static const QString DEFAULT_NODE;   /**< Default IOTA node for IRI requests */
+    static const quint32 WALLET_VERSION; /**< Wallet file version number         */
 
 private:
     DefinitionHolder() {} //static only

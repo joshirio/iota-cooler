@@ -88,11 +88,16 @@ private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}
     ~WalletManager();
+
+    /**
+     * @brief Make sure wallet is unlocked, if not crash with error
+     */
     void checkLock();
 
     static WalletManager *m_instance;
     WalletOp m_currentWalletOp;
     QString m_encryptionKey;
+    QString m_magicString;
 };
 
 #endif // WALLETMANAGER_H

@@ -22,3 +22,4 @@ const QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));
 const QString DefinitionHolder::DEFAULT_NODE = "https://field.carriota.com:443";
+const quint32 DefinitionHolder::WALLET_VERSION = 1;
