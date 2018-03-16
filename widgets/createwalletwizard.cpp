@@ -40,6 +40,8 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::walletError);
     connect(m_walletManager, &WalletManager::walletWriteError,
             this, &CreateWalletWizard::walletError);
+    connect(m_walletManager, &WalletManager::walletFileParsingError,
+            this, &CreateWalletWizard::walletParseError);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -102,4 +104,11 @@ void CreateWalletWizard::walletError(const QString &message)
 {
     QMessageBox::critical(this, tr("Wallet Error"), message);
     emit walletCreationCancelled();
+}
+
+void CreateWalletWizard::walletParseError(const QString &message)
+{
+    QString err = tr("Invalid wallet file: make sure you passphrase is correct!\n");
+    err.append(message);
+    walletError(err);
 }

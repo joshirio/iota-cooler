@@ -4,7 +4,7 @@
 2. wallet file version (quint32)
 3. SHA-1 data checksum ASCII string of base 64 encoded aes_wallet_data
 4. AES-256 IV-Vector (CBC) random 16 bytes (128 bits) encoded in base64
-5. AES-256 encrypted JSON wallet data (variable length) encoded as base64
+5. AES-256 encrypted JSON wallet data (variable length) encoded as base64. The encryption key is the SHA-256 hash of the passphrase.
 
 ##### Example:
 

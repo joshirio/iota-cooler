@@ -14,6 +14,7 @@
 #define WALLETMANAGER_H
 
 #include <QObject>
+#include <QJsonObject>
 
 class WalletManager : public QObject
 {
@@ -87,6 +88,13 @@ signals:
      */
     void walletWriteError(const QString &message);
 
+    /**
+     * @brief Emitted if an error occurred while parsing the wallet file.
+     * Possible cause is a wrong encryption passphrase or corrupted data.
+     * @param message - the error message
+     */
+    void walletFileParsingError(const QString &message);
+
 private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}
@@ -112,15 +120,18 @@ private:
 
     /**
      * @brief Decrypt and deserialize wallet data to the internal json doc
+     * @param aesData - the encrypted data as byte array
      * @param iv - AES (CBC) initialization vector
      * @return QString - the raw data (json) as string
      */
-    void decryptAndDeserializeWallet(const QByteArray &iv);
+    void decryptAndDeserializeWallet(const QByteArray &aesData,
+                                     const QByteArray &iv);
 
     static WalletManager *m_instance;
     WalletOp m_currentWalletOp;
     QString m_encryptionKey;
     QString m_magicString;
+    QJsonObject m_jsonObject;
 };
 
 #endif // WALLETMANAGER_H

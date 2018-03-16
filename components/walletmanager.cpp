@@ -8,6 +8,9 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonParseError>
 
 WalletManager* WalletManager::m_instance = 0;
 
@@ -34,6 +37,7 @@ void WalletManager::unlockWallet(const QString &encryptionKey)
 void WalletManager::lockWallet()
 {
     m_encryptionKey.clear();
+    m_jsonObject = QJsonObject();
 }
 
 bool WalletManager::createAndInitWallet(const QString &filePath)
@@ -54,10 +58,16 @@ bool WalletManager::createAndInitWallet(const QString &filePath)
     QByteArray aesIvVector;
     QByteArray aesWalletData;
 
+    //init JSON empty wallet
+    QString defaultJson = "{\"onlineSeed\":\"\",\"currentColdWallet\":\"\",\"cleanColdWalletBackup"
+                          "\":\"\",\"currentOperation\":1,\"currentOpArgs\":[],\"currentAddress"
+                          "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions\":[]}";
+    m_jsonObject = QJsonDocument::fromJson(defaultJson.toUtf8()).object();
+
     aesIvVector = getRandomIv();
     aesWalletData = serializeAndEncryptWallet(aesIvVector);
     dataChecksumString = QCryptographicHash::hash(aesWalletData,
-                                                  QCryptographicHash::Sha1);
+                                                  QCryptographicHash::Sha1).toHex();
 
     QTextStream out(&destFile);
     out << m_magicString << "\n";
@@ -92,14 +102,39 @@ QByteArray WalletManager::serializeAndEncryptWallet(const QByteArray &iv)
 {
     QByteArray data;
 
-    //TODO convert internal json
+    //convert internal json object to text json
+    QJsonDocument doc(m_jsonObject);
+    data = doc.toJson(QJsonDocument::Compact);
 
-    return data;
+    //encrypt data
+    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
+    QByteArray hashKey = QCryptographicHash::hash(m_encryptionKey.toLocal8Bit(),
+                                                  QCryptographicHash::Sha256);
+
+    return encryption.encode(data, hashKey, iv);
 }
 
-void WalletManager::decryptAndDeserializeWallet(const QByteArray &iv)
+void WalletManager::decryptAndDeserializeWallet(const QByteArray &aesData,
+                                                const QByteArray &iv)
 {
-    //TODO convert data into internal json
+    //clear
+    m_jsonObject = QJsonObject();
+
+    //decrypt data
+    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
+    QByteArray hashKey = QCryptographicHash::hash(m_encryptionKey.toLocal8Bit(),
+                                                  QCryptographicHash::Sha256);
+
+    QByteArray rawJson = encryption.decode(aesData, hashKey, iv);
+    QString cleanJson(rawJson); //remove \0 to make a valid string
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(cleanJson.toUtf8(), &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        emit walletFileParsingError(parseError.errorString());
+    } else {
+        m_jsonObject = doc.object();
+    }
 }
 
 WalletManager::WalletManager(QObject *parent) :
