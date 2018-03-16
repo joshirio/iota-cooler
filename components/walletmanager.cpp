@@ -100,6 +100,8 @@ QByteArray WalletManager::getRandomIv()
 
 QByteArray WalletManager::serializeAndEncryptWallet(const QByteArray &iv)
 {
+    checkLock();
+
     QByteArray data;
 
     //convert internal json object to text json
@@ -117,6 +119,8 @@ QByteArray WalletManager::serializeAndEncryptWallet(const QByteArray &iv)
 void WalletManager::decryptAndDeserializeWallet(const QByteArray &aesData,
                                                 const QByteArray &iv)
 {
+    checkLock();
+
     //clear
     m_jsonObject = QJsonObject();
 
