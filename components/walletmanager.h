@@ -52,22 +52,25 @@ public:
      * to InitOffline for the next step which is offline init.
      * Emits walletWriteError()
      * @param filePath - the new wallet file saving path
+     * @return bool - true on success
      */
-    void createAndInitWallet(const QString &filePath);
+    bool createAndInitWallet(const QString &filePath);
 
     /**
      * @brief Save and write internal wallet structure to an encrypted file
      * Emits walletWriteError()
      * @param filePath - file saving path
+     * @return bool - true on success
      */
-    void writeWalletToFile(const QString &filePath);
+    bool writeWalletToFile(const QString &filePath);
 
     /**
      * @brief Read and load encrypted wallet file
      * Emits walletReadError()
      * @param filePath - wallet file to read
+     * @return bool - true on success
      */
-    void readWalletFile(const QString &filePath);
+    bool readWalletFile(const QString &filePath);
 
 signals:
     /**
@@ -93,6 +96,26 @@ private:
      * @brief Make sure wallet is unlocked, if not crash with error
      */
     void checkLock();
+
+    /**
+     * @brief Get a random string for the IV vector for CBC AES
+     * @return random iv vector as byte array
+     */
+    QByteArray getRandomIv();
+
+    /**
+     * @brief Serialize current wallet in an aes encrypted byte array
+     * @param iv - AES (CBC) initialization vector
+     * @return byte array
+     */
+    QByteArray serializeAndEncryptWallet(const QByteArray &iv);
+
+    /**
+     * @brief Decrypt and deserialize wallet data to the internal json doc
+     * @param iv - AES (CBC) initialization vector
+     * @return QString - the raw data (json) as string
+     */
+    void decryptAndDeserializeWallet(const QByteArray &iv);
 
     static WalletManager *m_instance;
     WalletOp m_currentWalletOp;

@@ -36,6 +36,7 @@ private slots:
     void wConfUpdateNextButtonState();
     void wConfNextButtonClicked();
     void wInitOnlineQuitButtonClicked();
+    void walletError(const QString &message);
 
 private:
     Ui::CreateWalletWizard *ui;

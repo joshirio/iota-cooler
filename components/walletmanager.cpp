@@ -5,6 +5,9 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QtCore/QDataStream>
+#include <QtCore/QRandomGenerator>
+#include <QtCore/QCryptographicHash>
 
 WalletManager* WalletManager::m_instance = 0;
 
@@ -33,7 +36,7 @@ void WalletManager::lockWallet()
     m_encryptionKey.clear();
 }
 
-void WalletManager::createAndInitWallet(const QString &filePath)
+bool WalletManager::createAndInitWallet(const QString &filePath)
 {
     checkLock();
 
@@ -41,36 +44,62 @@ void WalletManager::createAndInitWallet(const QString &filePath)
     QString errorMessage;
 
     if (!destFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        errorMessage = tr("Failed to open create file %1: %2")
+        errorMessage = tr("Failed to open file %1: %2")
                 .arg(filePath).arg(destFile.errorString());
         emit walletWriteError(errorMessage);
-        return;
+        return false;
     }
 
-    //TODO
-    QString datachecksumString;
-    QString aesIvVector;
+    QString dataChecksumString;
+    QByteArray aesIvVector;
     QByteArray aesWalletData;
 
-    //TODO
-    datachecksumString = "";
-    aesIvVector = "";
-    aesWalletData.append("test");
+    aesIvVector = getRandomIv();
+    aesWalletData = serializeAndEncryptWallet(aesIvVector);
+    dataChecksumString = QCryptographicHash::hash(aesWalletData,
+                                                  QCryptographicHash::Sha1);
 
     QTextStream out(&destFile);
     out << m_magicString << "\n";
     out << "version:" << DefinitionHolder::WALLET_VERSION << "\n";
-    out << "data_checksum:" << datachecksumString << "\n";
-    out << "aes_iv:" << aesIvVector << "\n";
+    out << "data_checksum:" << dataChecksumString << "\n";
+    out << "aes_iv:" << aesIvVector.toBase64() << "\n";
     out << "aes_wallet_data:" << aesWalletData.toBase64();
 
     destFile.close();
+    return true;
 }
 
 void WalletManager::checkLock()
 {
     if (m_encryptionKey.isEmpty())
         qFatal("[FATAL ERROR:] encryption key not set, call WalletManager::unlockWallet() first!");
+}
+
+QByteArray WalletManager::getRandomIv()
+{
+    //generate 128 random bits for the IV
+    QByteArray byteArray;
+    QDataStream stream(&byteArray, QIODevice::WriteOnly);
+
+    stream << QRandomGenerator::system()->generate64(); //64 bits
+    stream << QRandomGenerator::system()->generate64(); //64 bits
+
+    return byteArray;
+}
+
+QByteArray WalletManager::serializeAndEncryptWallet(const QByteArray &iv)
+{
+    QByteArray data;
+
+    //TODO convert internal json
+
+    return data;
+}
+
+void WalletManager::decryptAndDeserializeWallet(const QByteArray &iv)
+{
+    //TODO convert data into internal json
 }
 
 WalletManager::WalletManager(QObject *parent) :

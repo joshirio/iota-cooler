@@ -3,7 +3,7 @@
 1. magic number 0x494f5441434f4f4c (IOTACOOL) (8 bytes)
 2. wallet file version (quint32)
 3. SHA-1 data checksum ASCII string of base 64 encoded aes_wallet_data
-4. AES-256 IV-Vector (CBC) random ASCII string of length 16
+4. AES-256 IV-Vector (CBC) random 16 bytes (128 bits) encoded in base64
 5. AES-256 encrypted JSON wallet data (variable length) encoded as base64
 
 ##### Example:
@@ -12,7 +12,7 @@
 IOTACOOL
 version:1
 data_checksum:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3
-aes_iv:randomstring1234
+aes_iv:cmFuZG9tc3RyaW5nMTIzNA==
 aes_wallet_data:dGVzdGRhdGExMjM0NTY3ODk=
 ```
 

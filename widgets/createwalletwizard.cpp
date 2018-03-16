@@ -8,6 +8,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QMessageBox>
 
 CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     QWidget(parent),
@@ -35,6 +36,10 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::wConfNextButtonClicked);
     connect(ui->wInitOnlineQuitButton, &QPushButton::clicked,
             this, &CreateWalletWizard::wInitOnlineQuitButtonClicked);
+    connect(m_walletManager, &WalletManager::walletReadError,
+            this, &CreateWalletWizard::walletError);
+    connect(m_walletManager, &WalletManager::walletWriteError,
+            this, &CreateWalletWizard::walletError);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -79,15 +84,22 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 
 void CreateWalletWizard::wConfNextButtonClicked()
 {
-    //TODO: handle connections for wallet read/write err
     m_walletManager->unlockWallet(ui->wpLineEdit->text());
-    m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed());
+    bool ok = m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed());
     m_walletManager->lockWallet();
 
-    ui->stackedWidget->setCurrentIndex(2);
+    if (ok) {
+        ui->stackedWidget->setCurrentIndex(2);
+    }
 }
 
 void CreateWalletWizard::wInitOnlineQuitButtonClicked()
 {
     qApp->quit();
+}
+
+void CreateWalletWizard::walletError(const QString &message)
+{
+    QMessageBox::critical(this, tr("Wallet Error"), message);
+    emit walletCreationCancelled();
 }
