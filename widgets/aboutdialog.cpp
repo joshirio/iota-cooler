@@ -11,6 +11,8 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->copyrightLabel->setText(DefinitionHolder::COPYRIGHT);
     ui->versionLabel->setText(DefinitionHolder::VERSION);
     ui->buildLabel->setText(QString::number(DefinitionHolder::SOFTWARE_BUILD));
+    ui->donateLabel->setText(tr("<a href='%1'>Support IOTAcooler by donating IOTA</a>")
+                             .arg(DefinitionHolder::DONATE_URL));
 }
 
 AboutDialog::~AboutDialog()

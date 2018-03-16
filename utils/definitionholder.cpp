@@ -23,3 +23,4 @@ const QString DefinitionHolder::COPYRIGHT =
         .arg(QDate::currentDate().toString("yyyy"));
 const QString DefinitionHolder::DEFAULT_NODE = "https://field.carriota.com:443";
 const quint32 DefinitionHolder::WALLET_VERSION = 1;
+const QString DefinitionHolder::DONATE_URL = "https://github.com/joshirio/iota-cooler/blob/master/doc/donate.md";

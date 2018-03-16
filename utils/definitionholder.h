@@ -28,6 +28,7 @@ public:
     static const bool WIN_PORTABLE;      /**< Deployment is portable Windows app */
     static const QString DEFAULT_NODE;   /**< Default IOTA node for IRI requests */
     static const quint32 WALLET_VERSION; /**< Wallet file version number         */
+    static const QString DONATE_URL;     /**< Donation URL                       */
 
 private:
     DefinitionHolder() {} //static only

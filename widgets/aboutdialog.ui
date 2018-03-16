@@ -135,9 +135,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="donateLabel">
          <property name="text">
-          <string>&lt;a href=&quot;https://thetangle.org/address/WQEEXMP9FMHOVTTAHFDRRXMWBDRXUKPQJUQFSVBFJNSDRHKCPZLBHVQYCEPTFNRAQQDM9SPLADPIEGDIXASNJUSMUW&quot;&gt;Support IOTAcooler by donating IOTA&lt;/a&gt;</string>
+          <string>d</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
