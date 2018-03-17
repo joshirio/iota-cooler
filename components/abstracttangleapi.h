@@ -24,10 +24,15 @@ public:
      */
     enum RequestType {
         NoRequest, /**< Invalid request status */
+        CreateSeed, /**< Generate a seed */
         GetBalance, /**< Get balance of an address */
         Promote, /**< Promote a transaction */
         Reattach, /**< Reattach a transaction */
-        MultisigTransfer /**< make a transfer from a multisig address */
+        MultisigTransfer, /**< Make a transfer from a multisig address */
+        CreateMultisigWallet, /**< Create a multisig file with 1 signing party */
+        AddMultisigParty, /**< Add a signing party to the multisig file.
+                               Can only be used until multisig file finalization */
+        FinalizeMultsigWallet/**< Finalize mutisig file */
     };
 
     /**

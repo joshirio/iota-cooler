@@ -13,7 +13,13 @@ class QString;
 class UtilsIOTA
 {
 public:
+    /** Check if the transaction hash format is a valid */
     static bool isValidTxHash(const QString &txHash);
+
+    /** Check if seed format is valid */
+    static bool isValidSeed(const QString &seed);
+
+    /** The current IOTA node URL used for API requests */
     static QString currentNodeUrl;
 
     /**

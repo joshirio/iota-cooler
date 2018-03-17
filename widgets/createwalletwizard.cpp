@@ -2,6 +2,7 @@
 #include "ui_createwalletwizard.h"
 #include "../components/walletmanager.h"
 #include "../components/settingsmanager.h"
+#include "../components/smidgentangleapi.h"
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
@@ -18,6 +19,7 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     ui->setupUi(this);
 
     m_walletManager = &WalletManager::getInstance();
+    m_tangleAPI = new SmidgenTangleAPI(this);
 
     connect(ui->infoNextButtonClicked, &QPushButton::clicked,
             this, &CreateWalletWizard::infoNextButtonClicked);
@@ -41,6 +43,10 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::infoCancelButtonClicked);
     connect(ui->offlineInitWalletButton, &QPushButton::clicked,
             this, &CreateWalletWizard::offlineInitWalletButtonClicked);
+    connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
+            this, &CreateWalletWizard::tangleAPIRequestFinished);
+    connect(m_tangleAPI, &AbstractTangleAPI::requestError,
+            this, &CreateWalletWizard::tangleAPIRequestError);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -126,7 +132,13 @@ void CreateWalletWizard::wInitOnlineQuitButtonClicked()
 
 void CreateWalletWizard::offlineInitWalletButtonClicked()
 {
-    //TODO wallet init
+    m_walletInitStepResults.clear();
+    ui->stackedWidget->setCurrentIndex(4);
+
+    QStringList args;
+    args.append("online");
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateSeed,
+                                 args);
 }
 
 void CreateWalletWizard::walletError(const QString &message)
@@ -145,4 +157,32 @@ void CreateWalletWizard::walletParseError(const QString &message)
 void CreateWalletWizard::walletPassError()
 {
     walletParseError("");
+}
+
+void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
+                                                  const QString &response)
+{
+    //TODO
+
+    switch (request) {
+    case AbstractTangleAPI::CreateSeed:
+        if (response.contains("online")) {
+            //extract online seed
+            m_walletInitStepResults.append(response.split(":").at(2));
+            //TODO update view status and generate offline seed
+        } else if (response.contains("offline")) {
+            //extract offline seed
+            m_walletInitStepResults.append(response.split(":").at(2));
+            //TODO
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+void CreateWalletWizard::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
+                                               const QString &errorMessage)
+{
+    //TODO
 }

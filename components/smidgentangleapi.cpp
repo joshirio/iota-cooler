@@ -24,6 +24,9 @@ SmidgenTangleAPI::~SmidgenTangleAPI()
 
 void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &argList)
 {
+    //save original request args
+    m_requestArgs = argList;
+
     QString command;
     QStringList args;
     QString smidgenPath;
@@ -56,12 +59,13 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         if (argList.size() > 0)
             extraArgs.append(argList.at(0)); //tail tx hash
         break;
+    case CreateSeed:
+        command = "generate-seed";
+        break;
     case GetBalance:
         command = "get-balance";
-        extraArgs = m_requestArgs;
         //TODO: just an example rm this
         extraArgs.append("RF9TQPFMGIWUTFWYHLVTDAUIKPGEKWIFBVELXVESPIMFPMQPPXHANGGYBJ9THRXRFFHWRQGQSNPVGJBJDXHNKNNSVY");
-
         break;
     }
 
@@ -207,6 +211,18 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
             } else {
                 //unexpected response
                 errorMessage = result;
+                error = true;
+            }
+            break;
+        case CreateSeed:
+            if (UtilsIOTA::isValidSeed(result.simplified())) {
+                //return seed as seedname(arg):seed
+                if (requestArgs.isEmpty())
+                    requestArgs.append("unnamed");
+                message = QString("Generated:").append(
+                            requestArgs.at(0)).append(":").append(result.simplified());
+            } else {
+                errorMessage = tr("Invalid seed: ").append(result);
                 error = true;
             }
             break;

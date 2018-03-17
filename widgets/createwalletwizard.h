@@ -10,6 +10,7 @@
 #define CREATEWALLETWIZARD_H
 
 #include <QWidget>
+#include "../components/abstracttangleapi.h"
 
 class WalletManager;
 
@@ -46,10 +47,16 @@ private slots:
     void walletError(const QString &message);
     void walletParseError(const QString &message);
     void walletPassError();
+    void tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
+                                  const QString &response);
+    void tangleAPIRequestError(AbstractTangleAPI::RequestType request,
+                               const QString &errorMessage);
 
 private:
     Ui::CreateWalletWizard *ui;
     WalletManager *m_walletManager;
+    AbstractTangleAPI *m_tangleAPI;
+    QStringList m_walletInitStepResults;
 };
 
 #endif // CREATEWALLETWIZARD_H

@@ -12,6 +12,13 @@ bool UtilsIOTA::isValidTxHash(const QString &txHash)
     return reg.match(txHash).hasMatch();
 }
 
+bool UtilsIOTA::isValidSeed(const QString &seed)
+{
+    //at this time only seed of length 81 are supported
+    QRegularExpression reg("^[A-Z9]{81}$");
+    return reg.match(seed).hasMatch();
+}
+
 UtilsIOTA::UtilsIOTA()
 {
 

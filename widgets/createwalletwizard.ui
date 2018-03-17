@@ -372,5 +372,22 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>wp2LineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>wConfNextButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>349</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
