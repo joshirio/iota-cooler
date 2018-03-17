@@ -25,6 +25,12 @@ public:
     explicit CreateWalletWizard(QWidget *parent = 0);
     ~CreateWalletWizard();
 
+    /** Set the current view to wallet offline init.
+     * If the device role is online, show info about
+     * continuing with offline device as next step
+     */
+    void setOfflineWalletInitStep();
+
 signals:
     /** Emitted when user cancels the wizard */
     void walletCreationCancelled();
@@ -36,6 +42,7 @@ private slots:
     void wConfUpdateNextButtonState();
     void wConfNextButtonClicked();
     void wInitOnlineQuitButtonClicked();
+    void offlineInitWalletButtonClicked();
     void walletError(const QString &message);
     void walletParseError(const QString &message);
     void walletPassError();

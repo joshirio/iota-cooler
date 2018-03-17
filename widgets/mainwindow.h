@@ -51,6 +51,8 @@ private:
     void createMenus();
     void createConnections();
     void loadSettings();
+    bool enforceOnlineRole();
+    bool enforceOfflineRole();
 
     /**
      * @brief Ask user if the device is a online or offline signer

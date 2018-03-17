@@ -248,7 +248,7 @@ Your offline multisig seed is never stored in the wallet file.</string>
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Your wallet file has been successfully configured.&lt;br /&gt;
-The next step requires the &lt;b&gt;offline signer&lt;/b&gt; device to initialize your wallet file.&lt;br /&gt;&lt;br /&gt;
+The next step requires the &lt;b&gt;offline signing&lt;/b&gt; device to initialize your wallet file.&lt;br /&gt;&lt;br /&gt;
 Please close the application and open your newly created wallet file with IOTAcooler on your &lt;b&gt;offline&lt;/b&gt; device, in order to proceed.</string>
          </property>
          <property name="wordWrap">
@@ -288,6 +288,78 @@ Please close the application and open your newly created wallet file with IOTAco
           <widget class="QPushButton" name="wInitOnlineQuitButton">
            <property name="text">
             <string>&amp;Quit</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_4">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10104; Wallet file initialization [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Your wallet file is now ready to be initialized by the &lt;b&gt;offline signer&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;
+For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device is permanently disconnected from the internet.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>49</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancelOfflineWalletInit">
+           <property name="text">
+            <string>&amp;Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="offlineInitWalletButton">
+           <property name="text">
+            <string>&amp;Initialize wallet</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
            </property>
           </widget>
          </item>

@@ -1,6 +1,7 @@
 #include "createwalletwizard.h"
 #include "ui_createwalletwizard.h"
 #include "../components/walletmanager.h"
+#include "../components/settingsmanager.h"
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
@@ -36,11 +37,26 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::wConfNextButtonClicked);
     connect(ui->wInitOnlineQuitButton, &QPushButton::clicked,
             this, &CreateWalletWizard::wInitOnlineQuitButtonClicked);
+    connect(ui->cancelOfflineWalletInit, &QPushButton::clicked,
+            this, &CreateWalletWizard::infoCancelButtonClicked);
+    connect(ui->offlineInitWalletButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::offlineInitWalletButtonClicked);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
 {
     delete ui;
+}
+
+void CreateWalletWizard::setOfflineWalletInitStep()
+{
+    SettingsManager sm(this);
+    if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
+        ui->stackedWidget->setCurrentIndex(3);
+        ui->offlineInitWalletButton->setFocus();
+    } else {
+        ui->stackedWidget->setCurrentIndex(2);
+    }
 }
 
 void CreateWalletWizard::infoNextButtonClicked()
@@ -106,6 +122,11 @@ void CreateWalletWizard::wConfNextButtonClicked()
 void CreateWalletWizard::wInitOnlineQuitButtonClicked()
 {
     qApp->quit();
+}
+
+void CreateWalletWizard::offlineInitWalletButtonClicked()
+{
+    //TODO wallet init
 }
 
 void CreateWalletWizard::walletError(const QString &message)

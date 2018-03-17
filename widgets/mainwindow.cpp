@@ -41,15 +41,17 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::openWallet(const QString &filePath)
-{
+{  
     WalletPassphraseDialog d(this);
     if (d.exec() == QDialog::Accepted) {
         m_walletManager->unlockWallet(d.getWalletPassphrase());
+
         WalletManager::WalletError error;
         if (m_walletManager->readWalletFile(filePath, error)) {
             switch (m_walletManager->getCurrentWalletOp()) {
             case WalletManager::InitOffline:
-                //TODO: set up createwallet widget for offline init steps
+                ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
+                m_createWalletWidget->setOfflineWalletInitStep();
                 break;
             case WalletManager::ColdSign:
                 //TODO: set up view for offline tx sign
@@ -133,24 +135,10 @@ void MainWindow::newWalletButtonClicked()
     checkDeviceRole();
 
     //only online role allowed
-    SettingsManager sm(this);
-    UtilsIOTA::DeviceRole role = sm.getDeviceRole();
-    if (role == UtilsIOTA::DeviceRole::OfflineSigner) {
-        int r = QMessageBox::warning(this, tr("Online role is required"),
-                             tr("Creating wallets requires an axctive internet connection!"
-                                "<br />Current device role is <b>offline signer</b>."
-                                "<br><b>Do you want to change current device role to online signer?</b>"),
-                             QMessageBox::Yes | QMessageBox::No);
-        if (r == QMessageBox::Yes) {
-            sm.setDeviceRole(UtilsIOTA::DeviceRole::OnlineSigner);
-        } else {
-            //not allowed
-            return;
-        }
+    if (enforceOnlineRole()) {
+        //setup view
+        ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
     }
-
-    //setup view
-    ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
 }
 
 void MainWindow::openWalletButtonClicked()
@@ -246,6 +234,47 @@ void MainWindow::loadSettings()
 
     //default node
     UtilsIOTA::currentNodeUrl = sm.getDefaultIOTANodeUrl();
+}
+
+bool MainWindow::enforceOnlineRole()
+{
+    SettingsManager sm(this);
+    UtilsIOTA::DeviceRole role = sm.getDeviceRole();
+    if (role == UtilsIOTA::DeviceRole::OfflineSigner) {
+        int r = QMessageBox::warning(this, tr("Online role is required"),
+                                     tr("This action requires an active internet connection!"
+                                        "<br />Current device role is <b>offline signer</b>."
+                                        "<br><b>Do you want to change current device role to online signer?</b>"),
+                                     QMessageBox::Yes | QMessageBox::No);
+        if (r == QMessageBox::Yes) {
+            sm.setDeviceRole(UtilsIOTA::DeviceRole::OnlineSigner);
+        } else {
+            //not allowed
+            return false;
+        }
+    }
+    return true;
+}
+
+bool MainWindow::enforceOfflineRole()
+{
+    SettingsManager sm(this);
+    UtilsIOTA::DeviceRole role = sm.getDeviceRole();
+    if (role == UtilsIOTA::DeviceRole::OnlineSigner) {
+        int r = QMessageBox::warning(this, tr("Offline role is required"),
+                                     tr("This action should be performed on an always offline device "
+                                        "for best security!"
+                                        "<br />Current device role is <b>online signer</b>."
+                                        "<br><b>Do you want to change current device role to offline signer?</b>"),
+                                     QMessageBox::Yes | QMessageBox::No);
+        if (r == QMessageBox::Yes) {
+            sm.setDeviceRole(UtilsIOTA::DeviceRole::OfflineSigner);
+        } else {
+            //not allowed
+            return false;
+        }
+    }
+    return true;
 }
 
 void MainWindow::checkDeviceRole()
