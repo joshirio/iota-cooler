@@ -27,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->hide();
     ui->openWalletButton->setFocus();
     m_walletManager = &WalletManager::getInstance();
-    m_currentWalletFilePath = "";
 
     loadWidgets();
     createMenus();
@@ -56,7 +55,7 @@ void MainWindow::openWallet(const QString &filePath)
                 QMessageBox::warning(this, tr("Wallet Error"),
                                      tr("Invalid wallet password!<br />"
                                         "Please try again"));
-                openWallet(m_currentWalletFilePath);
+                openWallet(filePath);
                 break;
             case WalletManager::WalletError::WalletFileParsingError:
             {
@@ -153,7 +152,6 @@ void MainWindow::openWalletButtonClicked()
                                                 tr("IOTAcooler wallet (*.icwl)"));
 
     if (!file.isEmpty()) {
-        m_currentWalletFilePath = file;
         openWallet(file);
     }
 }

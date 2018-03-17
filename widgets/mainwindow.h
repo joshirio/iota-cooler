@@ -73,7 +73,6 @@ private:
     QAction *m_helpAction;
     CreateWalletWizard *m_createWalletWidget;
     WalletManager *m_walletManager;
-    QString m_currentWalletFilePath;
 };
 
 #endif // MAINWINDOW_H
