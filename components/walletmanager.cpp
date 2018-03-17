@@ -157,6 +157,13 @@ bool WalletManager::readWalletFile(const QString &filePath,
     return decryptAndDeserializeWallet(aesWalletData, aesIvVector, error);
 }
 
+WalletManager::WalletOp WalletManager::getCurrentWalletOp()
+{
+    checkLock();
+
+    return (WalletOp) m_jsonObject.value("currentOperation").toInt();
+}
+
 void WalletManager::checkLock()
 {
     if (m_encryptionKey.isEmpty())

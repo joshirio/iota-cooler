@@ -47,8 +47,20 @@ void MainWindow::openWallet(const QString &filePath)
         m_walletManager->unlockWallet(d.getWalletPassphrase());
         WalletManager::WalletError error;
         if (m_walletManager->readWalletFile(filePath, error)) {
-            //TODO: check current wallet op (step) in switch for correct
-            //widget call and setup
+            switch (m_walletManager->getCurrentWalletOp()) {
+            case WalletManager::InitOffline:
+                //TODO: set up createwallet widget for offline init steps
+                break;
+            case WalletManager::ColdSign:
+                //TODO: set up view for offline tx sign
+                break;
+            case WalletManager::HotSign:
+                //TODO: set up view online tx sign and broadcast
+                break;
+            default:
+                //TODO: set up main wallet view
+                break;
+            }
         } else {
             switch (error.errorType) {
             case WalletManager::WalletError::WalletInvalidPassphrase:

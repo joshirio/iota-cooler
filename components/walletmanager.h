@@ -100,6 +100,13 @@ public:
      */
     bool readWalletFile(const QString &filePath, WalletError &error);
 
+    /**
+     * @brief Get the current wallet operation, ie. the next step.
+     * NoOp means wallet is in a clean state with no unfinished jobs.
+     * @return wallet operation enum
+     */
+    WalletOp getCurrentWalletOp();
+
 private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}
