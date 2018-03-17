@@ -8,12 +8,14 @@
 #include "../utils/utilsiota.h"
 #include "../components/settingsmanager.h"
 #include "../components/walletmanager.h"
+#include "walletpassphrasedialog.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QUrl>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QCloseEvent>
+#include <QtWidgets/QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_menuBar = ui->menuBar;
     ui->mainToolBar->hide();
     ui->openWalletButton->setFocus();
+    m_walletManager = &WalletManager::getInstance();
 
     loadWidgets();
     createMenus();
@@ -107,6 +110,24 @@ void MainWindow::newWalletButtonClicked()
 void MainWindow::openWalletButtonClicked()
 {
     checkDeviceRole();
+
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Open Wallet File"),
+                                                QStandardPaths::standardLocations(
+                                                    QStandardPaths::DocumentsLocation).at(0),
+                                                tr("IOTAcooler wallet (*.icwl)"));
+
+    if (!file.isEmpty()) {
+        WalletPassphraseDialog d(this);
+        if (d.exec() == QDialog::Accepted) {
+            m_walletManager->unlockWallet(d.getWalletPassphrase());
+            if (m_walletManager->readWalletFile(file)) {
+                //TODO: wallet manager connections to handle errors signals
+                //TODO: check current wallet op (step) in switch for correct
+                //widget call and setup
+            }
+        }
+    }
 }
 
 void MainWindow::newWalletWizardCancelled()

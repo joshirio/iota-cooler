@@ -44,6 +44,19 @@ bool WalletManager::createAndInitWallet(const QString &filePath)
 {
     checkLock();
 
+    //init JSON empty wallet
+    QString defaultJson = "{\"onlineSeed\":\"\",\"currentColdWallet\":\"\",\"cleanColdWalletBackup"
+                          "\":\"\",\"currentOperation\":1,\"currentOpArgs\":[],\"currentAddress"
+                          "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions\":[]}";
+    m_jsonObject = QJsonDocument::fromJson(defaultJson.toUtf8()).object();
+
+    return writeWalletToFile(filePath);
+}
+
+bool WalletManager::writeWalletToFile(const QString &filePath)
+{
+    checkLock();
+
     QFile destFile(filePath);
     QString errorMessage;
 
@@ -58,12 +71,6 @@ bool WalletManager::createAndInitWallet(const QString &filePath)
     QByteArray aesIvVector;
     QByteArray aesWalletData;
 
-    //init JSON empty wallet
-    QString defaultJson = "{\"onlineSeed\":\"\",\"currentColdWallet\":\"\",\"cleanColdWalletBackup"
-                          "\":\"\",\"currentOperation\":1,\"currentOpArgs\":[],\"currentAddress"
-                          "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions\":[]}";
-    m_jsonObject = QJsonDocument::fromJson(defaultJson.toUtf8()).object();
-
     aesIvVector = getRandomIv();
     aesWalletData = serializeAndEncryptWallet(aesIvVector);
     dataChecksumString = QCryptographicHash::hash(aesWalletData,
@@ -77,6 +84,50 @@ bool WalletManager::createAndInitWallet(const QString &filePath)
     out << "aes_wallet_data:" << aesWalletData.toBase64();
 
     destFile.close();
+    return true;
+}
+
+bool WalletManager::readWalletFile(const QString &filePath)
+{
+    checkLock();
+
+    QFile srcFile(filePath);
+    QString errorMessage;
+
+    if (!srcFile.open(QIODevice::ReadOnly)) {
+        errorMessage = tr("Failed to open file %1: %2")
+                .arg(filePath).arg(srcFile.errorString());
+        emit walletReadError(errorMessage);
+        return false;
+    }
+
+    QString magic, dataChecksumString;
+    quint32 version = 0;
+    QByteArray aesIvVector;
+    QByteArray aesWalletData;
+    QStringList tmp;
+
+    QTextStream in(&srcFile);
+    magic = in.readLine();
+    if (magic != m_magicString) {
+        errorMessage = tr("Invalid wallet file, magic number mismatch!");
+        emit walletReadError(errorMessage);
+        return false;
+    }
+    bool k;
+    tmp = in.readLine().split(":", QString::SkipEmptyParts);
+    if (tmp.size() == 2)
+        version = tmp.at(1).toUInt(&k);
+    if ((!k) | (version > DefinitionHolder::WALLET_VERSION)) {
+        errorMessage = tr("Unknown wallet version, please update "
+                          "your software to a newer version and try again!");
+        emit walletReadError(errorMessage);
+        return false;
+    }
+
+    //TODO
+
+    srcFile.close();
     return true;
 }
 

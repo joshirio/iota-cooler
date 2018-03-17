@@ -49,7 +49,8 @@ SOURCES += \
     utils/utilsiota.cpp \
     widgets/createwalletwizard.cpp \
     utils/Qt-AES/qaesencryption.cpp \
-    components/walletmanager.cpp
+    components/walletmanager.cpp \
+    widgets/walletpassphrasedialog.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -67,14 +68,16 @@ HEADERS += \
     utils/utilsiota.h \
     widgets/createwalletwizard.h \
     utils/Qt-AES/qaesencryption.h \
-    components/walletmanager.h
+    components/walletmanager.h \
+    widgets/walletpassphrasedialog.h
 
 FORMS += \
         widgets/mainwindow.ui \
     widgets/settingsdialog.ui \
     widgets/aboutdialog.ui \
     widgets/promotereattachdialog.ui \
-    widgets/createwalletwizard.ui
+    widgets/createwalletwizard.ui \
+    widgets/walletpassphrasedialog.ui
 
 ICON = resources/icons/iotacooler.icns # for mac
 RC_FILE = resources/iotacooler.rc # for windows
