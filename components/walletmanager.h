@@ -33,6 +33,30 @@ public:
         RecoverOnline /**< Recover wallet from seeds, online step */
     };
 
+    /**
+     * @brief The WalletError class, containing error related info
+     */
+    class WalletError {
+    public:
+        /**
+        * @brief The WalletError enum
+        */
+        enum ErrorType {
+            NoError, /**< No error occurred */
+            WalletReadError, /**< Error occurred while reading the wallet file.
+                         This could be cause by a wrong encryption key or a corrupt file. */
+            WalletWriteError, /**< Error occurred while writing the wallet file.
+                               This could be caused by missing permissions or a damaged file system. */
+            WalletFileParsingError, /**< Error occurred while parsing the JSON wallet string.
+                                     Possible cause is a wrong encryption passphrase or corrupted data. */
+            WalletInvalidPassphrase /**< Passphrase to decrypt the wallet is not valid.
+                                     This is only a guess based on JSON error 'illegal value'. */
+        };
+
+        ErrorType errorType = NoError;
+        QString errorString = "";
+    };
+
     static WalletManager& getInstance();
     static void destroy();
 
@@ -53,47 +77,28 @@ public:
      * to InitOffline for the next step which is offline init.
      * Emits walletWriteError()
      * @param filePath - the new wallet file saving path
+     * @param error - WalletError, containing error info on failure
      * @return bool - true on success
      */
-    bool createAndInitWallet(const QString &filePath);
+    bool createAndInitWallet(const QString &filePath, WalletError &error);
 
     /**
      * @brief Save and write internal wallet structure to an encrypted file
      * Emits walletWriteError()
      * @param filePath - file saving path
+     * @param error - WalletError, containing error info on failure
      * @return bool - true on success
      */
-    bool writeWalletToFile(const QString &filePath);
+    bool writeWalletToFile(const QString &filePath, WalletError &error);
 
     /**
      * @brief Read and load encrypted wallet file
      * Emits walletReadError()
      * @param filePath - wallet file to read
+     * @param error - WalletError, containing error info on failure
      * @return bool - true on success
      */
-    bool readWalletFile(const QString &filePath);
-
-signals:
-    /**
-     * @brief Emitted if an error occurred while reading the wallet file.
-     * This could be cause by a wrong encryption key or a corrupt file.
-     * @param message - the error message
-     */
-    void walletReadError(const QString &message);
-
-    /**
-     * @brief Emitted if an error occurred while writing the wallet file.
-     * This could be caused by missing permissions or a damaged file system.
-     * @param message - the error message
-     */
-    void walletWriteError(const QString &message);
-
-    /**
-     * @brief Emitted if an error occurred while parsing the wallet file.
-     * Possible cause is a wrong encryption passphrase or corrupted data.
-     * @param message - the error message
-     */
-    void walletFileParsingError(const QString &message);
+    bool readWalletFile(const QString &filePath, WalletError &error);
 
 private:
     explicit WalletManager(QObject *parent = nullptr);
@@ -122,10 +127,12 @@ private:
      * @brief Decrypt and deserialize wallet data to the internal json doc
      * @param aesData - the encrypted data as byte array
      * @param iv - AES (CBC) initialization vector
-     * @return QString - the raw data (json) as string
+     * @param error - WalletError, containing error info on failure
+     * @return bool - true on successfull json conversion
      */
-    void decryptAndDeserializeWallet(const QByteArray &aesData,
-                                     const QByteArray &iv);
+    bool decryptAndDeserializeWallet(const QByteArray &aesData,
+                                     const QByteArray &iv,
+                                     WalletError &error);
 
     static WalletManager *m_instance;
     WalletOp m_currentWalletOp;

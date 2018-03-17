@@ -38,6 +38,7 @@ private slots:
     void wInitOnlineQuitButtonClicked();
     void walletError(const QString &message);
     void walletParseError(const QString &message);
+    void walletPassError();
 
 private:
     Ui::CreateWalletWizard *ui;

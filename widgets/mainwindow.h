@@ -25,6 +25,13 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    /**
+     * @brief Open the specified wallet file and check for next steps
+     * (wallet operation) to setup the appropriate view
+     * @param filePath -  wallet file path
+     */
+    void openWallet(const QString &filePath);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -66,6 +73,7 @@ private:
     QAction *m_helpAction;
     CreateWalletWizard *m_createWalletWidget;
     WalletManager *m_walletManager;
+    QString m_currentWalletFilePath;
 };
 
 #endif // MAINWINDOW_H

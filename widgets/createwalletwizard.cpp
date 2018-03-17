@@ -36,12 +36,6 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::wConfNextButtonClicked);
     connect(ui->wInitOnlineQuitButton, &QPushButton::clicked,
             this, &CreateWalletWizard::wInitOnlineQuitButtonClicked);
-    connect(m_walletManager, &WalletManager::walletReadError,
-            this, &CreateWalletWizard::walletError);
-    connect(m_walletManager, &WalletManager::walletWriteError,
-            this, &CreateWalletWizard::walletError);
-    connect(m_walletManager, &WalletManager::walletFileParsingError,
-            this, &CreateWalletWizard::walletParseError);
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -87,11 +81,25 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 void CreateWalletWizard::wConfNextButtonClicked()
 {
     m_walletManager->unlockWallet(ui->wpLineEdit->text());
-    bool ok = m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed());
+    WalletManager::WalletError error;
+    bool ok = m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed(),
+                                                   error);
     m_walletManager->lockWallet();
 
     if (ok) {
         ui->stackedWidget->setCurrentIndex(2);
+    } else {
+        switch (error.errorType) {
+        case WalletManager::WalletError::WalletFileParsingError:
+            walletParseError(error.errorString);
+            break;
+        case WalletManager::WalletError::WalletInvalidPassphrase:
+            walletPassError();
+            break;
+        default:
+            this->walletError(error.errorString);
+            break;
+        }
     }
 }
 
@@ -108,7 +116,12 @@ void CreateWalletWizard::walletError(const QString &message)
 
 void CreateWalletWizard::walletParseError(const QString &message)
 {
-    QString err = tr("Invalid wallet file: make sure you passphrase is correct!\n");
+    QString err = tr("Invalid wallet file: make sure your passphrase is correct!\n");
     err.append(message);
     walletError(err);
+}
+
+void CreateWalletWizard::walletPassError()
+{
+    walletParseError("");
 }

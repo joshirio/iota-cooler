@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->hide();
     ui->openWalletButton->setFocus();
     m_walletManager = &WalletManager::getInstance();
+    m_currentWalletFilePath = "";
 
     loadWidgets();
     createMenus();
@@ -38,6 +39,40 @@ MainWindow::~MainWindow()
 {
     delete ui;
     WalletManager::getInstance().destroy();
+}
+
+void MainWindow::openWallet(const QString &filePath)
+{
+    WalletPassphraseDialog d(this);
+    if (d.exec() == QDialog::Accepted) {
+        m_walletManager->unlockWallet(d.getWalletPassphrase());
+        WalletManager::WalletError error;
+        if (m_walletManager->readWalletFile(filePath, error)) {
+            //TODO: check current wallet op (step) in switch for correct
+            //widget call and setup
+        } else {
+            switch (error.errorType) {
+            case WalletManager::WalletError::WalletInvalidPassphrase:
+                QMessageBox::warning(this, tr("Wallet Error"),
+                                     tr("Invalid wallet password!<br />"
+                                        "Please try again"));
+                openWallet(m_currentWalletFilePath);
+                break;
+            case WalletManager::WalletError::WalletFileParsingError:
+            {
+                QString message = tr("Invalid wallet file: make sure your passphrase is correct!\n");
+                error.errorString.append(message);
+                QMessageBox::critical(this, tr("Wallet Error"),
+                                      error.errorString);
+            }
+                break;
+            default:
+                QMessageBox::critical(this, tr("Wallet Error"),
+                                      error.errorString);
+                break;
+            }
+        }
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -118,15 +153,8 @@ void MainWindow::openWalletButtonClicked()
                                                 tr("IOTAcooler wallet (*.icwl)"));
 
     if (!file.isEmpty()) {
-        WalletPassphraseDialog d(this);
-        if (d.exec() == QDialog::Accepted) {
-            m_walletManager->unlockWallet(d.getWalletPassphrase());
-            if (m_walletManager->readWalletFile(file)) {
-                //TODO: wallet manager connections to handle errors signals
-                //TODO: check current wallet op (step) in switch for correct
-                //widget call and setup
-            }
-        }
+        m_currentWalletFilePath = file;
+        openWallet(file);
     }
 }
 
