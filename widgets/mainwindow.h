@@ -45,6 +45,7 @@ private slots:
     void newWalletButtonClicked();
     void openWalletButtonClicked();
     void newWalletWizardCancelled();
+    void walletCreationCompleted();
 
 private:
     void loadWidgets();

@@ -37,6 +37,9 @@ signals:
     /** Emitted when user cancels the wizard */
     void walletCreationCancelled();
 
+    /** Emitted when user completes the wizard */
+    void walletCreationCompleted();
+
 private slots:
     void infoNextButtonClicked();
     void infoCancelButtonClicked();
@@ -46,6 +49,12 @@ private slots:
     void wInitOnlineQuitButtonClicked();
     void offlineInitWalletButtonClicked();
     void offlineInitProgressCancelled();
+    void nextWInitProgressButtonClicked();
+    void savePDFButtonClicked();
+    void wBackupNextButton();
+    void wBackupconfirmBackButtonClicked();
+    void wConfirmButtonClicked();
+    void wBackupInfoNextButtonClicked();
     void walletError(const QString &message);
     void walletParseError(const QString &message);
     void walletPassError();

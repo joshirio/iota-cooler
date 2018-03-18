@@ -35,8 +35,7 @@
 &lt;b&gt;&amp;#10102; Information&lt;/b&gt;&lt;br /&gt;
 &amp;#9313; Wallet file configuration&lt;br /&gt;
 &amp;#9314; Wallet file initialization [offline]&lt;br /&gt;
-&amp;#9314; Multisig seeds and passphrase backup [offline]&lt;br /&gt;
-&amp;#9315; Wallet file verification</string>
+&amp;#9315; Multisig seeds and passphrase backup [offline]</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -433,6 +432,9 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
              <property name="text">
               <string>r</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
             </widget>
            </item>
           </layout>
@@ -475,6 +477,248 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_6">
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10105; Multisig seeds and passphrase backup [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="scrollArea_2">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>445</width>
+            <height>322</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>IOTAcooler uses standard IOTA seeds to implement multisig, which are compatible with other multisig applications based on the official IOTA API.&lt;br /&gt;&lt;br /&gt;
+IOTAcooler, at this point, can restore your funds &lt;b&gt;only&lt;/b&gt; if you also backup your &lt;b&gt;encrypted IOTAcooler wallet file&lt;/b&gt; alongside with the  wallet encryption password and the multisig seeds, which are displayed on the next page. The wallet file is stateful, meaning that all addresses and balances are remembered, even after a snapshot.
+&lt;br /&gt;
+Restoring your funds from only the IOTA multisig seeds is possible by using the command line utility &lt;a href=&quot;https://github.com/bitfinexcom/smidgen&quot;&gt;smidgen&lt;/a&gt;. But this is still tricky and not recommended.
+&lt;br /&gt;
+&lt;b&gt;&lt;i&gt;Just store your wallet file, that is encrypted and doesn't contain the offline signing keys, on a cloud service or make regularly backups of it, after each transaction, and you will be safe&lt;/i&gt;&lt;/b&gt;
+</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="wBackupInfoNextButton">
+           <property name="text">
+            <string>&amp;Next</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_7">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10105; Multisig seeds and passphrase backup [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Please backup and store the following information securely offline</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="walletBackupTextArea">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="savePDFButton">
+           <property name="text">
+            <string>&amp;Save PDF</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="wBackupNextButton">
+           <property name="text">
+            <string>&amp;Next</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_8">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10105; Multisig seeds and passphrase backup [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Please confirm your backup...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Wallet file:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="wBackupFilePathLabel">
+           <property name="text">
+            <string>w</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>Offline signer seed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="wBackupOfflineSeedLineEdit"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>Online signer seed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="wBackupOnlineSeedLineEdit"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Wallet password:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="wBackupPasswordLineEdit"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="wBackupconfirmBackButton">
+           <property name="text">
+            <string>&amp;Back</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="wConfirmButton">
+           <property name="text">
+            <string>&amp;Confirm</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -494,6 +738,22 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
     <hint type="destinationlabel">
      <x>422</x>
      <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>wBackupPasswordLineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>wConfirmButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>352</x>
+     <y>186</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>239</y>
     </hint>
    </hints>
   </connection>

@@ -161,6 +161,11 @@ void MainWindow::newWalletWizardCancelled()
     ui->stackedWidget->setCurrentIndex(0);
 }
 
+void MainWindow::walletCreationCompleted()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -226,6 +231,8 @@ void MainWindow::createConnections()
     //wallet creation wizard
     connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCancelled,
             this, &MainWindow::newWalletWizardCancelled);
+    connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCompleted,
+            this, &MainWindow::walletCreationCompleted);
 }
 
 void MainWindow::loadSettings()

@@ -55,6 +55,13 @@ void WalletManager::lockWallet()
     m_jsonObject = QJsonObject();
 }
 
+QString WalletManager::getCurrentWalletPassphrase()
+{
+    checkLock();
+
+    return m_encryptionKey;
+}
+
 bool WalletManager::createAndInitWallet(const QString &filePath,
                                         WalletError &error)
 {
@@ -205,8 +212,44 @@ bool WalletManager::saveWallet(const QString &walletFilePath,
     if (importTmpCleanBackupMultisigFile) {
         ok = ok && importMultisigFileAsCleanBackup();
     }
-    ok = ok && writeWalletToFile(walletFilePath, error);
+    if (ok) {
+        ok = ok && writeWalletToFile(walletFilePath, error);
+    }
     return ok;
+}
+
+bool WalletManager::restoreWallet(const QString &walletFilePath,
+                                  bool exportTmpMultisigFile,
+                                  bool exportTmpCleanBackupMultisigFile,
+                                  WalletError &error)
+{
+    bool ok = true;
+    ok = readWalletFile(walletFilePath, error);
+    if (ok) {
+        if (exportTmpMultisigFile) {
+            ok = ok && exportMultisigFile();
+        }
+        if (exportTmpCleanBackupMultisigFile) {
+            ok = ok &&  exportCleanBackupMultisigFile();
+        }
+    }
+    return ok;
+}
+
+void WalletManager::setCurrentWalletOp(WalletOp op,
+                                       const QVariantList &opArgs)
+{
+    int i = (int) op;
+    m_jsonObject.insert("currentOperation", i);
+    m_jsonObject.insert("currentOpArgs", QJsonArray::fromVariantList(opArgs));
+}
+
+WalletManager::WalletOp WalletManager::getCurrentWalletOp(QVariantList &opArgs)
+{
+    int i = m_jsonObject.value("currentOperation").toInt();
+    opArgs = m_jsonObject.value("currentOpArgs").toArray().toVariantList();
+    WalletOp op = (WalletOp) i;
+    return op;
 }
 
 bool WalletManager::importMultisigFile()

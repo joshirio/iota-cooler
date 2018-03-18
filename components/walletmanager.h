@@ -88,6 +88,12 @@ public:
     void lockWallet();
 
     /**
+     * @brief Get the wallet passphrase
+     * @return wallet password
+     */
+    QString getCurrentWalletPassphrase();
+
+    /**
      * @brief Create and initialize a new wallet file.
      * Writes the wallet to file and sets the current wallet op
      * to InitOffline for the next step which is offline init.
@@ -176,6 +182,35 @@ public:
                     bool importTmpMultisigFile,
                     bool importTmpCleanBackupMultisigFile,
                     WalletError &error);
+
+    /**
+     * @brief Restore current wallet from disk
+     * @param walletFilePath - file where wallet is read from
+     * @param exportTmpMultisigFile - if true, exportMultisigFile() is called
+     * which writes the temp multisig file from current one
+     * @param exportTmpCleanBackupMultisigFile - if true, exportMultisigFileAsCleanBackup() is called
+     * which writes the temp multisig file from current clean state multisig backup
+     * @param error - WalletError, containing error info on failure
+     * @return true on success
+     */
+    bool restoreWallet(const QString &walletFilePath,
+                       bool exportTmpMultisigFile,
+                       bool exportTmpCleanBackupMultisigFile,
+                       WalletError &error);
+
+    /**
+     * @brief Set the current wallet operation (next required step)
+     * @param op - the operation (enum)
+     * @param opArgs - operation arguments, if any
+     */
+    void setCurrentWalletOp(WalletOp op, const QVariantList &opArgs);
+
+    /**
+     * @brief Get the current wallet operation (next required step)
+     * @param opArgs - where (optional) op args are saved to
+     * @return wallet op (enum)
+     */
+    WalletOp getCurrentWalletOp(QVariantList &opArgs);
 
 private:
     explicit WalletManager(QObject *parent = nullptr);

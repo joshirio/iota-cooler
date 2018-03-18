@@ -3,6 +3,7 @@
 #include "../components/walletmanager.h"
 #include "../components/settingsmanager.h"
 #include "../components/smidgentangleapi.h"
+#include "../utils/definitionholder.h"
 
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
@@ -13,6 +14,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QTextEdit>
+#include <QtPrintSupport/QPrinter>
 
 CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     QWidget(parent),
@@ -48,6 +51,18 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::offlineInitWalletButtonClicked);
     connect(ui->cancelOfflineWInitProgressButton, &QPushButton::clicked,
             this, &CreateWalletWizard::offlineInitProgressCancelled);
+    connect(ui->nextWInitProgressButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::nextWInitProgressButtonClicked);
+    connect(ui->wBackupInfoNextButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wBackupInfoNextButtonClicked);
+    connect(ui->savePDFButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::savePDFButtonClicked);
+    connect(ui->wBackupNextButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wBackupNextButton);
+    connect(ui->wBackupconfirmBackButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wBackupconfirmBackButtonClicked);
+    connect(ui->wConfirmButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::wConfirmButtonClicked);
     connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
             this, &CreateWalletWizard::tangleAPIRequestFinished);
     connect(m_tangleAPI, &AbstractTangleAPI::requestError,
@@ -91,7 +106,7 @@ void CreateWalletWizard::wConfBrowseButtonClicked()
                                                     tr("IOTAcooler Wallet(*.icwl)"));
     if (fileName.isEmpty())
         return;
-    if (!fileName.contains(".icwl"))
+    if (!fileName.contains(".icwl", Qt::CaseInsensitive))
         fileName.append(".icwl");
     ui->wPathLineEdit->setText(fileName);
 }
@@ -163,6 +178,93 @@ void CreateWalletWizard::offlineInitProgressCancelled()
 {
     m_tangleAPI->stopCurrentAPIRequest();
     emit walletCreationCancelled();
+}
+
+void CreateWalletWizard::nextWInitProgressButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(5);
+}
+
+void CreateWalletWizard::wBackupInfoNextButtonClicked()
+{
+    //populate backup data
+    QString data;
+    data.append(tr("<b>IOTAcooler version:</b> %1<br />")
+                .arg(DefinitionHolder::VERSION));
+    data.append(tr("<b>Offline signer seed:</b> %1<br />")
+                .arg(m_walletInitStepResults.at(0)));
+    data.append(tr("<b>Online signer seed:</b> %1<br />")
+                .arg(m_walletInitStepResults.at(1)));
+    data.append(tr("<b>Wallet encryption password:</b> %1<br />")
+                .arg(m_walletManager->getCurrentWalletPassphrase()));
+    ui->walletBackupTextArea->setText(data);
+    ui->stackedWidget->setCurrentIndex(6);
+}
+
+void CreateWalletWizard::savePDFButtonClicked()
+{
+    QString documentsDir = QStandardPaths::standardLocations(
+                QStandardPaths::DocumentsLocation).at(0);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save PDF File"),
+                                                    documentsDir + "/" + "iotacooler-backup",
+                                                    tr("PDF (*.pdf)"));
+    if (fileName.isEmpty())
+        return;
+    if (!fileName.contains(".pdf", Qt::CaseInsensitive))
+        fileName.append(".pdf");
+
+    //print to pdf
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    ui->walletBackupTextArea->print(&printer);
+
+    QMessageBox::information(this, tr("PDF Save"),
+                             tr("PDF successfully created!"));
+}
+
+void CreateWalletWizard::wBackupNextButton()
+{
+    ui->stackedWidget->setCurrentIndex(7);
+    ui->wBackupFilePathLabel->setText(m_currentWalletFilePath);
+}
+
+void CreateWalletWizard::wBackupconfirmBackButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(6);
+}
+
+void CreateWalletWizard::wConfirmButtonClicked()
+{
+    bool match;
+    match = ui->wBackupOfflineSeedLineEdit->text().simplified()
+            .replace(" ", "") == m_walletInitStepResults.at(0);
+    match = match &&
+            ui->wBackupOnlineSeedLineEdit->text().simplified()
+            .replace(" ", "") == m_walletInitStepResults.at(1);
+    match = match &&
+            ui->wBackupPasswordLineEdit->text().simplified()
+            .replace(" ", "") == m_walletManager->getCurrentWalletPassphrase();
+
+    if (!match) {
+        QMessageBox::warning(this,
+                             tr("Incorrect Backup Data"),
+                             tr("Your backup data is not correct!\n"
+                                "Please try again"));
+    } else {
+        //set wallet init as complete
+        m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::NoOp,
+                                            QVariantList());
+        WalletManager::WalletError error;
+        bool w = m_walletManager->saveWallet(m_currentWalletFilePath,
+                                             false,
+                                             false,
+                                             error);
+        if (w)
+            emit walletCreationCompleted();
+        else
+            walletError(error.errorString);
+    }
 }
 
 void CreateWalletWizard::walletError(const QString &message)
@@ -255,9 +357,7 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
             ui->wInitProgressWaitLabel->setText(tr("Finished!"));
             ui->wInitProgressStatusLabel->hide();
             ui->nextWInitProgressButton->setEnabled(true);
-
-            //TODO setup view for wallet seed, pass and general info about backup
-
+            ui->nextWInitProgressButton->setFocus();
         } else {
             tangleAPIRequestError(request, error.errorString);
         }
