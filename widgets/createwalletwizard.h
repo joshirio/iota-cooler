@@ -29,8 +29,9 @@ public:
     /** Set the current view to wallet offline init.
      * If the device role is online, show info about
      * continuing with offline device as next step
+     * @param walletFilePath - the wallet file to init
      */
-    void setOfflineWalletInitStep();
+    void setOfflineWalletInitStep(const QString &walletFilePath);
 
 signals:
     /** Emitted when user cancels the wizard */
@@ -44,6 +45,7 @@ private slots:
     void wConfNextButtonClicked();
     void wInitOnlineQuitButtonClicked();
     void offlineInitWalletButtonClicked();
+    void offlineInitProgressCancelled();
     void walletError(const QString &message);
     void walletParseError(const QString &message);
     void walletPassError();
@@ -57,6 +59,7 @@ private:
     WalletManager *m_walletManager;
     AbstractTangleAPI *m_tangleAPI;
     QStringList m_walletInitStepResults;
+    QString m_currentWalletFilePath;
 };
 
 #endif // CREATEWALLETWIZARD_H

@@ -11,6 +11,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonParseError>
+#include <QtCore/QStandardPaths>
 
 WalletManager* WalletManager::m_instance = 0;
 
@@ -26,6 +27,20 @@ void WalletManager::destroy()
     if (m_instance)
         delete m_instance;
     m_instance = 0;
+}
+
+QString WalletManager::getTmpMultisigSignFilePath()
+{
+    return QStandardPaths::standardLocations(QStandardPaths::TempLocation)
+            .at(0) + "/iotacooler_wallet_multisig";
+}
+
+bool WalletManager::deleteTmpMultisifSignFile() {
+    QString file = getTmpMultisigSignFilePath();
+    if (QFile::exists(file)) {
+        return QFile::remove(file);
+    }
+    return true;
 }
 
 void WalletManager::unlockWallet(const QString &encryptionKey)
@@ -164,6 +179,84 @@ WalletManager::WalletOp WalletManager::getCurrentWalletOp()
     return (WalletOp) m_jsonObject.value("currentOperation").toInt();
 }
 
+void WalletManager::clearImportedMultisigFile()
+{
+    checkLock();
+
+    m_jsonObject.insert("currentColdWallet", "");
+}
+
+void WalletManager::clearCleamBackupImportedMultisigFile()
+{
+    checkLock();
+
+    m_jsonObject.insert("cleanColdWalletBackup", "");
+}
+
+bool WalletManager::saveWallet(const QString &walletFilePath,
+                               bool importTmpMultisigFile,
+                               bool importTmpCleanBackupMultisigFile,
+                               WalletError &error)
+{
+    bool ok = true;
+    if (importTmpMultisigFile) {
+        ok = importMultisigFile();
+    }
+    if (importTmpCleanBackupMultisigFile) {
+        ok = ok && importMultisigFileAsCleanBackup();
+    }
+    ok = ok && writeWalletToFile(walletFilePath, error);
+    return ok;
+}
+
+bool WalletManager::importMultisigFile()
+{
+    QFile tmpFile(getTmpMultisigSignFilePath());
+    if (!tmpFile.open(QIODevice::ReadOnly))
+        return false;
+
+    m_jsonObject.insert("currentColdWallet",
+                        QString::fromUtf8(tmpFile.readAll().toBase64()));
+    return true;
+}
+
+bool WalletManager::importMultisigFileAsCleanBackup()
+{
+    QFile tmpFile(getTmpMultisigSignFilePath());
+    if (!tmpFile.open(QIODevice::ReadOnly))
+        return false;
+
+    m_jsonObject.insert("cleanColdWalletBackup",
+                        QString::fromUtf8(tmpFile.readAll().toBase64()));
+    return true;
+}
+
+bool WalletManager::exportMultisigFile()
+{
+    QFile tmpFile(getTmpMultisigSignFilePath());
+    if (!tmpFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+
+    qint64 w = tmpFile.write(QByteArray::fromBase64(m_jsonObject
+                                                .value("currentColdWallet")
+                                                .toString().toUtf8()));
+    bool writeOK = w > 0;
+    return writeOK;
+}
+
+bool WalletManager::exportCleanBackupMultisigFile()
+{
+    QFile tmpFile(getTmpMultisigSignFilePath());
+    if (!tmpFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+
+    qint64 w = tmpFile.write(QByteArray::fromBase64(m_jsonObject
+                                                .value("cleanColdWalletBackup")
+                                                .toString().toUtf8()));
+    bool writeOK = w > 0;
+    return writeOK;
+}
+
 void WalletManager::checkLock()
 {
     if (m_encryptionKey.isEmpty())
@@ -243,5 +336,6 @@ WalletManager::WalletManager(QObject *parent) :
 
 WalletManager::~WalletManager()
 {
-
+    //clean up tmp file
+    deleteTmpMultisifSignFile();
 }

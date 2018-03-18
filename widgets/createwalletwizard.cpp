@@ -11,6 +11,8 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QLabel>
 
 CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     QWidget(parent),
@@ -18,6 +20,7 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_currentWalletFilePath = "/invalid";
     m_walletManager = &WalletManager::getInstance();
     m_tangleAPI = new SmidgenTangleAPI(this);
 
@@ -43,6 +46,8 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::infoCancelButtonClicked);
     connect(ui->offlineInitWalletButton, &QPushButton::clicked,
             this, &CreateWalletWizard::offlineInitWalletButtonClicked);
+    connect(ui->cancelOfflineWInitProgressButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::offlineInitProgressCancelled);
     connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
             this, &CreateWalletWizard::tangleAPIRequestFinished);
     connect(m_tangleAPI, &AbstractTangleAPI::requestError,
@@ -54,10 +59,11 @@ CreateWalletWizard::~CreateWalletWizard()
     delete ui;
 }
 
-void CreateWalletWizard::setOfflineWalletInitStep()
+void CreateWalletWizard::setOfflineWalletInitStep(const QString &walletFilePath)
 {
     SettingsManager sm(this);
     if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
+        m_currentWalletFilePath = walletFilePath;
         ui->stackedWidget->setCurrentIndex(3);
         ui->offlineInitWalletButton->setFocus();
     } else {
@@ -135,10 +141,28 @@ void CreateWalletWizard::offlineInitWalletButtonClicked()
     m_walletInitStepResults.clear();
     ui->stackedWidget->setCurrentIndex(4);
 
+    //status update
+    //5 steps:
+    //seed gen offline
+    //seed gen online
+    //multisig create
+    //multisig add
+    //multisig finalize
+    ui->wInitProgressBar->setRange(0, 5);
+    ui->wInitProgressBar->setValue(1);
+    ui->wInitProgressResultLabel->hide();
+    ui->wInitProgressStatusLabel->setText(tr("Generating offline signer seed..."));
+
     QStringList args;
-    args.append("online");
+    args.append("offline");
     m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateSeed,
                                  args);
+}
+
+void CreateWalletWizard::offlineInitProgressCancelled()
+{
+    m_tangleAPI->stopCurrentAPIRequest();
+    emit walletCreationCancelled();
 }
 
 void CreateWalletWizard::walletError(const QString &message)
@@ -162,19 +186,82 @@ void CreateWalletWizard::walletPassError()
 void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType request,
                                                   const QString &response)
 {
-    //TODO
-
     switch (request) {
     case AbstractTangleAPI::CreateSeed:
-        if (response.contains("online")) {
-            //extract online seed
-            m_walletInitStepResults.append(response.split(":").at(2));
-            //TODO update view status and generate offline seed
-        } else if (response.contains("offline")) {
+        if (response.contains("offline")) {
             //extract offline seed
             m_walletInitStepResults.append(response.split(":").at(2));
-            //TODO
+
+            //generate online seed
+            ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
+            ui->wInitProgressStatusLabel->setText(tr("Generating online signer seed..."));
+            QStringList args;
+            args.append("online");
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateSeed,
+                                         args);
+
+        } else if (response.contains("online")) {
+            //extract online seed
+            m_walletInitStepResults.append(response.split(":").at(2));
+
+            //create multisig file
+            ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
+            ui->wInitProgressStatusLabel->setText(tr("Creating multisig file..."));
+            QStringList args;
+            args.append("offline"); //pass multisig party
+            args.append(m_walletInitStepResults.at(0)); //pass offline seed
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateMultisigWallet,
+                                         args);
         }
+        break;
+    case AbstractTangleAPI::CreateMultisigWallet:
+        if (response.contains("OK")) {
+            //add online signing party to multisig
+            ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
+            ui->wInitProgressStatusLabel->setText(tr("Adding multisig parties..."));
+            QStringList args;
+            args.append("online"); //pass multisig party
+            args.append(m_walletInitStepResults.at(1)); //pass online seed
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::AddMultisigParty,
+                                         args);
+        }
+        break;
+    case AbstractTangleAPI::AddMultisigParty:
+        if (response.contains("OK")) {
+            //finalize multisig
+            ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
+            ui->wInitProgressStatusLabel->setText(tr("Finalizing multisig file..."));
+            QStringList args;
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::FinalizeMultsigWallet,
+                                         args);
+        }
+        break;
+    case AbstractTangleAPI::FinalizeMultsigWallet:
+    {
+        //extract main wallet address
+        m_walletInitStepResults.append(response.split(":").at(2));
+
+        //save wallet
+        WalletManager::WalletError error;
+        bool w = m_walletManager->saveWallet(m_currentWalletFilePath,
+                                             true,
+                                             true,
+                                             error);
+        if (w) {
+            //finished
+            ui->cancelOfflineWInitProgressButton->setEnabled(false);
+            ui->wInitProgressResultLabel->show();
+            ui->wInitProgressResultLabel->setText(tr("Wallet successfully initialized!"));
+            ui->wInitProgressWaitLabel->setText(tr("Finished!"));
+            ui->wInitProgressStatusLabel->hide();
+            ui->nextWInitProgressButton->setEnabled(true);
+
+            //TODO setup view for wallet seed, pass and general info about backup
+
+        } else {
+            tangleAPIRequestError(request, error.errorString);
+        }
+    }
         break;
     default:
         break;
@@ -184,5 +271,11 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
 void CreateWalletWizard::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
                                                const QString &errorMessage)
 {
-    //TODO
+    ui->stackedWidget->setCurrentIndex(4);
+
+    ui->wInitProgressBar->hide();
+    ui->wInitProgressWaitLabel->hide();
+    ui->wInitProgressStatusLabel->hide();
+    ui->wInitProgressResultLabel->show();
+    ui->wInitProgressResultLabel->setText(tr("Error: \n") + errorMessage);
 }

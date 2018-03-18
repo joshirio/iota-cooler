@@ -27,10 +27,13 @@ private slots:
     void processReadyReadOutput();
 
 private:
+    bool clearSmidgenMultisigFile();
+
     RequestType m_currentRequest;
     QProcess *m_process;
     QStringList m_requestArgs;
     QString m_processOutput;
+    QString m_smidgenMultisigFilePath;
 };
 
 #endif // SMIDGENTANGLEAPI_H

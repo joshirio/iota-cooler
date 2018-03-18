@@ -1,11 +1,15 @@
 #include "smidgentangleapi.h"
 #include "../utils/definitionholder.h"
 #include "../utils/utilsiota.h"
+#include "walletmanager.h"
 
 SmidgenTangleAPI::SmidgenTangleAPI(QObject *parent) :
     AbstractTangleAPI(parent), m_currentRequest(RequestType::NoRequest)
 {
     m_process = new QProcess(this);
+
+    //use tmp file as smidgen multisig wallet file
+    m_smidgenMultisigFilePath = WalletManager::getTmpMultisigSignFilePath();
 
     connect(m_process, &QProcess::readyReadStandardOutput,
             this, &SmidgenTangleAPI::processReadyReadOutput);
@@ -62,6 +66,26 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     case CreateSeed:
         command = "generate-seed";
         break;
+    case CreateMultisigWallet:
+        if (!clearSmidgenMultisigFile()) return;
+        command = "multisig";
+        extraArgs.append("create");
+        extraArgs.append(argList.at(0)); //signing party name
+        extraArgs.append(m_smidgenMultisigFilePath); //smidgen multisig wallet file
+        extraArgs.append("--no-validation"); //skip check to allow offline usage
+        break;
+    case AddMultisigParty:
+        command = "multisig";
+        extraArgs.append("add");
+        extraArgs.append(argList.at(0)); //signing party name
+        extraArgs.append(m_smidgenMultisigFilePath); //smidgen multisig wallet file
+        extraArgs.append("--no-validation"); //skip check to allow offline usage
+        break;
+    case FinalizeMultsigWallet:
+        command = "multisig";
+        extraArgs.append("finalize");
+        extraArgs.append(m_smidgenMultisigFilePath); //smidgen multisig wallet file
+        break;
     case GetBalance:
         command = "get-balance";
         //TODO: just an example rm this
@@ -78,14 +102,19 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     m_processOutput.clear();
     m_process->start(smidgenPath, args);
 
-    //if login command, use interactive command to avoid pass leak
-    //instead of command line args
-    /*if (m_currentRequest == AuthRequest) {
-            QString megaPass = "YSTSEP9AFGGENBAZDGDZRZEXJIORI9WCLEHNAVDKAOZENLFIVHAZ9ZYP9TGDHFWNMQGYGYYMOGHVSELS9";
-            m_process->waitForReadyRead();
-            m_process->write(megaPass.toLatin1());
-            m_process->waitForBytesWritten();
-        }*/ //disable while balance adr given
+    //if seed arg is required, use interactive input to avoid seed leak
+    //also used for other interactive inputs like addresses
+    if (m_currentRequest == CreateMultisigWallet) {
+        QString seed = argList.at(1);
+        m_process->waitForReadyRead();
+        m_process->write(seed.toLatin1());
+        m_process->waitForBytesWritten();
+    } else if (m_currentRequest == AddMultisigParty) {
+        QString seed = argList.at(1);
+        m_process->waitForReadyRead();
+        m_process->write(seed.toLatin1());
+        m_process->waitForBytesWritten();
+    }
 
     //close write channel to allow
     //ready output signals, see docs
@@ -226,6 +255,37 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 error = true;
             }
             break;
+        case CreateMultisigWallet:
+            if (result.contains("Successfully")) {
+                //return ok as OK:party_name
+                message = QString("Multisig create:OK:").append(requestArgs.at(0));
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case AddMultisigParty:
+            if (result.contains("Successfully")) {
+                //return ok as OK:party_name
+                message = QString("Multisig add:OK:").append(requestArgs.at(0));
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case FinalizeMultsigWallet:
+            if (result.contains("Successfully")) {
+                //return ok as OK:main_address
+                QString mainAddress = result.simplified().split(":").at(1).trimmed();
+                message = QString("Multisig finalize:OK:").append(mainAddress);
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
         default:
             //unexpected response
             errorMessage = result;
@@ -266,4 +326,14 @@ void SmidgenTangleAPI::processReadyReadOutput()
     default:
         break;
     }*/
+}
+
+bool SmidgenTangleAPI::clearSmidgenMultisigFile()
+{
+    if (!WalletManager::deleteTmpMultisifSignFile()) {
+        emit requestError(m_currentRequest,
+                          tr("Failed to remove temporary multisig file!"));
+        return false;
+    }
+    return true;
 }

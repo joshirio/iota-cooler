@@ -61,6 +61,22 @@ public:
     static void destroy();
 
     /**
+     * @brief Get the path of the multisig file,
+     * which is the file with signed or yet to sign transactions
+     * that is embedded into the encrypted wallet file.
+     * In case of smidgen tangleAPI implementation this is
+     * just the smidgen mutisig file.
+     * @return file path in a temp directory
+     */
+    static QString getTmpMultisigSignFilePath();
+
+    /**
+     * @brief Deletes the multisig file
+     * @return true on success
+     */
+    static bool deleteTmpMultisifSignFile();
+
+    /**
      * @brief Unlock wallet by caching the encryption passphrase
      * @param encryptionKey - the aes encryption key used to read/write the wallet file
      */
@@ -106,6 +122,60 @@ public:
      * @return wallet operation enum
      */
     WalletOp getCurrentWalletOp();
+
+    /**
+     * @brief Import the temporary multisig file to be embedded into the
+     * wallet, call this before writing the wallet file.
+     * @return true on success
+     */
+    bool importMultisigFile();
+
+    /**
+     * @brief Import the temporary multisig file to be embedded into the
+     * wallet as a clean state (ie. no pending multisig ops like transfers).
+     * Call this before writing the wallet file.
+     * @return true on success
+     */
+    bool importMultisigFileAsCleanBackup();
+
+    /**
+     * @brief Export the multisig file as a temporary file.
+     * Call this only after a wallet has been read.
+     * @return true on success
+     */
+    bool exportMultisigFile();
+
+    /**
+     * @brief Export the clean state (no pending op) multisig file as a temporary file.
+     * Call this only after a wallet has been read.
+     * @return true on success
+     */
+    bool exportCleanBackupMultisigFile();
+
+    /**
+     * @brief Clear the internal stored multisig file
+     */
+    void clearImportedMultisigFile();
+
+    /**
+     * @brief Clear the internal clean backup stored multisig file
+     */
+    void clearCleamBackupImportedMultisigFile();
+
+    /**
+     * @brief Save current wallet to disk
+     * @param walletFilePath - file where wallet is written to
+     * @param importTmpMultisigFile - if true, importMultisigFile() is called
+     * which sets the temp multisig file as current one
+     * @param importTmpCleanBackupMultisigFile - if true, importMultisigFileAsCleanBackup() is called
+     * which sets the temp multisig file as current clean state multisig backup
+     * @param error - WalletError, containing error info on failure
+     * @return true on success
+     */
+    bool saveWallet(const QString &walletFilePath,
+                    bool importTmpMultisigFile,
+                    bool importTmpCleanBackupMultisigFile,
+                    WalletError &error);
 
 private:
     explicit WalletManager(QObject *parent = nullptr);

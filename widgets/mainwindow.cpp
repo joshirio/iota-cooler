@@ -51,7 +51,7 @@ void MainWindow::openWallet(const QString &filePath)
             switch (m_walletManager->getCurrentWalletOp()) {
             case WalletManager::InitOffline:
                 ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
-                m_createWalletWidget->setOfflineWalletInitStep();
+                m_createWalletWidget->setOfflineWalletInitStep(filePath);
                 break;
             case WalletManager::ColdSign:
                 //TODO: set up view for offline tx sign
