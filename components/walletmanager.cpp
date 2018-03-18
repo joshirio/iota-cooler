@@ -205,6 +205,8 @@ bool WalletManager::saveWallet(const QString &walletFilePath,
                                bool importTmpCleanBackupMultisigFile,
                                WalletError &error)
 {
+    checkLock();
+
     bool ok = true;
     if (importTmpMultisigFile) {
         ok = importMultisigFile();
@@ -223,6 +225,8 @@ bool WalletManager::restoreWallet(const QString &walletFilePath,
                                   bool exportTmpCleanBackupMultisigFile,
                                   WalletError &error)
 {
+    checkLock();
+
     bool ok = true;
     ok = readWalletFile(walletFilePath, error);
     if (ok) {
