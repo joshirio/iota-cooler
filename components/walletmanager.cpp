@@ -256,6 +256,18 @@ WalletManager::WalletOp WalletManager::getCurrentWalletOp(QVariantList &opArgs)
     return op;
 }
 
+QVariantList WalletManager::getPastUsedAddresses()
+{
+    return m_jsonObject.value("pastUsedAdresses").toArray().toVariantList();
+}
+
+void WalletManager::addPastUsedAddress(const QString &address)
+{
+    QJsonArray array = m_jsonObject.value("pastUsedAdresses").toArray();
+    array.append(address);
+    m_jsonObject.insert("pastUsedAdresses", array);
+}
+
 QString WalletManager::getCurrentAddress()
 {
     return m_jsonObject.value("currentAddress").toString();

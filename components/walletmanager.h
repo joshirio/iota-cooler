@@ -213,6 +213,18 @@ public:
     WalletOp getCurrentWalletOp(QVariantList &opArgs);
 
     /**
+     * @brief Get past used addresses
+     * @return QVariant list with the addresses
+     */
+    QVariantList getPastUsedAddresses();
+
+    /**
+     * @brief Add an address to the list of past used addresses
+     * @param address to add
+     */
+    void addPastUsedAddress(const QString &address);
+
+    /**
      * @brief Get current receiving address
      * @return address string
      */

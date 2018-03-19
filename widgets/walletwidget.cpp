@@ -73,7 +73,10 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
     //TODO
 
     //load past addresses
-    //TODO
+    QVariantList usedAddresses = m_walletManager->getPastUsedAddresses();
+    foreach (QVariant v, usedAddresses) {
+        ui->addressesListWidget->addItem(v.toString());
+    }
 
     //check balance
     updateBalance();
