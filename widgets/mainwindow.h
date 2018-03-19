@@ -15,6 +15,7 @@ class MainWindow;
 }
 
 class CreateWalletWizard;
+class WalletWidget;
 class WalletManager;
 
 class MainWindow : public QMainWindow
@@ -75,6 +76,7 @@ private:
     QAction *m_reattachAction;
     QAction *m_helpAction;
     CreateWalletWizard *m_createWalletWidget;
+    WalletWidget *m_walletWidget;
     WalletManager *m_walletManager;
 };
 

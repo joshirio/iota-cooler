@@ -3,6 +3,7 @@
 #include "settingsdialog.h"
 #include "aboutdialog.h"
 #include "createwalletwizard.h"
+#include "walletwidget.h"
 #include "promotereattachdialog.h"
 #include "../utils/definitionholder.h"
 #include "../utils/utilsiota.h"
@@ -20,7 +21,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_createWalletWidget(0)
+    m_createWalletWidget(0),
+    m_walletWidget(0)
 {
     ui->setupUi(this);
     m_menuBar = ui->menuBar;
@@ -60,7 +62,8 @@ void MainWindow::openWallet(const QString &filePath)
                 //TODO: set up view online tx sign and broadcast
                 break;
             default:
-                //TODO: set up main wallet view
+                ui->stackedWidget->setCurrentWidget(m_walletWidget);
+                m_walletWidget->setCurrentWalletPath(filePath);
                 break;
             }
         } else {
@@ -170,6 +173,8 @@ void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
     ui->stackedWidget->addWidget(m_createWalletWidget);
+    m_walletWidget = new WalletWidget(this);
+    ui->stackedWidget->addWidget(m_walletWidget);
 }
 
 void MainWindow::createMenus()
