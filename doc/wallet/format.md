@@ -54,7 +54,8 @@ list of past spending transactions (signed outgoing multisig txs).
         "",
         ""
       ],
-      "tag": ""
+      "tag": "",
+      "dateTime": "2012-04-23T18:25:43.511Z"
     },
     {
       "tailTxHash": "SUGDOXURVKGCNCBRRLEXKGTBRRUHF9FHVDZGJOBHACMMIZM9YKSTBPDUMHMFHY9POVKDNRXBFWYZ99999",
@@ -65,7 +66,8 @@ list of past spending transactions (signed outgoing multisig txs).
         "",
         ""
       ],
-      "tag": ""
+      "tag": "",
+      "dateTime": "2014-04-23T18:25:43.511Z"
     }
   ]
 }
