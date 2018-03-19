@@ -44,6 +44,9 @@ signals:
     /** Signal main window to show a status bar message */
     void showStatusMessage(const QString &message);
 
+    /** Emitted on send button (new transaction) clicked */
+    void makeNewTransactionSignal();
+
 private slots:
     /**
      * @brief Update balance of the main address
@@ -51,6 +54,11 @@ private slots:
     void updateBalance();
     void closeWalletButtonClicked();
     void copyCurrentAddress();
+    void tangleExplorerButtonClicked();
+    void sendButtonClicked();
+    void addressesButtonClicked();
+    void addressesBackButtonClicked();
+    void addressesViewTangleButton();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,

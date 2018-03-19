@@ -10,6 +10,10 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMessageBox>
+#include <QtGui/QDesktopServices>
+#include <QtCore/QUrl>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QTableWidget>
 
 WalletWidget::WalletWidget(QWidget *parent) :
     QWidget(parent),
@@ -25,6 +29,18 @@ WalletWidget::WalletWidget(QWidget *parent) :
             this, &WalletWidget::closeWalletButtonClicked);
     connect(ui->copyAddressToolButton, &QToolButton::clicked,
             this, &WalletWidget::copyCurrentAddress);
+    connect(ui->copyAddressToolButton_2, &QToolButton::clicked,
+            this, &WalletWidget::copyCurrentAddress);
+    connect(ui->tangleExplorerButton, &QPushButton::clicked,
+            this, &WalletWidget::tangleExplorerButtonClicked);
+    connect(ui->sendButton, &QPushButton::clicked,
+            this, &WalletWidget::sendButtonClicked);
+    connect(ui->addressesButton, &QPushButton::clicked,
+            this, &WalletWidget::addressesButtonClicked);
+    connect(ui->addressesBackButton, &QPushButton::clicked,
+            this, &WalletWidget::addressesBackButtonClicked);
+    connect(ui->addressesViewTangleButton, &QPushButton::clicked,
+            this, &WalletWidget::addressesViewTangleButton);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -51,6 +67,13 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
     ui->addressLabel->setText(QString("<a href='%1'>%2</a>")
                               .arg("https://thetangle.org/address/" + address)
                               .arg(addressWrapped));
+    ui->addressLabel_2->setText(addressWrapped);
+
+    //load past transactions
+    //TODO
+
+    //load past addresses
+    //TODO
 
     //check balance
     updateBalance();
@@ -82,6 +105,50 @@ void WalletWidget::copyCurrentAddress()
 {
     QGuiApplication::clipboard()->setText(
                 m_walletManager->getCurrentAddress());
+}
+
+void WalletWidget::tangleExplorerButtonClicked()
+{
+    QString h, v;
+    if (ui->pastTxTableWidget->selectionModel()->hasSelection()) {
+        v = "transaction";
+        int i = ui->pastTxTableWidget->currentRow();
+        h = ui->pastTxTableWidget->item(i, 2)->text();
+    } else {
+        v = "address";
+        h = m_walletManager->getCurrentAddress();
+    }
+    QDesktopServices::openUrl(QUrl(QString("https://thetangle.org/%1/%2")
+                                   .arg(v).arg(h)));
+}
+
+void WalletWidget::sendButtonClicked()
+{
+    stopBalanceRefresher();
+    emit makeNewTransactionSignal();
+}
+
+void WalletWidget::addressesButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+
+void WalletWidget::addressesBackButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+void WalletWidget::addressesViewTangleButton()
+{
+    QString a;
+    if (ui->addressesListWidget->selectionModel()->hasSelection()) {
+        int i = ui->addressesListWidget->currentRow();
+        a = ui->addressesListWidget->item(i)->text();
+    } else {
+        a = m_walletManager->getCurrentAddress();
+    }
+    QDesktopServices::openUrl(QUrl(QString("https://thetangle.org/address/%1")
+                                   .arg(a)));
 }
 
 void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,

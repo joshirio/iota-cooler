@@ -181,6 +181,12 @@ void MainWindow::showStatusMessage(const QString &message)
     ui->statusBar->showMessage(message);
 }
 
+void MainWindow::makeNewTransaction()
+{
+    //TODO
+    //ui->stackedWidget->setCurrentWidget(m_);
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -256,6 +262,8 @@ void MainWindow::createConnections()
             this, &MainWindow::closeWallet);
     connect(m_walletWidget, &WalletWidget::showStatusMessage,
             this, &MainWindow::showStatusMessage);
+    connect(m_walletWidget, &WalletWidget::makeNewTransactionSignal,
+            this, &MainWindow::makeNewTransaction);
 }
 
 void MainWindow::loadSettings()

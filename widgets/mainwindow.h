@@ -49,6 +49,7 @@ private slots:
     void walletCreationCompleted();
     void closeWallet();
     void showStatusMessage(const QString &message);
+    void makeNewTransaction();
 
 private:
     void loadWidgets();
