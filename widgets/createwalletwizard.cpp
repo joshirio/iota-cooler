@@ -341,7 +341,9 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
     case AbstractTangleAPI::FinalizeMultsigWallet:
     {
         //extract main wallet address
-        m_walletInitStepResults.append(response.split(":").at(2));
+        QString mainAddress = response.split(":").at(2);
+        m_walletInitStepResults.append(mainAddress);
+        m_walletManager->setCurrentAddress(mainAddress);
 
         //save wallet
         WalletManager::WalletError error;

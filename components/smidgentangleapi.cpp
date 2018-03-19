@@ -88,8 +88,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         break;
     case GetBalance:
         command = "get-balance";
-        //TODO: just an example rm this
-        extraArgs.append("RF9TQPFMGIWUTFWYHLVTDAUIKPGEKWIFBVELXVESPIMFPMQPPXHANGGYBJ9THRXRFFHWRQGQSNPVGJBJDXHNKNNSVY");
+        extraArgs.append(argList.at(0));
         break;
     }
 
@@ -280,6 +279,22 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 //return ok as OK:main_address
                 QString mainAddress = result.simplified().split(":").at(1).trimmed();
                 message = QString("Multisig finalize:OK:").append(mainAddress);
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case GetBalance:
+            if (result.contains("Balance:")) {
+                //return ok as Balace:address:iotabalance:readablebalance
+                QString ibalance = result;
+                ibalance.remove("Balance: ");
+                QString readableBalance = ibalance.simplified().trimmed();
+                ibalance = ibalance.split(" (").at(0);
+                message = QString("Balance:").append(requestArgs.at(0))
+                        .append(":" + ibalance.append(":"))
+                        .append(readableBalance);
             } else {
                 //unexpected response
                 errorMessage = result;

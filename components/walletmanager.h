@@ -212,6 +212,18 @@ public:
      */
     WalletOp getCurrentWalletOp(QVariantList &opArgs);
 
+    /**
+     * @brief Get current receiving address
+     * @return address string
+     */
+    QString getCurrentAddress();
+
+    /**
+     * @brief Set the current receiving address
+     * @param address
+     */
+    void setCurrentAddress(const QString &address);
+
 private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}

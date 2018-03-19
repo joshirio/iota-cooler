@@ -62,6 +62,7 @@ void MainWindow::openWallet(const QString &filePath)
                 //TODO: set up view online tx sign and broadcast
                 break;
             default:
+                enforceOnlineRole();
                 ui->stackedWidget->setCurrentWidget(m_walletWidget);
                 m_walletWidget->setCurrentWalletPath(filePath);
                 break;
@@ -169,6 +170,17 @@ void MainWindow::walletCreationCompleted()
     ui->stackedWidget->setCurrentIndex(0);
 }
 
+void MainWindow::closeWallet()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+    m_walletManager->lockWallet();
+}
+
+void MainWindow::showStatusMessage(const QString &message)
+{
+    ui->statusBar->showMessage(message);
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -238,6 +250,12 @@ void MainWindow::createConnections()
             this, &MainWindow::newWalletWizardCancelled);
     connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCompleted,
             this, &MainWindow::walletCreationCompleted);
+
+    //wallet main view
+    connect(m_walletWidget, &WalletWidget::walletClosed,
+            this, &MainWindow::closeWallet);
+    connect(m_walletWidget, &WalletWidget::showStatusMessage,
+            this, &MainWindow::showStatusMessage);
 }
 
 void MainWindow::loadSettings()

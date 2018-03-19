@@ -19,6 +19,13 @@ bool UtilsIOTA::isValidSeed(const QString &seed)
     return reg.match(seed).hasMatch();
 }
 
+bool UtilsIOTA::isValidAddress(const QString &address)
+{
+    QRegularExpression reg("^[A-Z9]{81}$|^[A-Z9]{90}$"); //81 or 90 (checksum) length
+    //checksum is not checked at this time
+    return reg.match(address).hasMatch();
+}
+
 UtilsIOTA::UtilsIOTA()
 {
 

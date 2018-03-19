@@ -47,6 +47,8 @@ private slots:
     void openWalletButtonClicked();
     void newWalletWizardCancelled();
     void walletCreationCompleted();
+    void closeWallet();
+    void showStatusMessage(const QString &message);
 
 private:
     void loadWidgets();

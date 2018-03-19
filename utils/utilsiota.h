@@ -19,6 +19,10 @@ public:
     /** Check if seed format is valid */
     static bool isValidSeed(const QString &seed);
 
+    /**
+     * Check if the address format is valid */
+    static bool isValidAddress(const QString &address);
+
     /** The current IOTA node URL used for API requests */
     static QString currentNodeUrl;
 

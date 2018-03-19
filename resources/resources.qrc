@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>icons/iotacooler.png</file>
         <file>icons/wallet_file.png</file>
+        <file>icons/copy.png</file>
     </qresource>
 </RCC>

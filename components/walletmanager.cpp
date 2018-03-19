@@ -256,6 +256,16 @@ WalletManager::WalletOp WalletManager::getCurrentWalletOp(QVariantList &opArgs)
     return op;
 }
 
+QString WalletManager::getCurrentAddress()
+{
+    return m_jsonObject.value("currentAddress").toString();
+}
+
+void WalletManager::setCurrentAddress(const QString &address)
+{
+    m_jsonObject.insert("currentAddress", address);
+}
+
 bool WalletManager::importMultisigFile()
 {
     QFile tmpFile(getTmpMultisigSignFilePath());
