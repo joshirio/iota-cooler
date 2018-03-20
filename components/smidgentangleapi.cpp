@@ -23,7 +23,7 @@ SmidgenTangleAPI::SmidgenTangleAPI(QObject *parent) :
 
 SmidgenTangleAPI::~SmidgenTangleAPI()
 {
-    stopCurrentAPIRequest();
+
 }
 
 void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &argList)

@@ -15,6 +15,7 @@
 
 #include <QObject>
 #include <QJsonObject>
+#include "../utils/utilsiota.h"
 
 class WalletManager : public QObject
 {
@@ -235,6 +236,20 @@ public:
      * @param address
      */
     void setCurrentAddress(const QString &address);
+
+    /**
+     * @brief Add a transaction entry to the past transaction object array.
+     * If a transaction has multiple receivers, please add same tx multiple times
+     * with updated amounts and receivers but same tail tx hash.
+     * @param transaction (struct)
+     */
+    void addPastSpendingTx(const UtilsIOTA::Transation &transaction);
+
+    /**
+     * @brief Get past spending transactions
+     * @return list of transaction structs
+     */
+    QList<UtilsIOTA::Transation> getPastSpendingTxs();
 
 private:
     explicit WalletManager(QObject *parent = nullptr);

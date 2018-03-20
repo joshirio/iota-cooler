@@ -58,7 +58,7 @@ private slots:
     void sendButtonClicked();
     void addressesButtonClicked();
     void addressesBackButtonClicked();
-    void addressesViewTangleButton();
+    void addressesViewTangleButtonClicked();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,
@@ -70,6 +70,7 @@ private:
      */
     void startBalanceRefresher();
     void stopBalanceRefresher();
+    void loadPastTxs();
 
     Ui::WalletWidget *ui;
     QString m_currentWalletFilePath;

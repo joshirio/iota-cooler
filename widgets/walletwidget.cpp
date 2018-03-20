@@ -14,6 +14,7 @@
 #include <QtCore/QUrl>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QTableWidget>
+#include <QtWidgets/QHeaderView>
 
 WalletWidget::WalletWidget(QWidget *parent) :
     QWidget(parent),
@@ -40,7 +41,15 @@ WalletWidget::WalletWidget(QWidget *parent) :
     connect(ui->addressesBackButton, &QPushButton::clicked,
             this, &WalletWidget::addressesBackButtonClicked);
     connect(ui->addressesViewTangleButton, &QPushButton::clicked,
-            this, &WalletWidget::addressesViewTangleButton);
+            this, &WalletWidget::addressesViewTangleButtonClicked);
+
+    //pastTxTable
+    connect(ui->pastTxTableWidget, &QTableWidget::cellDoubleClicked,
+            this, &WalletWidget::tangleExplorerButtonClicked);
+
+    //pastUsedAddressesList
+    connect(ui->addressesListWidget, &QListWidget::itemDoubleClicked,
+            this, &WalletWidget::addressesViewTangleButtonClicked);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -52,7 +61,7 @@ WalletWidget::WalletWidget(QWidget *parent) :
 
 WalletWidget::~WalletWidget()
 {
-    stopBalanceRefresher();
+    //stopBalanceRefresher();
     delete ui;
 }
 
@@ -70,7 +79,7 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
     ui->addressLabel_2->setText(addressWrapped);
 
     //load past transactions
-    //TODO
+    loadPastTxs();
 
     //load past addresses
     QVariantList usedAddresses = m_walletManager->getPastUsedAddresses();
@@ -141,7 +150,7 @@ void WalletWidget::addressesBackButtonClicked()
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-void WalletWidget::addressesViewTangleButton()
+void WalletWidget::addressesViewTangleButtonClicked()
 {
     QString a;
     if (ui->addressesListWidget->selectionModel()->hasSelection()) {
@@ -176,15 +185,15 @@ void WalletWidget::requestError(AbstractTangleAPI::RequestType request,
     switch (request) {
     case AbstractTangleAPI::GetBalance:
         ui->balanceLabel->setText(tr("error..."));
-        if (errorMessage.contains("--provider")) { //TODO: check actual message when offline
+        if (errorMessage.contains("--provider")) {
             emit showStatusMessage(tr("Failed to check balance! "
                                       "Please check your node and connection"));
-            break;
         } else {
-            //break missing
-            //to show error message with box belo
-            //WARNING: Do not add any switch cases below this, only above!
+            QMessageBox::critical(this,
+                                  tr("IOTA API Request Error"),
+                                  errorMessage);
         }
+        break;
     default:
         QMessageBox::critical(this,
                               tr("IOTA API Request Error"),
@@ -210,4 +219,29 @@ void WalletWidget::stopBalanceRefresher()
         disconnect(m_BalanceRefreshTimer, &QTimer::timeout,
                    this, &WalletWidget::updateBalance);
     }
+}
+
+void WalletWidget::loadPastTxs()
+{
+    QList<UtilsIOTA::Transation> pastTxList = m_walletManager->getPastSpendingTxs();
+    foreach (UtilsIOTA::Transation tx, pastTxList) {
+        int rows = ui->pastTxTableWidget->rowCount() + 1;
+        int currentRow = rows - 1;
+        ui->pastTxTableWidget->setRowCount(rows);
+        QTableWidgetItem *date = new QTableWidgetItem(tx.dateTime
+                                                      .toString(Qt::DefaultLocaleShortDate));
+        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount);
+        QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
+        QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
+        QTableWidgetItem *to = new QTableWidgetItem(tx.receivingAddress);
+        ui->pastTxTableWidget->setItem(currentRow, 0, date);
+        ui->pastTxTableWidget->setItem(currentRow, 1, amount);
+        ui->pastTxTableWidget->setItem(currentRow, 2, txHash);
+        ui->pastTxTableWidget->setItem(currentRow, 3, from);
+        ui->pastTxTableWidget->setItem(currentRow, 4, to);
+    }
+    ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(0,
+                                                                    QHeaderView::ResizeToContents);
+    ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(1,
+                                                                    QHeaderView::ResizeToContents);
 }

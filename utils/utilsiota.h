@@ -8,6 +8,9 @@
 #ifndef UTILSIOTA_H
 #define UTILSIOTA_H
 
+#include <QtCore/QDateTime>
+#include <QtCore/QStringList>
+
 class QString;
 
 class UtilsIOTA
@@ -33,6 +36,18 @@ public:
         Undefined, /**< Undefined role */
         OnlineSigner, /**< Device broadcasts and prepare transactions */
         OfflineSigner /**< Device only signs transactions securely offline */
+    };
+
+    /**
+     * @brief The Transation struct
+     */
+    struct Transation {
+        QString tailTxHash; /**< First tx in the bundle */
+        QString amount; /**< Amount in iota */
+        QString spendingAddress; /**< Address with original funds */
+        QString receivingAddress; /**< Receiver */
+        QString tag; /**< IOTA tag */
+        QDateTime dateTime; /**< Date and time of the transaction */
     };
 
 private:

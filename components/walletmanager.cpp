@@ -278,6 +278,44 @@ void WalletManager::setCurrentAddress(const QString &address)
     m_jsonObject.insert("currentAddress", address);
 }
 
+void WalletManager::addPastSpendingTx(const UtilsIOTA::Transation &transaction)
+{
+    QJsonArray txListArray = m_jsonObject.value("pastSpendingTransactions").toArray();
+
+    QJsonObject jsonTx;
+    jsonTx.insert("tailTxHash", transaction.tailTxHash);
+    jsonTx.insert("amount", transaction.amount);
+    jsonTx.insert("spendingAddress", transaction.spendingAddress);
+    jsonTx.insert("receivingAdress", transaction.receivingAddress);
+    jsonTx.insert("tag", transaction.tag);
+    jsonTx.insert("dateTime", transaction.dateTime.toString(Qt::ISODate));
+    txListArray.append(jsonTx);
+
+    m_jsonObject.insert("pastSpendingTransactions", txListArray);
+}
+
+QList<UtilsIOTA::Transation> WalletManager::getPastSpendingTxs()
+{
+    QList<UtilsIOTA::Transation> txList;
+    QJsonArray txsJsonArray = m_jsonObject.value("pastSpendingTransactions").toArray();
+
+    foreach (QJsonValue jTx, txsJsonArray) {
+        QJsonObject jObj = jTx.toObject();
+        UtilsIOTA::Transation tx;
+        tx.tailTxHash = jObj.value("tailTxHash").toString();
+        tx.amount = jObj.value("amount").toString();
+        tx.spendingAddress = jObj.value("spendingAddress").toString();
+        tx.receivingAddress = jObj.value("receivingAdress").toString();
+        tx.tag = jObj.value("tag").toString();
+        tx.dateTime = QDateTime::fromString(jObj.value("dateTime").toString(),
+                                            Qt::ISODate);
+
+        txList.append(tx);
+    }
+
+    return txList;
+}
+
 bool WalletManager::importMultisigFile()
 {
     QFile tmpFile(getTmpMultisigSignFilePath());
