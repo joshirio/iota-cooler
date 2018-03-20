@@ -52,6 +52,7 @@ void MainWindow::openWallet(const QString &filePath)
 
         WalletManager::WalletError error;
         if (m_walletManager->readWalletFile(filePath, error)) {
+            SettingsManager sm(this);
             m_currentWalletPath = filePath;
             switch (m_walletManager->getCurrentWalletOp()) {
             case WalletManager::InitOffline:
@@ -59,7 +60,12 @@ void MainWindow::openWallet(const QString &filePath)
                 m_createWalletWidget->setOfflineWalletInitStep(filePath);
                 break;
             case WalletManager::ColdSign:
-                //TODO: set up view for offline tx sign
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
+                    //TODO
+                } else {
+                    ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
+                    m_multisigTransferWidget->showContinueWithOfflineSigner(m_currentWalletPath);
+                }
                 break;
             case WalletManager::HotSign:
                 //TODO: set up view online tx sign and broadcast
@@ -188,7 +194,7 @@ void MainWindow::showStatusMessage(const QString &message)
 void MainWindow::makeNewTransaction()
 {
     ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
-    m_multisigTransferWidget->prepareNewTransfer();
+    m_multisigTransferWidget->prepareNewTransfer(m_currentWalletPath);
 }
 
 void MainWindow::multisigTransferCancelled()

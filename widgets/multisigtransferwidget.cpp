@@ -12,6 +12,7 @@
 #include <QtGui/QRegExpValidator>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QApplication>
 
 MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
     QWidget(parent),
@@ -19,6 +20,7 @@ MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     m_walletManager = &WalletManager::getInstance();
+    m_currentWalletPath = "/invalid";
 
     connect(ui->infoCancelButton, &QPushButton::clicked,
             this, &MultisigTransferWidget::transferCancelled);
@@ -32,6 +34,10 @@ MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
             this, &MultisigTransferWidget::transferCancelled);
     connect(ui->rNextButton, &QPushButton::clicked,
             this, &MultisigTransferWidget::receiversNextButtonClicked);
+    connect(ui->onlineSignQuitButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::onlineSignQuitButtonClicked);
+    connect(ui->goOfflineAbortTransactionButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::abortCurrentTransaction);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -46,13 +52,20 @@ MultisigTransferWidget::~MultisigTransferWidget()
     delete ui;
 }
 
-void MultisigTransferWidget::prepareNewTransfer()
+void MultisigTransferWidget::prepareNewTransfer(const QString &walletPath)
 {
+    m_currentWalletPath = walletPath;
     ui->stackedWidget->setCurrentIndex(0);
     clearAllReceivers();
     addReceiverButtonClicked();
     updateBalance();
     ui->infoNextButton->setFocus();
+}
+
+void MultisigTransferWidget::showContinueWithOfflineSigner(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    ui->stackedWidget->setCurrentIndex(2);
 }
 
 void MultisigTransferWidget::nextPage()
@@ -135,10 +148,26 @@ void MultisigTransferWidget::receiversNextButtonClicked()
     }
     if (!valid) return;
 
+    //exlude own addresses from receivers
+    bool ow = false;
+    QVariantList ownAddresses = m_walletManager->getPastUsedAddresses();
+    ownAddresses.append(m_walletManager->getCurrentAddress());
+    foreach (QVariant ows, ownAddresses) {
+        if (m_receiversMap.contains(ows.toString())) {
+            ow = true;
+            QMessageBox::critical(this, tr("Address Error"),
+                                  tr("Sending funds to your own addresses "
+                                     "is not allowed, this is to avoid lost funds!"));
+            break;
+        }
+    }
+    if (ow) return;
+
     //check amounts
     bool b = true;
     bool error = false;
-    quint64 walletBalance = ui->rBalanceLabel->text().toULongLong(&error);
+    quint64 walletBalance = ui->rBalanceLabel->text().toULongLong(&b);
+    if (!b) error = true;
     quint64 sendingAmountTot = 0;
     foreach (QLineEdit *a, m_receiversAmountLineList) {
         sendingAmountTot += a->text().toULongLong(&b);
@@ -158,14 +187,54 @@ void MultisigTransferWidget::receiversNextButtonClicked()
     }
 
     //prepare tx
-    //TODO
+    m_walletManager->backupMultisigFileAsClean(); //backup clean multisig file
+    QVariantList opArgs;
+    QStringList amountList = m_receiversMap.keys();
+    QStringList addressList = m_receiversMap.values();
+    opArgs.append(addressList);
+    opArgs.append(amountList);
+    m_walletManager->setCurrentWalletOp(WalletManager::ColdSign, opArgs);
+    WalletManager::WalletError wError;
+    m_walletManager->saveWallet(m_currentWalletPath,
+                                false,
+                                false,
+                                wError);
+    if (wError.errorType == WalletManager::WalletError::NoError) {
+        nextPage();
+    } else {
+        //restore clean wallet
+        m_walletManager->restoreCleanMultisigFileBackup();
+        QMessageBox::critical(this,
+                              tr("Wallet Save Error"),
+                              wError.errorString);
+    }
+}
 
-    nextPage();
+void MultisigTransferWidget::onlineSignQuitButtonClicked()
+{
+    qApp->quit();
+}
+
+void MultisigTransferWidget::abortCurrentTransaction()
+{
+    m_walletManager->restoreCleanMultisigFileBackup();
+    m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::NoOp,
+                                        QVariantList());
+    WalletManager::WalletError error;
+    m_walletManager->saveWallet(m_currentWalletPath,
+                                false, false, error);
+    if (error.errorType != WalletManager::WalletError::NoError) {
+        QMessageBox::critical(this,
+                              tr("Wallet Save Error"),
+                              error.errorString);
+    } else {
+        emit transferCancelled();
+    }
 }
 
 void MultisigTransferWidget::updateBalance()
 {
-    ui->rBalanceButton->setText(tr("checking..."));
+    ui->rBalanceLabel->setText(tr("checking..."));
     QString a = m_walletManager->getCurrentAddress();
     if (UtilsIOTA::isValidAddress(a)) {
         QStringList args;
@@ -182,7 +251,7 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
     case AbstractTangleAPI::GetBalance:
     {
         QString balanceIota = responseMessage.split(":").at(2);
-        ui->rBalanceButton->setText(balanceIota);
+        ui->rBalanceLabel->setText(balanceIota);
 
     }
         break;
@@ -197,7 +266,7 @@ void MultisigTransferWidget::requestError(AbstractTangleAPI::RequestType request
     switch (request) {
     case AbstractTangleAPI::GetBalance:
     {
-        ui->rBalanceButton->setText(tr("error..."));
+        ui->rBalanceLabel->setText(tr("error..."));
         QString e = errorMessage;
         if (e.contains("--provider")) {
             e = tr("Failed to check balance! "

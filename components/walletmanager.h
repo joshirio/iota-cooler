@@ -251,6 +251,16 @@ public:
      */
     QList<UtilsIOTA::Transation> getPastSpendingTxs();
 
+    /**
+     * @brief Make a clean state (no pending txs) backup of the multisig file
+     */
+    void backupMultisigFileAsClean();
+
+    /**
+     * @brief Restore clean multisig file backup
+     */
+    void restoreCleanMultisigFileBackup();
+
 private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}

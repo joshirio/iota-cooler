@@ -174,8 +174,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>424</width>
-            <height>134</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="scrollAreaLayout"/>
@@ -215,7 +215,85 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2"/>
+     <widget class="QWidget" name="page_2">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10104; Transaction signing [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Your multisig transaction has been successfully prepared.&lt;br /&gt;
+The next step requires the &lt;b&gt;offline signing&lt;/b&gt; device to sign your transfer which has been saved inside the wallet file.&lt;br /&gt;&lt;br /&gt;
+Please close the application and open your wallet file with IOTAcooler on your &lt;b&gt;offline&lt;/b&gt; device, in order to proceed.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="goOfflineAbortTransactionButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>The current unsigned transaction is cancelled and undone</string>
+           </property>
+           <property name="text">
+            <string>&amp;Abort current transaction</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="onlineSignQuitButton">
+           <property name="text">
+            <string>&amp;Quit</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

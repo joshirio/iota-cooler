@@ -316,6 +316,18 @@ QList<UtilsIOTA::Transation> WalletManager::getPastSpendingTxs()
     return txList;
 }
 
+void WalletManager::backupMultisigFileAsClean()
+{
+    m_jsonObject.insert("cleanColdWalletBackup",
+                        m_jsonObject.value("currentColdWallet"));
+}
+
+void WalletManager::restoreCleanMultisigFileBackup()
+{
+    m_jsonObject.insert("currentColdWallet",
+                        m_jsonObject.value("cleanColdWalletBackup"));
+}
+
 bool WalletManager::importMultisigFile()
 {
     QFile tmpFile(getTmpMultisigSignFilePath());

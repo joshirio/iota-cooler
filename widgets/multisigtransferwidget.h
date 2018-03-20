@@ -30,7 +30,10 @@ public:
     ~MultisigTransferWidget();
 
     /** Setup UI for new transfer */
-    void prepareNewTransfer();
+    void prepareNewTransfer(const QString &walletPath);
+
+    /** Prepare UI about next offline step from online signer */
+    void showContinueWithOfflineSigner(const QString &walletPath);
 
 signals:
     /** Unfinished transfer was aborted */
@@ -41,6 +44,8 @@ private slots:
     void addReceiverButtonClicked();
     void removeReceiverButtonClicked();
     void receiversNextButtonClicked();
+    void onlineSignQuitButtonClicked();
+    void abortCurrentTransaction();
     void updateBalance();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
@@ -53,11 +58,12 @@ private:
     Ui::MultisigTransferWidget *ui;
     WalletManager *m_walletManager;
     AbstractTangleAPI *m_tangleAPI;
-    QHash<QString, QString> m_receiversMap;
+    QHash<QString, QString> m_receiversMap; //address, amount
     QList<QLabel*> m_receiversLabelList;
     QList<QLineEdit*> m_receiversAddressLineList;
     QList<QLineEdit*> m_receiversAmountLineList;
     QList<QHBoxLayout*> m_receiversLayoutList;
+    QString m_currentWalletPath;
 };
 
 #endif // MULTISIGTRANSFERWIDGET_H
