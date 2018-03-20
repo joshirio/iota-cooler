@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_walletManager = &WalletManager::getInstance();
     m_currentWalletPath = "/invalid";
 
+    //TODO: save and restore geometry (window size)
     loadWidgets();
     createMenus();
     createConnections();
@@ -214,6 +215,17 @@ void MainWindow::multisigTransferCancelled()
     }
 }
 
+void MainWindow::multisigTransferCompleted()
+{
+    SettingsManager sm(this);
+    if (sm.getDeviceRole() == UtilsIOTA::OnlineSigner) {
+        ui->stackedWidget->setCurrentWidget(m_walletWidget);
+        m_walletWidget->setCurrentWalletPath(m_currentWalletPath);
+    } else {
+        ui->stackedWidget->setCurrentIndex(0);
+    }
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -297,6 +309,8 @@ void MainWindow::createConnections()
     //multisig transfer widget
     connect(m_multisigTransferWidget, &MultisigTransferWidget::transferCancelled,
             this, &MainWindow::multisigTransferCancelled);
+    connect(m_multisigTransferWidget, &MultisigTransferWidget::transferCompleted,
+            this, &MainWindow::multisigTransferCompleted);
 }
 
 void MainWindow::loadSettings()

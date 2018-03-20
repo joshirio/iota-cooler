@@ -238,6 +238,18 @@ public:
     void setCurrentAddress(const QString &address);
 
     /**
+     * @brief Set the online seed for hot signing
+     * @param seed
+     */
+    void setOnlineSeed(const QString &seed);
+
+    /**
+     * @brief Get the online (hot signing) seed
+     * @return seed
+     */
+    QString getOnlineSeed();
+
+    /**
      * @brief Add a transaction entry to the past transaction object array.
      * If a transaction has multiple receivers, please add same tx multiple times
      * with updated amounts and receivers but same tail tx hash.

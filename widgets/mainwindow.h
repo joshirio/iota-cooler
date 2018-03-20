@@ -52,6 +52,7 @@ private slots:
     void showStatusMessage(const QString &message);
     void makeNewTransaction();
     void multisigTransferCancelled();
+    void multisigTransferCompleted();
 
 private:
     void loadWidgets();

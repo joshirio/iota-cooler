@@ -321,10 +321,15 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
             if (result.contains("Successfully signed transfer")) {
                 if (requestArgs.contains("online")) {
                     message = "SignOK:online";
-                } else {
-                    //TODO: check if broadcasted also
-                    message = "SignOK:offline";
                 }
+            } else if (result.contains("Transaction sent")) {
+                //return ok as TransferOK:tailTxHash:newAddress
+                message = "TransferOK:";
+                QString txHash = result.split("hash: ").at(1);
+                txHash = txHash.split("\ninfo").at(0);
+                QString newAddress = result.split("New main address: ").at(1);
+                newAddress.remove("\n");
+                message.append(txHash).append(":").append(newAddress);
             } else if (result.contains("Bundle is invalid")) {
                 error = true;
                 errorMessage = tr("Invalid bundle: please check your seed, "

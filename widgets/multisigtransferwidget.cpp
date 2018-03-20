@@ -54,6 +54,8 @@ MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
             this, &MultisigTransferWidget::txFinalQuitButtonClicked);
     connect(ui->txFinalNextButton, &QPushButton::clicked,
             this, &MultisigTransferWidget::txFinalNextButtonClicked);
+    connect(ui->broadcastFinishButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::broadcastFinishButtonClicked);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -109,7 +111,12 @@ void MultisigTransferWidget::prepareColdTransferSign(const QString &walletPath)
     m_amountList = opArgs.at(2).toStringList();
 
     QString text;
-    text.append(tr("<b>Wallet balance (iota):</b> %1 <br /><br />").arg(m_walletBalance));
+    text.append(tr("<b>Wallet balance (iota):</b> %1 <br />").arg(m_walletBalance));
+    quint64 totSpending = 0;
+    foreach (QString tsp, m_amountList) {
+        totSpending += tsp.toULongLong();
+    }
+    text.append(tr("<b>Total spending (iota):</b> %1 <br /><br />").arg(totSpending));
     for (int i = 0; i < m_receiverList.size(); i++) {
         text.append(tr("<b>Receiver %1</b><br />").arg(i+1));
         text.append(tr("<b>Address:</b> %2 <br />").arg(m_receiverList.at(i)));
@@ -348,9 +355,12 @@ void MultisigTransferWidget::txFinalQuitButtonClicked()
 void MultisigTransferWidget::txFinalNextButtonClicked()
 {
     ui->broadcastResultLabel->hide();
+    ui->broadcastProgressBar->show();
+    ui->broadcastProgressStatusLabel->show();
+    ui->broadcastFinishButton->setEnabled(false);
     nextPage();
 
-    QString onlineSeed = m_walletManager->??
+    QString onlineSeed = m_walletManager->getOnlineSeed();
     QStringList args;
     for (int i = 0; i < m_receiverList.size(); i++) {
         args.append(m_amountList.at(i));
@@ -362,6 +372,11 @@ void MultisigTransferWidget::txFinalNextButtonClicked()
     m_walletManager->exportMultisigFile();
     m_tangleAPI->startAPIRequest(AbstractTangleAPI::MultisigTransfer,
                                  args);
+}
+
+void MultisigTransferWidget::broadcastFinishButtonClicked()
+{
+    emit transferCompleted();
 }
 
 void MultisigTransferWidget::updateBalance()
@@ -410,6 +425,58 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
                 ui->offlineSigningProgressAbortTxButton->setEnabled(false);
                 ui->offlineSigningTxNextButton->setEnabled(true);
             }
+        } else if (responseMessage.contains("TransferOK")) {
+            //extract new address and tx hash
+            QStringList sl = responseMessage.split(":"); //TransferOK:tailTxHash:newAddress
+            QString tailTxHash = sl.at(1);
+            QString newAddress = sl.at(2);
+
+            //update current address
+            QString spendingAddress = m_walletManager->getCurrentAddress();
+            m_walletManager->addPastUsedAddress(spendingAddress);
+            m_walletManager->setCurrentAddress(newAddress);
+
+            //create and save past txs
+            QVariantList prevArgs;
+            m_walletManager->getCurrentWalletOp(prevArgs);
+            QStringList receiverList = prevArgs.at(1).toStringList();
+            QStringList amountList = prevArgs.at(2).toStringList();
+            for (int i = 0; i < receiverList.size(); i++) {
+                UtilsIOTA::Transation tx;
+                tx.amount = amountList.at(i);
+                tx.dateTime = QDateTime::currentDateTime();
+                tx.receivingAddress = receiverList.at(i);
+                tx.spendingAddress = spendingAddress;
+                tx.tag = "";
+                tx.tailTxHash = tailTxHash;
+                m_walletManager->addPastSpendingTx(tx);
+            }
+
+            //reset op
+            m_walletManager->setCurrentWalletOp(WalletManager::NoOp, QVariantList());
+
+            //save
+            WalletManager::WalletError wError;
+            m_walletManager->saveWallet(m_currentWalletPath,
+                                        true,
+                                        true,
+                                        wError);
+            if (wError.errorType != WalletManager::WalletError::NoError) {
+                QMessageBox::critical(this,
+                                      tr("Wallet Save Error"),
+                                      wError.errorString);
+            }
+
+            //show result on label with txhash link to explorer
+            ui->broadcastResultLabel->show();
+            QString resultMessage = tr("Transaction successfully sent!<br />"
+                                       "Transaction hash: <a href='https://thetangle.org/transaction/")
+                    .append(tailTxHash).append("'>").append(tailTxHash).append("</a>");
+            ui->broadcastResultLabel->setText(resultMessage);
+            ui->broadcastFinishButton->setEnabled(true);
+            ui->broadcastFinishButton->setFocus();
+            ui->broadcastProgressBar->hide();
+            ui->broadcastProgressStatusLabel->hide();
         }
         break;
     default:
@@ -434,6 +501,13 @@ void MultisigTransferWidget::requestError(AbstractTangleAPI::RequestType request
                               e);
         break;
     }
+    case AbstractTangleAPI::MultisigTransfer:
+        if (ui->stackedWidget->currentIndex() == 7)
+            ui->stackedWidget->setCurrentIndex(6);
+        QMessageBox::critical(this,
+                              tr("IOTA API Request Error"),
+                              errorMessage);
+        break;
     default:
         QMessageBox::critical(this,
                               tr("IOTA API Request Error"),

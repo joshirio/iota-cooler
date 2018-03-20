@@ -278,6 +278,16 @@ void WalletManager::setCurrentAddress(const QString &address)
     m_jsonObject.insert("currentAddress", address);
 }
 
+QString WalletManager::getOnlineSeed()
+{
+    return m_jsonObject.value("onlineSeed").toString();
+}
+
+void WalletManager::setOnlineSeed(const QString &seed)
+{
+    m_jsonObject.insert("onlineSeed", seed);
+}
+
 void WalletManager::addPastSpendingTx(const UtilsIOTA::Transation &transaction)
 {
     QJsonArray txListArray = m_jsonObject.value("pastSpendingTransactions").toArray();

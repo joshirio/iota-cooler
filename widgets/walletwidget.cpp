@@ -82,6 +82,7 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
     loadPastTxs();
 
     //load past addresses
+    ui->addressesListWidget->clear();
     QVariantList usedAddresses = m_walletManager->getPastUsedAddresses();
     foreach (QVariant v, usedAddresses) {
         ui->addressesListWidget->addItem(v.toString());
@@ -117,6 +118,7 @@ void WalletWidget::copyCurrentAddress()
 {
     QGuiApplication::clipboard()->setText(
                 m_walletManager->getCurrentAddress());
+    emit showStatusMessage(tr("Address copied to clipboard!"));
 }
 
 void WalletWidget::tangleExplorerButtonClicked()
@@ -223,6 +225,9 @@ void WalletWidget::stopBalanceRefresher()
 
 void WalletWidget::loadPastTxs()
 {
+    ui->pastTxTableWidget->clearContents();
+    ui->pastTxTableWidget->setRowCount(0);
+
     QList<UtilsIOTA::Transation> pastTxList = m_walletManager->getPastSpendingTxs();
     foreach (UtilsIOTA::Transation tx, pastTxList) {
         int rows = ui->pastTxTableWidget->rowCount() + 1;

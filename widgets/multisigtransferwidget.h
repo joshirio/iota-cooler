@@ -48,6 +48,9 @@ signals:
     /** Unfinished transfer was aborted */
     void transferCancelled();
 
+    /** Transfer successfully completed */
+    void transferCompleted();
+
 private slots:
     void nextPage();
     void addReceiverButtonClicked();
@@ -58,6 +61,7 @@ private slots:
     void offlineSignConfirmButtonClicked();
     void txFinalQuitButtonClicked();
     void txFinalNextButtonClicked();
+    void broadcastFinishButtonClicked();
     void updateBalance();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
