@@ -10,6 +10,7 @@
 #include "../components/settingsmanager.h"
 #include "../components/walletmanager.h"
 #include "walletpassphrasedialog.h"
+#include "multisigtransferwidget.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
@@ -183,8 +184,13 @@ void MainWindow::showStatusMessage(const QString &message)
 
 void MainWindow::makeNewTransaction()
 {
-    //TODO
-    //ui->stackedWidget->setCurrentWidget(m_);
+    ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
+    m_multisigTransferWidget->prepareNewTransfer();
+}
+
+void MainWindow::multisigTransferCancelled()
+{
+    ui->stackedWidget->setCurrentWidget(m_walletWidget);
 }
 
 void MainWindow::loadWidgets()
@@ -193,6 +199,8 @@ void MainWindow::loadWidgets()
     ui->stackedWidget->addWidget(m_createWalletWidget);
     m_walletWidget = new WalletWidget(this);
     ui->stackedWidget->addWidget(m_walletWidget);
+    m_multisigTransferWidget = new MultisigTransferWidget(this);
+    ui->stackedWidget->addWidget(m_multisigTransferWidget);
 }
 
 void MainWindow::createMenus()
@@ -264,6 +272,10 @@ void MainWindow::createConnections()
             this, &MainWindow::showStatusMessage);
     connect(m_walletWidget, &WalletWidget::makeNewTransactionSignal,
             this, &MainWindow::makeNewTransaction);
+
+    //multisig transfer widget
+    connect(m_multisigTransferWidget, &MultisigTransferWidget::transferCancelled,
+            this, &MainWindow::multisigTransferCancelled);
 }
 
 void MainWindow::loadSettings()

@@ -17,6 +17,7 @@ class MainWindow;
 class CreateWalletWizard;
 class WalletWidget;
 class WalletManager;
+class MultisigTransferWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -50,6 +51,7 @@ private slots:
     void closeWallet();
     void showStatusMessage(const QString &message);
     void makeNewTransaction();
+    void multisigTransferCancelled();
 
 private:
     void loadWidgets();
@@ -80,6 +82,7 @@ private:
     QAction *m_helpAction;
     CreateWalletWizard *m_createWalletWidget;
     WalletWidget *m_walletWidget;
+    MultisigTransferWidget *m_multisigTransferWidget;
     WalletManager *m_walletManager;
 };
 

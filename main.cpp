@@ -41,6 +41,9 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
+    //TODO: handle args for wallet file open and add mimetype with icon
+    //if wallet is already open close it first (mainwindow's job)
+
     //wake up window
     IOTAcoolerApp.setActivationWindow(&w);
 
