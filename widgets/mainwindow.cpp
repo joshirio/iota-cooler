@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->hide();
     ui->openWalletButton->setFocus();
     m_walletManager = &WalletManager::getInstance();
+    m_currentWalletPath = "/invalid";
 
     loadWidgets();
     createMenus();
@@ -51,6 +52,7 @@ void MainWindow::openWallet(const QString &filePath)
 
         WalletManager::WalletError error;
         if (m_walletManager->readWalletFile(filePath, error)) {
+            m_currentWalletPath = filePath;
             switch (m_walletManager->getCurrentWalletOp()) {
             case WalletManager::InitOffline:
                 ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
@@ -175,6 +177,7 @@ void MainWindow::closeWallet()
 {
     ui->stackedWidget->setCurrentIndex(0);
     m_walletManager->lockWallet();
+    m_currentWalletPath = "/invalid";
 }
 
 void MainWindow::showStatusMessage(const QString &message)
@@ -191,6 +194,7 @@ void MainWindow::makeNewTransaction()
 void MainWindow::multisigTransferCancelled()
 {
     ui->stackedWidget->setCurrentWidget(m_walletWidget);
+    m_walletWidget->setCurrentWalletPath(m_currentWalletPath);
 }
 
 void MainWindow::loadWidgets()

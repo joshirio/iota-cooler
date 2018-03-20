@@ -84,6 +84,7 @@ private:
     WalletWidget *m_walletWidget;
     MultisigTransferWidget *m_multisigTransferWidget;
     WalletManager *m_walletManager;
+    QString m_currentWalletPath;
 };
 
 #endif // MAINWINDOW_H
