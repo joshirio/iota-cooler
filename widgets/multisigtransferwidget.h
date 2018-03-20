@@ -35,6 +35,15 @@ public:
     /** Prepare UI about next offline step from online signer */
     void showContinueWithOfflineSigner(const QString &walletPath);
 
+    /** Prepare UI about next online step from online signer */
+    void showContinueWithOnlineSigner(const QString &walletPath);
+
+    /** Prepare UI for offline transaction signing */
+    void prepareColdTransferSign(const QString &walletPath);
+
+    /** Prepare UI for online transaction signing and broadcasting */
+    void prepareHotTransferSign(const QString &walletPath);
+
 signals:
     /** Unfinished transfer was aborted */
     void transferCancelled();
@@ -46,6 +55,9 @@ private slots:
     void receiversNextButtonClicked();
     void onlineSignQuitButtonClicked();
     void abortCurrentTransaction();
+    void offlineSignConfirmButtonClicked();
+    void txFinalQuitButtonClicked();
+    void txFinalNextButtonClicked();
     void updateBalance();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
@@ -64,6 +76,9 @@ private:
     QList<QLineEdit*> m_receiversAmountLineList;
     QList<QHBoxLayout*> m_receiversLayoutList;
     QString m_currentWalletPath;
+    QStringList m_receiverList;
+    QStringList m_amountList;
+    QString m_walletBalance;
 };
 
 #endif // MULTISIGTRANSFERWIDGET_H

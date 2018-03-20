@@ -38,6 +38,22 @@ MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
             this, &MultisigTransferWidget::onlineSignQuitButtonClicked);
     connect(ui->goOfflineAbortTransactionButton, &QPushButton::clicked,
             this, &MultisigTransferWidget::abortCurrentTransaction);
+    connect(ui->offlineSignAbortTransactionButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::abortCurrentTransaction);
+    connect(ui->offlineSignConfirmButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::offlineSignConfirmButtonClicked);
+    connect(ui->offlineSigningProgressAbortTxButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::abortCurrentTransaction);
+    connect(ui->offlineSigningTxNextButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::nextPage);
+    connect(ui->broadcastAbortTxButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::abortCurrentTransaction);
+    connect(ui->broadcastAbortTxButton_2, &QPushButton::clicked,
+            this, &MultisigTransferWidget::abortCurrentTransaction);
+    connect(ui->txFinalQuitButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::txFinalQuitButtonClicked);
+    connect(ui->txFinalNextButton, &QPushButton::clicked,
+            this, &MultisigTransferWidget::txFinalNextButtonClicked);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -66,6 +82,65 @@ void MultisigTransferWidget::showContinueWithOfflineSigner(const QString &wallet
 {
     m_currentWalletPath = walletPath;
     ui->stackedWidget->setCurrentIndex(2);
+}
+
+void MultisigTransferWidget::showContinueWithOnlineSigner(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    ui->stackedWidget->setCurrentIndex(5);
+}
+
+void MultisigTransferWidget::prepareColdTransferSign(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    bool error = false;
+    QString errorMessage;
+    m_receiverList.clear();
+    m_amountList.clear();
+    ui->offlineSeedLineEdit->setClearButtonEnabled(true);
+
+    //load tx
+    QVariantList opArgs;
+    m_walletManager->getCurrentWalletOp(opArgs);
+    if (opArgs.size() >= 3) {
+    ui->stackedWidget->setCurrentIndex(3);
+    m_walletBalance = opArgs.at(0).toString();
+    m_receiverList = opArgs.at(1).toStringList();
+    m_amountList = opArgs.at(2).toStringList();
+
+    QString text;
+    text.append(tr("<b>Wallet balance (iota):</b> %1 <br /><br />").arg(m_walletBalance));
+    for (int i = 0; i < m_receiverList.size(); i++) {
+        text.append(tr("<b>Receiver %1</b><br />").arg(i+1));
+        text.append(tr("<b>Address:</b> %2 <br />").arg(m_receiverList.at(i)));
+        text.append(tr("<b>Amount (iota):</b> %2").arg(m_amountList.at(i)));
+        text.append("<hr />");
+    }
+    ui->confirmTxTextArea->setText(text);
+
+    } else {
+        error = true;
+        errorMessage = tr("Missing cold signing arguments!");
+    }
+
+    if (error) {
+        QMessageBox::critical(this, tr("Cold Singing Error"), errorMessage);
+        emit transferCancelled();
+    }
+}
+
+void MultisigTransferWidget::prepareHotTransferSign(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+
+    //load tx
+    QVariantList opArgs;
+    m_walletManager->getCurrentWalletOp(opArgs);
+    m_walletBalance = opArgs.at(0).toString();
+    m_receiverList = opArgs.at(1).toStringList();
+    m_amountList = opArgs.at(2).toStringList();
+
+    ui->stackedWidget->setCurrentIndex(6);
 }
 
 void MultisigTransferWidget::nextPage()
@@ -176,21 +251,22 @@ void MultisigTransferWidget::receiversNextButtonClicked()
             break;
         }
     }
-    if (walletBalance < sendingAmountTot) {
+    if ((walletBalance < sendingAmountTot) || (sendingAmountTot == 0)) {
         error = true;
     }
     if (error) {
         QMessageBox::warning(this, tr("Amount Error"),
                              tr("The sending amount is not valid!\n"
-                                "Check if your wallet balance or input format"));
+                                "Check your wallet balance or amount inputs"));
         return;
     }
 
     //prepare tx
     m_walletManager->backupMultisigFileAsClean(); //backup clean multisig file
     QVariantList opArgs;
-    QStringList amountList = m_receiversMap.keys();
-    QStringList addressList = m_receiversMap.values();
+    QStringList addressList = m_receiversMap.keys();
+    QStringList amountList = m_receiversMap.values();
+    opArgs.append(ui->rBalanceLabel->text());
     opArgs.append(addressList);
     opArgs.append(amountList);
     m_walletManager->setCurrentWalletOp(WalletManager::ColdSign, opArgs);
@@ -232,6 +308,62 @@ void MultisigTransferWidget::abortCurrentTransaction()
     }
 }
 
+void MultisigTransferWidget::offlineSignConfirmButtonClicked()
+{
+    //check seed
+    QString offlineSeed = ui->offlineSeedLineEdit->text().simplified().trimmed();
+    offlineSeed.replace(" ", "");
+    if (!UtilsIOTA::isValidSeed(offlineSeed.toUpper())) {
+        QMessageBox::warning(this,
+                             tr("IOTA Seed Invalid"),
+                             tr("The entered seed is not a valid format!<br />"
+                                "Please check your input and try again"));
+        return;
+    }
+
+    ui->coldSignResultLabel->hide();
+    QStringList args;
+    for (int i = 0; i < m_receiverList.size(); i++) {
+        args.append(m_amountList.at(i));
+        args.append(m_receiverList.at(i));
+    }
+    args.append("offline"); //offline party
+    args.append(m_walletBalance);
+    args.append(offlineSeed);
+    m_walletManager->exportMultisigFile();
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::MultisigTransfer,
+                                 args);
+
+    ui->coldSignProgressBar->show();
+    ui->coldSignStatusLabel->show();
+    ui->coldSignResultLabel->hide();
+    nextPage();
+}
+
+void MultisigTransferWidget::txFinalQuitButtonClicked()
+{
+    qApp->quit();
+}
+
+void MultisigTransferWidget::txFinalNextButtonClicked()
+{
+    ui->broadcastResultLabel->hide();
+    nextPage();
+
+    QString onlineSeed = m_walletManager->??
+    QStringList args;
+    for (int i = 0; i < m_receiverList.size(); i++) {
+        args.append(m_amountList.at(i));
+        args.append(m_receiverList.at(i));
+    }
+    args.append("online"); //online party
+    args.append(m_walletBalance);
+    args.append(onlineSeed);
+    m_walletManager->exportMultisigFile();
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::MultisigTransfer,
+                                 args);
+}
+
 void MultisigTransferWidget::updateBalance()
 {
     ui->rBalanceLabel->setText(tr("checking..."));
@@ -254,6 +386,31 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
         ui->rBalanceLabel->setText(balanceIota);
 
     }
+        break;
+    case AbstractTangleAPI::MultisigTransfer:
+        if (responseMessage == "SignOK:offline") {
+            WalletManager::WalletError error;
+            QVariantList prevArgs;
+            m_walletManager->getCurrentWalletOp(prevArgs);
+            m_walletManager->setCurrentWalletOp(WalletManager::HotSign,
+                                                prevArgs);
+            m_walletManager->saveWallet(m_currentWalletPath,
+                                        true,
+                                        false,
+                                        error);
+            if (error.errorType != WalletManager::WalletError::NoError) {
+                QMessageBox::critical(this,
+                                      tr("Wallet Save Error"),
+                                      error.errorString);
+            } else {
+                ui->coldSignProgressBar->hide();
+                ui->coldSignStatusLabel->hide();
+                ui->coldSignResultLabel->show();
+                ui->coldSignResultLabel->setText(tr("Transaction successfully signed!"));
+                ui->offlineSigningProgressAbortTxButton->setEnabled(false);
+                ui->offlineSigningTxNextButton->setEnabled(true);
+            }
+        }
         break;
     default:
         break;

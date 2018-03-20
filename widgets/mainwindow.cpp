@@ -54,6 +54,7 @@ void MainWindow::openWallet(const QString &filePath)
         if (m_walletManager->readWalletFile(filePath, error)) {
             SettingsManager sm(this);
             m_currentWalletPath = filePath;
+
             switch (m_walletManager->getCurrentWalletOp()) {
             case WalletManager::InitOffline:
                 ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
@@ -61,14 +62,19 @@ void MainWindow::openWallet(const QString &filePath)
                 break;
             case WalletManager::ColdSign:
                 if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
-                    //TODO
+                    m_multisigTransferWidget->prepareColdTransferSign(m_currentWalletPath);
                 } else {
-                    ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
                     m_multisigTransferWidget->showContinueWithOfflineSigner(m_currentWalletPath);
                 }
+                ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
                 break;
             case WalletManager::HotSign:
-                //TODO: set up view online tx sign and broadcast
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OnlineSigner) {
+                    m_multisigTransferWidget->prepareHotTransferSign(m_currentWalletPath);
+                } else {
+                    m_multisigTransferWidget->showContinueWithOnlineSigner(m_currentWalletPath);
+                }
+                ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
                 break;
             default:
                 enforceOnlineRole();
@@ -199,8 +205,13 @@ void MainWindow::makeNewTransaction()
 
 void MainWindow::multisigTransferCancelled()
 {
-    ui->stackedWidget->setCurrentWidget(m_walletWidget);
-    m_walletWidget->setCurrentWalletPath(m_currentWalletPath);
+    SettingsManager sm(this);
+    if (sm.getDeviceRole() == UtilsIOTA::OnlineSigner) {
+        ui->stackedWidget->setCurrentWidget(m_walletWidget);
+        m_walletWidget->setCurrentWalletPath(m_currentWalletPath);
+    } else {
+        ui->stackedWidget->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::loadWidgets()

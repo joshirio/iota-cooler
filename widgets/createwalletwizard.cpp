@@ -344,6 +344,7 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
         QString mainAddress = response.split(":").at(2);
         m_walletInitStepResults.append(mainAddress);
         m_walletManager->setCurrentAddress(mainAddress);
+        //FIXME: save online seed to wallet from step results!!!!
 
         //save wallet
         WalletManager::WalletError error;

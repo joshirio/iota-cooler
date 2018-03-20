@@ -34,6 +34,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     QString command;
     QStringList args;
     QString smidgenPath;
+    QString seed;
 
 #ifdef Q_OS_WIN
     smidgenPath =  "iotacooler-smidgen.exe";
@@ -68,6 +69,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         break;
     case CreateMultisigWallet:
         if (!clearSmidgenMultisigFile()) return;
+        seed = argList.at(1);
         command = "multisig";
         extraArgs.append("create");
         extraArgs.append(argList.at(0)); //signing party name
@@ -75,6 +77,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         extraArgs.append("--no-validation"); //skip check to allow offline usage
         break;
     case AddMultisigParty:
+        seed = argList.at(1);
         command = "multisig";
         extraArgs.append("add");
         extraArgs.append(argList.at(0)); //signing party name
@@ -90,6 +93,21 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         command = "get-balance";
         extraArgs.append(argList.at(0));
         break;
+    case MultisigTransfer:
+    {
+        QStringList transferList = argList;
+        command = "multisig";
+        extraArgs.append("transfer");
+        seed = transferList.takeLast();
+        QString balance = transferList.takeLast();
+        QString id = transferList.takeLast();
+        extraArgs.append(transferList);
+        extraArgs.append(id);
+        extraArgs.append(m_smidgenMultisigFilePath); //smidgen multisig wallet file
+        extraArgs.append("--balance");
+        extraArgs.append(balance);
+    }
+        break;
     }
 
     //init args
@@ -103,19 +121,17 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
 
     //if seed arg is required, use interactive input to avoid seed leak
     //also used for other interactive inputs like addresses
-    if (m_currentRequest == CreateMultisigWallet) {
-        QString seed = argList.at(1);
-        m_process->waitForReadyRead();
-        m_process->write(seed.toLatin1());
-        m_process->waitForBytesWritten();
-    } else if (m_currentRequest == AddMultisigParty) {
-        QString seed = argList.at(1);
-        m_process->waitForReadyRead();
-        m_process->write(seed.toLatin1());
-        m_process->waitForBytesWritten();
+    if ((m_currentRequest == CreateMultisigWallet) ||
+            (m_currentRequest == AddMultisigParty) ||
+            (m_currentRequest == MultisigTransfer)) {
+        if (!seed.isEmpty()) {
+            m_process->waitForReadyRead();
+            m_process->write(seed.toLatin1());
+            m_process->waitForBytesWritten();
+        }
     }
 
-    //close write channel to allow
+            //close write channel to allow
     //ready output signals, see docs
     m_process->closeWriteChannel();
 }
@@ -295,6 +311,26 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 message = QString("Balance:").append(requestArgs.at(0))
                         .append(":" + ibalance.append(":"))
                         .append(readableBalance);
+            } else {
+                //unexpected response
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case MultisigTransfer:
+            if (result.contains("Successfully signed transfer")) {
+                if (requestArgs.contains("online")) {
+                    message = "SignOK:online";
+                } else {
+                    //TODO: check if broadcasted also
+                    message = "SignOK:offline";
+                }
+            } else if (result.contains("Bundle is invalid")) {
+                error = true;
+                errorMessage = tr("Invalid bundle: please check your seed, "
+                                  "balance and addresses.<br />"
+                                  "If this error persists, consider aborting"
+                                  " the transaction and start over again.");
             } else {
                 //unexpected response
                 errorMessage = result;
