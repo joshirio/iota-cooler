@@ -57,6 +57,24 @@ WalletWidget::WalletWidget(QWidget *parent) :
             this, &WalletWidget::requestFinished);
     connect(m_tangleAPI, &AbstractTangleAPI::requestError,
             this, &WalletWidget::requestError);
+
+    //fix fonts for addresses to use monospace (except on linux)
+#ifdef Q_OS_WIN
+    QString osMonospace = "Consolas";
+#endif
+#ifdef Q_OS_OSX
+    QString osMonospace = "Menlo";
+#endif
+#if defined(Q_OS_WIN) || defined(Q_OS_OSX)
+    QString s;
+    s = ui->addressLabel->styleSheet().replace("monospace", osMonospace);
+    ui->addressLabel->setStyleSheet(s);
+    s = ui->addressLabel_2->styleSheet().replace("monospace", osMonospace);
+    ui->addressLabel_2->setStyleSheet(s);
+    s = ui->addressesListWidget->styleSheet().replace("monospace", osMonospace);
+    ui->addressesListWidget->setStyleSheet(s);
+#endif
+
 }
 
 WalletWidget::~WalletWidget()
