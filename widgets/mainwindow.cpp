@@ -36,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_currentWalletPath = "/invalid";
     m_settingsManager = new SettingsManager(this);
 
-    //TODO: save and restore geometry (window size)
     loadWidgets();
     createMenus();
     createConnections();
@@ -115,6 +114,9 @@ void MainWindow::openWallet(const QString &filePath)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    //save window geometry
+    saveSettings();
+
     event->accept();
 }
 
@@ -368,6 +370,17 @@ void MainWindow::loadSettings()
 
     //default node
     UtilsIOTA::currentNodeUrl = sm.getDefaultIOTANodeUrl();
+
+    //restore window geometry
+    restoreGeometry(m_settingsManager->restoreGeometry("mainWindow"));
+    restoreState(m_settingsManager->restoreState("mainWindow"));
+}
+
+void MainWindow::saveSettings()
+{
+    //save window geometry
+    m_settingsManager->saveGeometry("mainWindow", saveGeometry());
+    m_settingsManager->saveState("mainWindow", saveState());
 }
 
 bool MainWindow::enforceOnlineRole()

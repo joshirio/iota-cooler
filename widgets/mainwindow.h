@@ -64,6 +64,7 @@ private:
     void createMenus();
     void createConnections();
     void loadSettings();
+    void saveSettings();
     bool enforceOnlineRole();
     bool enforceOfflineRole();
 

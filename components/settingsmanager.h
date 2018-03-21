@@ -40,7 +40,7 @@ public:
      * @brief Get the default url for IOTA IRI node
      * @return QString - node url (protocol://host:port)
      */
-    QString getDefaultIOTANodeUrl();
+    QString getDefaultIOTANodeUrl() const;
 
     /**
      * @brief Set the default url for IOTA IRI node
@@ -52,7 +52,7 @@ public:
      * @brief Get current role for the device
      * @return UtilsIOTA::DeviceRole -  role (enum)
      */
-    UtilsIOTA::DeviceRole getDeviceRole();
+    UtilsIOTA::DeviceRole getDeviceRole() const;
 
     /**
      * @brief Set current device role
@@ -64,7 +64,22 @@ public:
     void setCheckUpdates(bool b);
 
     /** Check updates automatically at startup */
-    bool getCheckUpdates();
+    bool getCheckUpdates() const;
+
+    /** Save the geometry property for the given object name */
+    void saveGeometry(const QString& objectName, const QByteArray& geometry);
+
+    /** Restore the geometry property for the specified object */
+    QByteArray restoreGeometry(const QString& objectName) const;
+
+    /**
+      * Save the state property (dock, toolbars, etc...)
+      * for the given object name
+      */
+    void saveState(const QString& objectName, const QByteArray& state);
+
+    /** Restore the state property for the specified object */
+    QByteArray restoreState(const QString& objectName) const;
 
 private:
     QSettings *m_settings;

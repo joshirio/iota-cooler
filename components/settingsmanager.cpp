@@ -44,7 +44,7 @@ void SettingsManager::setDefaultIOTANodeUrl(const QString &url)
     m_settings->endGroup();
 }
 
-QString SettingsManager::getDefaultIOTANodeUrl()
+QString SettingsManager::getDefaultIOTANodeUrl() const
 {
     QString url;
 
@@ -55,7 +55,7 @@ QString SettingsManager::getDefaultIOTANodeUrl()
     return url;
 }
 
-UtilsIOTA::DeviceRole SettingsManager::getDeviceRole()
+UtilsIOTA::DeviceRole SettingsManager::getDeviceRole() const
 {
     UtilsIOTA::DeviceRole role;
 
@@ -80,7 +80,7 @@ void SettingsManager::setCheckUpdates(bool b)
     m_settings->endGroup();
 }
 
-bool SettingsManager::getCheckUpdates()
+bool SettingsManager::getCheckUpdates() const
 {
     bool b;
 
@@ -89,4 +89,41 @@ bool SettingsManager::getCheckUpdates()
     m_settings->endGroup();
 
     return b;
+}
+
+void SettingsManager::saveGeometry(const QString &objectName,
+                                   const QByteArray &geometry)
+{
+    m_settings->beginGroup(objectName);
+    m_settings->setValue("geometry", geometry);
+    m_settings->endGroup();
+}
+
+QByteArray SettingsManager::restoreGeometry(const QString &objectName) const
+{
+    QByteArray g;
+
+    m_settings->beginGroup(objectName);
+    g = m_settings->value("geometry").toByteArray();
+    m_settings->endGroup();
+
+    return g;
+}
+
+void SettingsManager::saveState(const QString &objectName, const QByteArray &state)
+{
+    m_settings->beginGroup(objectName);
+    m_settings->setValue("state", state);
+    m_settings->endGroup();
+}
+
+QByteArray SettingsManager::restoreState(const QString &objectName) const
+{
+    QByteArray s;
+
+    m_settings->beginGroup(objectName);
+    s = m_settings->value("state").toByteArray();
+    m_settings->endGroup();
+
+    return s;
 }

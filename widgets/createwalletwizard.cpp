@@ -376,6 +376,8 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
 void CreateWalletWizard::tangleAPIRequestError(AbstractTangleAPI::RequestType request,
                                                const QString &errorMessage)
 {
+    Q_UNUSED(request);
+
     ui->stackedWidget->setCurrentIndex(4);
 
     ui->wInitProgressBar->hide();
