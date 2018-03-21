@@ -14,6 +14,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     sm = new SettingsManager(this);
 
+    if (DefinitionHolder::APP_STORE || DefinitionHolder::SNAP_PKG) {
+        ui->updatesComboBox->setEnabled(false);
+    }
+
     createConnections();
     loadSettings();
 }

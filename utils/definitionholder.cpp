@@ -18,6 +18,7 @@ const int DefinitionHolder::SOFTWARE_BUILD = 1;
 const bool DefinitionHolder::APP_STORE = false;
 const bool DefinitionHolder::APPIMAGE_LINUX = false;
 const bool DefinitionHolder::WIN_PORTABLE = false;
+const bool DefinitionHolder::SNAP_PKG = false;
 const QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));

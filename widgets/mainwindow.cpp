@@ -248,7 +248,7 @@ void MainWindow::checkForUpdatesSlot()
     if (m_settingsManager->getDeviceRole() == UtilsIOTA::OfflineSigner)
         return;
 
-    if (DefinitionHolder::APP_STORE ||
+    if (DefinitionHolder::APP_STORE || DefinitionHolder::SNAP_PKG ||
             (!m_settingsManager->getCheckUpdates()))
         return;
 

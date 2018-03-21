@@ -26,6 +26,7 @@ public:
     static const bool APP_STORE;         /**< Deployment target is an app store  */
     static const bool APPIMAGE_LINUX;    /**< Deployment target is an AppImage   */
     static const bool WIN_PORTABLE;      /**< Deployment is portable Windows app */
+    static const bool SNAP_PKG;          /**< Deployment is a snap package       */
     static const QString DEFAULT_NODE;   /**< Default IOTA node for IRI requests */
     static const quint32 WALLET_VERSION; /**< Wallet file version number         */
     static const QString DONATE_URL;     /**< Donation URL                       */

@@ -37,14 +37,18 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     QString seed;
 
 #ifdef Q_OS_WIN
-    smidgenPath =  "iotacooler-smidgen.exe";
+    smidgenPath =  QApplication::applicationDirPath().append("/iotacooler-smidgen.exe");
 #endif
 #ifdef Q_OS_OSX
-    smidgenPath = QString("/Applications/IOTAcooler.app/Contents/MacOS/");
-    smidgenPath.append("iotacooler-smidgen");
+    smidgenPath = QApplication::applicationDirPath().append("/iotacooler-smidgen");
 #endif
 #ifdef Q_OS_LINUX
-    smidgenPath = "./iotacooler-smidgen";
+    smidgenPath = "/usr/bin/iotacooler-smidgen";
+    if (DefinitionHolder::SNAP_PKG) {
+        smidgenPath.prepend("/snap/iotacooler/current");
+    } else if (DefinitionHolder::APPIMAGE_LINUX) {
+        smidgenPath.remove("/usr/bin/");
+    }
 #endif
 
     //init command and etra args
