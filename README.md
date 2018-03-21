@@ -1,6 +1,6 @@
 ![Logo](https://raw.githubusercontent.com/joshirio/iota-cooler/master/resources/icons/iotacooler_64.png "logo")
 # IOTAcooler
-A simple and corss-platform cold wallet for IOTA. At its core, IOTAcooler uses standard IOTA multisig transfers to split the signing process on two devices, one online (hot signer) and the other offline (cold signer), so that the offline signing seed is never exposed to the internet, which is the major attack vector. For best security, run IOTAcooler on a live linux distro while cold signing a transaction.
+A simple and cross-platform cold wallet for IOTA. At its core, IOTAcooler uses standard IOTA multisig transfers to split the signing process over two devices, one online (hot signer) and the other offline (cold signer). In this way, the offline signing seed is never exposed to the internet, which is the major attack vector. For best security, consider running IOTAcooler on a live linux distro while cold signing a transaction.
 
 The multisig signing is handled by [smidgen](https://github.com/bitfinexcom/smidgen), a nodejs command line multisig utility based on thr IOTA javascript API, created by Bitfinex.
 
