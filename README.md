@@ -4,6 +4,18 @@ A simple and cross-platform cold wallet for IOTA. At its core, IOTAcooler uses s
 
 The multisig signing is handled by [smidgen](https://github.com/bitfinexcom/smidgen), a nodejs command line multisig utility based on thr IOTA javascript API, created by Bitfinex.
 
+### Features
+- Wallet encryption (AES-256) with password. Wallet does not store the offline signing key.
+- Multiple receiving addresses per transaction (batching)
+- Address reuse detection when sending to addresses with outgoing transfers
+- Two step transaction signing, online and offline
+- Built-in promote and reattach utility
+
+### Limitations
+- Only one receiving address a time. A new address is generated automatically on transfers.
+- Requires to always backup the wallet file after each transfer. Store and sync it on the cloud to be safe (wallet is encrypted and doesn't hold the offline signing key).
+- At this time. restoring funds from only the multisig seeds without the wallet file is tricky and only possible with smidgen, the command line utility for multisig transfers.
+
 ### How it looks
 ![Screenshot](https://raw.githubusercontent.com/joshirio/iota-cooler/master/stuff/screenshots/mainwindow.png "Wallet screenshot")
 
