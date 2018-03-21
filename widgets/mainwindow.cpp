@@ -11,6 +11,7 @@
 #include "../components/walletmanager.h"
 #include "walletpassphrasedialog.h"
 #include "multisigtransferwidget.h"
+#include "../components/updatemanager.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
@@ -23,7 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_createWalletWidget(0),
-    m_walletWidget(0)
+    m_walletWidget(0),
+    m_updateManager(0),
+    m_settingsManager(0)
 {
     ui->setupUi(this);
     m_menuBar = ui->menuBar;
@@ -31,12 +34,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->openWalletButton->setFocus();
     m_walletManager = &WalletManager::getInstance();
     m_currentWalletPath = "/invalid";
+    m_settingsManager = new SettingsManager(this);
 
     //TODO: save and restore geometry (window size)
     loadWidgets();
     createMenus();
     createConnections();
     loadSettings();
+    checkForUpdatesSlot();
 }
 
 MainWindow::~MainWindow()
@@ -226,6 +231,41 @@ void MainWindow::multisigTransferCompleted()
     }
 }
 
+void MainWindow::checkForUpdatesSlot()
+{
+
+    if (m_settingsManager->getDeviceRole() == UtilsIOTA::OfflineSigner)
+        return;
+
+    if (DefinitionHolder::APP_STORE ||
+            (!m_settingsManager->getCheckUpdates()))
+        return;
+
+    if (!m_updateManager) {
+        m_updateManager = new UpdateManager(this);
+        connect(m_updateManager, SIGNAL(noUpdateSignal()),
+                this, SLOT(noUpdateFoundSlot()));
+        connect(m_updateManager, SIGNAL(updateErrorSignal()),
+                this, SLOT(updateErrorSlot()));
+        connect(m_updateManager, SIGNAL(updatesAccepted()),
+                this, SLOT(close()));
+    }
+
+    //start async update check
+    statusBar()->showMessage(tr("Checking for updates..."));
+    m_updateManager->checkForUpdates();
+}
+
+void MainWindow::noUpdateFoundSlot()
+{
+    statusBar()->showMessage(tr("Your software version is up to date"));
+}
+
+void MainWindow::updateErrorSlot()
+{
+    statusBar()->showMessage(tr("Error while checking for software updates"));
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -269,6 +309,13 @@ void MainWindow::createMenus()
     m_helpMenu->addAction(m_aboutQtAction);
     m_helpMenu->addSeparator();
     m_helpMenu->addAction(m_helpAction);
+    m_helpMenu->addSeparator();
+    m_checkUpdatesAction = new QAction(tr("Check for updates"), this);
+    m_checkUpdatesAction->setStatusTip(tr("Check for %1 updates")
+                                       .arg(DefinitionHolder::NAME));
+    m_checkUpdatesAction->setMenuRole(QAction::ApplicationSpecificRole);
+    if (!DefinitionHolder::APP_STORE)
+        m_helpMenu->addAction(m_checkUpdatesAction);
 }
 
 void MainWindow::createConnections()
@@ -291,6 +338,8 @@ void MainWindow::createConnections()
             this, &MainWindow::newWalletButtonClicked);
     connect(ui->openWalletButton, &QPushButton::clicked,
             this, &MainWindow::openWalletButtonClicked);
+    connect(m_checkUpdatesAction, SIGNAL(triggered()),
+                this, SLOT(checkForUpdatesSlot()));
 
     //wallet creation wizard
     connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCancelled,

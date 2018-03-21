@@ -11,8 +11,8 @@
 const QString DefinitionHolder::VERSION = "1.0";
 const QString DefinitionHolder::NAME = "IOTAcooler";
 const QString DefinitionHolder::ORG = "iotacooler.github.io";
-const QString DefinitionHolder::UPDATE_URL = "https://joshirio.github.io/iotacooler/update/iotacooler/updates";
-const QString DefinitionHolder::DOWNLOAD_URL = "https://joshirio.github.io/iotacooler/update.html";
+const QString DefinitionHolder::UPDATE_URL = "https://raw.githubusercontent.com/joshirio/iota-cooler/master/doc/update/raw_check/latest";
+const QString DefinitionHolder::DOWNLOAD_URL = "https://github.com/joshirio/iota-cooler/blob/master/doc/update/update.md";
 const QString DefinitionHolder::HELP_URL = "https://github.com/joshirio/iota-cooler/wiki";
 const int DefinitionHolder::SOFTWARE_BUILD = 1;
 const bool DefinitionHolder::APP_STORE = false;

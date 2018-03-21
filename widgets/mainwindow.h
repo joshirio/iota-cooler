@@ -18,6 +18,8 @@ class CreateWalletWizard;
 class WalletWidget;
 class WalletManager;
 class MultisigTransferWidget;
+class UpdateManager;
+class SettingsManager;
 
 class MainWindow : public QMainWindow
 {
@@ -53,6 +55,9 @@ private slots:
     void makeNewTransaction();
     void multisigTransferCancelled();
     void multisigTransferCompleted();
+    void checkForUpdatesSlot();
+    void noUpdateFoundSlot();
+    void updateErrorSlot();
 
 private:
     void loadWidgets();
@@ -81,11 +86,14 @@ private:
     QAction *m_promoteAction;
     QAction *m_reattachAction;
     QAction *m_helpAction;
+    QAction *m_checkUpdatesAction;
     CreateWalletWizard *m_createWalletWidget;
     WalletWidget *m_walletWidget;
     MultisigTransferWidget *m_multisigTransferWidget;
     WalletManager *m_walletManager;
     QString m_currentWalletPath;
+    UpdateManager *m_updateManager;
+    SettingsManager *m_settingsManager;
 };
 
 #endif // MAINWINDOW_H

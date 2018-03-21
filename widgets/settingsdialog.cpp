@@ -46,6 +46,11 @@ void SettingsDialog::deviceRoleComboBoxChanged(int index)
                       index);
 }
 
+void SettingsDialog::updatesComboBoxChanged(int index)
+{
+    sm->setCheckUpdates(!index);
+}
+
 void SettingsDialog::createConnections()
 {
     connect(ui->defaultNodeButton, &QPushButton::clicked,
@@ -55,6 +60,9 @@ void SettingsDialog::createConnections()
     connect(ui->deviceRoleComboBox,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
             this, &SettingsDialog::deviceRoleComboBoxChanged);
+    connect(ui->updatesComboBox,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+            this, &SettingsDialog::updatesComboBoxChanged);
 }
 
 void SettingsDialog::loadSettings()
@@ -63,4 +71,5 @@ void SettingsDialog::loadSettings()
     ui->nodeLineEdit->setText(nodeUrl);
 
     ui->deviceRoleComboBox->setCurrentIndex((int) sm->getDeviceRole());
+    ui->updatesComboBox->setCurrentIndex((sm->getCheckUpdates() ? 0 : 1));
 }

@@ -60,6 +60,12 @@ public:
      */
     void setDeviceRole(UtilsIOTA::DeviceRole role);
 
+    /** Save state on check updates at startup */
+    void setCheckUpdates(bool b);
+
+    /** Check updates automatically at startup */
+    bool getCheckUpdates();
+
 private:
     QSettings *m_settings;
 };

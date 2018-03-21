@@ -72,3 +72,21 @@ void SettingsManager::setDeviceRole(UtilsIOTA::DeviceRole role)
     m_settings->setValue("deviceRole", (int) role);
     m_settings->endGroup();
 }
+
+void SettingsManager::setCheckUpdates(bool b)
+{
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    m_settings->setValue("checkUpdates", b);
+    m_settings->endGroup();
+}
+
+bool SettingsManager::getCheckUpdates()
+{
+    bool b;
+
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    b = m_settings->value("checkUpdates", true).toBool();
+    m_settings->endGroup();
+
+    return b;
+}

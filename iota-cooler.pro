@@ -52,7 +52,8 @@ SOURCES += \
     components/walletmanager.cpp \
     widgets/walletpassphrasedialog.cpp \
     widgets/walletwidget.cpp \
-    widgets/multisigtransferwidget.cpp
+    widgets/multisigtransferwidget.cpp \
+    components/updatemanager.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -73,7 +74,8 @@ HEADERS += \
     components/walletmanager.h \
     widgets/walletpassphrasedialog.h \
     widgets/walletwidget.h \
-    widgets/multisigtransferwidget.h
+    widgets/multisigtransferwidget.h \
+    components/updatemanager.h
 
 FORMS += \
         widgets/mainwindow.ui \
