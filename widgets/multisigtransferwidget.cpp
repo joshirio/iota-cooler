@@ -472,6 +472,8 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
             QString resultMessage = tr("Transaction successfully sent!<br />"
                                        "Transaction hash: <a href='https://thetangle.org/transaction/")
                     .append(tailTxHash).append("'>").append(tailTxHash).append("</a>");
+            resultMessage.append(tr("<br /><br /><b>NOTE:</b> Your wallet balance will be "
+                                    "temporarily zero until the transaction is confirmed"));
             ui->broadcastResultLabel->setText(resultMessage);
             ui->broadcastFinishButton->setEnabled(true);
             ui->broadcastFinishButton->setFocus();

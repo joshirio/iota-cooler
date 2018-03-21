@@ -53,7 +53,8 @@ SOURCES += \
     widgets/walletpassphrasedialog.cpp \
     widgets/walletwidget.cpp \
     widgets/multisigtransferwidget.cpp \
-    components/updatemanager.cpp
+    components/updatemanager.cpp \
+    widgets/walletrawdatadialog.cpp
 
 HEADERS += \
         widgets/mainwindow.h \
@@ -75,7 +76,8 @@ HEADERS += \
     widgets/walletpassphrasedialog.h \
     widgets/walletwidget.h \
     widgets/multisigtransferwidget.h \
-    components/updatemanager.h
+    components/updatemanager.h \
+    widgets/walletrawdatadialog.h
 
 FORMS += \
         widgets/mainwindow.ui \
@@ -85,7 +87,8 @@ FORMS += \
     widgets/createwalletwizard.ui \
     widgets/walletpassphrasedialog.ui \
     widgets/walletwidget.ui \
-    widgets/multisigtransferwidget.ui
+    widgets/multisigtransferwidget.ui \
+    widgets/walletrawdatadialog.ui
 
 ICON = resources/icons/iotacooler.icns # for mac
 RC_FILE = resources/iotacooler.rc # for windows

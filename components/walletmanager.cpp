@@ -338,6 +338,12 @@ void WalletManager::restoreCleanMultisigFileBackup()
                         m_jsonObject.value("cleanColdWalletBackup"));
 }
 
+QString WalletManager::getRawJsonData() const
+{
+    QString s = QString::fromUtf8(QJsonDocument(m_jsonObject).toJson());
+    return s;
+}
+
 bool WalletManager::importMultisigFile()
 {
     QFile tmpFile(getTmpMultisigSignFilePath());

@@ -12,6 +12,7 @@
 #include "walletpassphrasedialog.h"
 #include "multisigtransferwidget.h"
 #include "../components/updatemanager.h"
+#include "walletrawdatadialog.h"
 
 #include <QtWidgets/QMenuBar>
 #include <QtGui/QDesktopServices>
@@ -170,6 +171,12 @@ void MainWindow::newWalletButtonClicked()
     }
 }
 
+void MainWindow::showWalletJsonActionTriggered()
+{
+    WalletRawDataDialog d(this);
+    d.exec();
+}
+
 void MainWindow::openWalletButtonClicked()
 {
     checkDeviceRole();
@@ -296,9 +303,13 @@ void MainWindow::createMenus()
     m_reattachAction->setShortcut(tr("CTRL+A"));
     m_toolsMenu->addAction(m_reattachAction);
     m_toolsMenu->addSeparator();
+    m_showWalletJsonAction = new QAction(tr("Show raw wallet data..."));
+    m_toolsMenu->addAction(m_showWalletJsonAction);
+    m_toolsMenu->addSeparator();
     m_settingsAction = new QAction(tr("Settings..."));
     m_settingsAction->setMenuRole(QAction::PreferencesRole);
     m_settingsAction->setShortcut(QKeySequence::Preferences);
+
     m_toolsMenu->addAction(m_settingsAction);
 
     m_helpMenu = ui->menuBar->addMenu(tr("&Help"));
@@ -344,6 +355,8 @@ void MainWindow::createConnections()
             this, &MainWindow::openWalletButtonClicked);
     connect(m_checkUpdatesAction, SIGNAL(triggered()),
                 this, SLOT(checkForUpdatesSlot()));
+    connect(m_showWalletJsonAction, &QAction::triggered,
+            this, &MainWindow::showWalletJsonActionTriggered);
 
     //wallet creation wizard
     connect(m_createWalletWidget, &CreateWalletWizard::walletCreationCancelled,

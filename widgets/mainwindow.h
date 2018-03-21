@@ -47,6 +47,7 @@ private slots:
     void promoteActionTriggered();
     void reattachActionTriggered();
     void newWalletButtonClicked();
+    void showWalletJsonActionTriggered();
     void openWalletButtonClicked();
     void newWalletWizardCancelled();
     void walletCreationCompleted();
@@ -88,6 +89,7 @@ private:
     QAction *m_reattachAction;
     QAction *m_helpAction;
     QAction *m_checkUpdatesAction;
+    QAction *m_showWalletJsonAction;
     CreateWalletWizard *m_createWalletWidget;
     WalletWidget *m_walletWidget;
     MultisigTransferWidget *m_multisigTransferWidget;

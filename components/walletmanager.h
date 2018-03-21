@@ -273,6 +273,9 @@ public:
      */
     void restoreCleanMultisigFileBackup();
 
+    /** Get the raw json data */
+    QString getRawJsonData() const;
+
 private:
     explicit WalletManager(QObject *parent = nullptr);
     WalletManager(const WalletManager&) : QObject(0) {}

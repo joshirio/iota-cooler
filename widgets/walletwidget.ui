@@ -44,7 +44,8 @@
            <item>
             <widget class="QLabel" name="balanceLabel">
              <property name="toolTip">
-              <string>Balance of the current address. Refreshes every 30 seconds...</string>
+              <string>Balance of the current address. Refreshes every 30 seconds...
+NOTE: may show temporarily 0 during unconfirmed transfers</string>
              </property>
              <property name="styleSheet">
               <string notr="true">QLabel {
@@ -345,8 +346,9 @@
             <string>The current receiving address for your wallet</string>
            </property>
            <property name="styleSheet">
-            <string notr="true">QLabel{
+            <string notr="true">QLabel {
 	font-family: monospace;
+	font-weight: bold;
 }</string>
            </property>
            <property name="text">
@@ -392,7 +394,9 @@
        <item>
         <widget class="QListWidget" name="addressesListWidget">
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">QListWidget {
+	font-family: monospace;
+}</string>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
