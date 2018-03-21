@@ -319,8 +319,8 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
             break;
         case MultisigTransfer:
             if (result.contains("Successfully signed transfer")) {
-                if (requestArgs.contains("online")) {
-                    message = "SignOK:online";
+                if (requestArgs.contains("offline")) {
+                    message = "SignOK:offline";
                 }
             } else if (result.contains("Transaction sent")) {
                 //return ok as TransferOK:tailTxHash:newAddress

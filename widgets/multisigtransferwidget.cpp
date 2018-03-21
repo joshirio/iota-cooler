@@ -116,12 +116,12 @@ void MultisigTransferWidget::prepareColdTransferSign(const QString &walletPath)
     foreach (QString tsp, m_amountList) {
         totSpending += tsp.toULongLong();
     }
-    text.append(tr("<b>Total spending (iota):</b> %1 <br /><br />").arg(totSpending));
+    text.append(tr("<b>Total spending (iota):</b> %1 <br />").arg(totSpending));
     for (int i = 0; i < m_receiverList.size(); i++) {
+        text.append("<hr />");
         text.append(tr("<b>Receiver %1</b><br />").arg(i+1));
         text.append(tr("<b>Address:</b> %2 <br />").arg(m_receiverList.at(i)));
         text.append(tr("<b>Amount (iota):</b> %2").arg(m_amountList.at(i)));
-        text.append("<hr />");
     }
     ui->confirmTxTextArea->setText(text);
 
@@ -239,7 +239,7 @@ void MultisigTransferWidget::receiversNextButtonClicked()
             ow = true;
             QMessageBox::critical(this, tr("Address Error"),
                                   tr("Sending funds to your own addresses "
-                                     "is not allowed, this is to avoid lost funds!"));
+                                     "is not allowed, this is to avoid losing funds!"));
             break;
         }
     }

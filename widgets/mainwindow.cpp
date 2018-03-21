@@ -51,6 +51,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::openWallet(const QString &filePath)
 {  
+    if (!QFileInfo::exists(filePath)) return;
+
     WalletPassphraseDialog d(this);
     if (d.exec() == QDialog::Accepted) {
         m_walletManager->unlockWallet(d.getWalletPassphrase());
