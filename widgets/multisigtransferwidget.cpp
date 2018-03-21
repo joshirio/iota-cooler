@@ -210,6 +210,7 @@ void MultisigTransferWidget::removeReceiverButtonClicked()
 void MultisigTransferWidget::receiversNextButtonClicked()
 {
     //populate map
+    m_receiversMap.clear();
     bool valid = true;
     for (int i = 0; i < m_receiversAddressLineList.size(); i++) {
         m_receiversMap.insert(m_receiversAddressLineList.at(i)->text(),
@@ -504,11 +505,19 @@ void MultisigTransferWidget::requestError(AbstractTangleAPI::RequestType request
         break;
     }
     case AbstractTangleAPI::MultisigTransfer:
+    {
+        QString message = errorMessage;
+        if (errorMessage.contains("Address reuse detected")) {
+            message = tr("Address reuse detected!<br />"
+                         "<b>Please abort the transaction!</b><br />"
+                         "Output: ").append(errorMessage);
+        }
         if (ui->stackedWidget->currentIndex() == 7)
             ui->stackedWidget->setCurrentIndex(6);
         QMessageBox::critical(this,
                               tr("IOTA API Request Error"),
-                              errorMessage);
+                              message);
+    }
         break;
     default:
         QMessageBox::critical(this,

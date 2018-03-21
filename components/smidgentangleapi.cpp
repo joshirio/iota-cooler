@@ -336,6 +336,10 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                                   "balance and addresses.<br />"
                                   "If this error persists, consider aborting"
                                   " the transaction and start over again.");
+            } else if (result.contains("addresses were used already")) {
+                error = true;
+                errorMessage = QString("Address reuse detected!<br />") //no tr() bc it's parsed
+                        .append(result);
             } else {
                 //unexpected response
                 errorMessage = result;
