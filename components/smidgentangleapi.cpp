@@ -49,7 +49,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     if (DefinitionHolder::SNAP_PKG) {
         smidgenPath.prepend("/snap/iotacooler/current");
     } else if (DefinitionHolder::APPIMAGE_LINUX) {
-        smidgenPath.remove("/usr/bin/");
+        smidgenPath = QApplication::applicationDirPath().append("/iotacooler-smidgen");
     }
 #endif
 

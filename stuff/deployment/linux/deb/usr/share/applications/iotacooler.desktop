@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=IOTAcooler
+GenericName=Iotacooler
+Exec=iota-cooler
+Icon=iotacooler
+Type=Application
+StartupNotify=false
+Terminal=false
+Categories=Office;
