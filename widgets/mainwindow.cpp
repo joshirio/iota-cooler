@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_walletManager = &WalletManager::getInstance();
     m_currentWalletPath = "/invalid";
     m_settingsManager = new SettingsManager(this);
+    UtilsIOTA::currentNodeUrl = DefinitionHolder::DEFAULT_NODE;
 
     loadWidgets();
     createMenus();

@@ -1,10 +1,10 @@
 #include "utilsiota.h"
-#include "definitionholder.h"
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QString>
 
-QString UtilsIOTA::currentNodeUrl = DefinitionHolder::DEFAULT_NODE;
+//later initialized with DefinitionHolder::DEFAULT_NODE to avoid static init dep cycle and crash
+QString UtilsIOTA::currentNodeUrl = "";
 
 bool UtilsIOTA::isValidTxHash(const QString &txHash)
 {

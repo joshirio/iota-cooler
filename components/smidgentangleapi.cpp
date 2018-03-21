@@ -3,6 +3,8 @@
 #include "../utils/utilsiota.h"
 #include "walletmanager.h"
 
+#include <QApplication>
+
 SmidgenTangleAPI::SmidgenTangleAPI(QObject *parent) :
     AbstractTangleAPI(parent), m_currentRequest(RequestType::NoRequest)
 {
