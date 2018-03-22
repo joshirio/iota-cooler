@@ -86,9 +86,10 @@ void MainWindow::openWallet(const QString &filePath)
                 ui->stackedWidget->setCurrentWidget(m_multisigTransferWidget);
                 break;
             default:
-                enforceOnlineRole();
-                ui->stackedWidget->setCurrentWidget(m_walletWidget);
-                m_walletWidget->setCurrentWalletPath(filePath);
+                if (enforceOnlineRole()) {
+                    ui->stackedWidget->setCurrentWidget(m_walletWidget);
+                    m_walletWidget->setCurrentWalletPath(filePath);
+                }
                 break;
             }
         } else {
