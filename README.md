@@ -23,7 +23,7 @@ The multisig signing is handled by [smidgen](https://github.com/bitfinexcom/smid
 [Click here for a short YouTube demo](https://youtu.be/MegEEOyEkgk)
 
 ### Download
-IOTAcooler works on Windows, macOS and Linux. Visit the [releases page](https://github.com/joshirio/iota-cooler/releases) and download the appropriate executable/installer for your OS.
+IOTAcooler works on Windows, macOS and Linux. Visit the [releases page](https://github.com/joshirio/iota-cooler/releases) and download the appropriate executable/installer for your OS. For Arch Linux based distributions, there's also an [AUR package](https://aur.archlinux.org/packages/iotacooler/) for building from source, this is also the most secure option, since you don't have to trust the precompiled binaries.
 
 ### Building from source
 Unpack archive and compile with
@@ -32,7 +32,7 @@ cd iotacooler
 qmake -config release
 make
 ```
-To run, [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen) is required (`/usr/bin/iotacooler-smidgen`). iotacooler-smidgen is a fork of smidgen with added functionality like promoting, address reuse checking on multisig transfers and changes to allow building nodejs binaries with `pkg`.
+To run, [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen) is required (`/usr/bin/iotacooler-smidgen`). iotacooler-smidgen is a fork of smidgen with added functionality like promoting, address reuse checking on multisig transfers and changes to allow building nodejs binaries with `pkg`. Please check out the [PKGBUILD script](https://github.com/joshirio/iota-cooler/blob/master/stuff/deployment/linux/PKGBUILD) for specific build and packaging steps.
 
 NOTE: The documentation is still in progress, including the building, running and packaging instructions. The [project wiki](https://github.com/joshirio/iota-cooler/wiki) will include user guides and detailed instructions, including on contributing with code or translations.
 
