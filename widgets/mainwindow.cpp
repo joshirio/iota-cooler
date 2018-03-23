@@ -150,16 +150,20 @@ void MainWindow::settingsActionTriggered()
 
 void MainWindow::promoteActionTriggered()
 {
-    PromoteReattachDialog d(this);
-    d.setPromoteView();
-    d.exec();
+    if (enforceOnlineRole()) {
+        PromoteReattachDialog d(this);
+        d.setPromoteView();
+        d.exec();
+    }
 }
 
 void MainWindow::reattachActionTriggered()
 {
-    PromoteReattachDialog d(this);
-    d.setReattachView();
-    d.exec();
+    if (enforceOnlineRole()) {
+        PromoteReattachDialog d(this);
+        d.setReattachView();
+        d.exec();
+    }
 }
 
 void MainWindow::newWalletButtonClicked()
