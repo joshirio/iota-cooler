@@ -350,8 +350,15 @@ bool WalletManager::importMultisigFile()
     if (!tmpFile.open(QIODevice::ReadOnly))
         return false;
 
+    //purge smidgen history (too much data)
+    QJsonParseError jerr;
+    QJsonObject smidgenJson = QJsonDocument::fromJson(tmpFile.readAll(), &jerr).object();
+    if (jerr.error != QJsonParseError::NoError) return false;
+    smidgenJson.remove("last");
+
     m_jsonObject.insert("currentColdWallet",
-                        QString::fromUtf8(tmpFile.readAll().toBase64()));
+                        QString::fromUtf8(QJsonDocument(smidgenJson)
+                                          .toJson().toBase64()));
     return true;
 }
 
@@ -361,8 +368,15 @@ bool WalletManager::importMultisigFileAsCleanBackup()
     if (!tmpFile.open(QIODevice::ReadOnly))
         return false;
 
+    //purge smidgen history (too much data)
+    QJsonParseError jerr;
+    QJsonObject smidgenJson = QJsonDocument::fromJson(tmpFile.readAll(), &jerr).object();
+    if (jerr.error != QJsonParseError::NoError) return false;
+    smidgenJson.remove("last");
+
     m_jsonObject.insert("cleanColdWalletBackup",
-                        QString::fromUtf8(tmpFile.readAll().toBase64()));
+                        QString::fromUtf8(QJsonDocument(smidgenJson)
+                                          .toJson().toBase64()));
     return true;
 }
 
