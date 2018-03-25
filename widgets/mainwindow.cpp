@@ -21,6 +21,7 @@
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QFileDialog>
 #include <QtGui/QClipboard>
+#include <QtCore/QMimeData>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -139,6 +140,37 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         clipboardGuardCheck();
     }
     return QMainWindow::eventFilter(watched, event);
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    if (ui->stackedWidget->currentIndex() == 0) {
+        if (event->mimeData()->hasUrls()) {
+            QList<QUrl> urls = event->mimeData()->urls();
+            //find first file
+            foreach (QUrl url, urls) {
+                QFileInfo info(url.path());
+                QString fileSuffix = info.suffix().toUpper();
+                if (fileSuffix == "ICWL") {
+                    QString filePath = url.path();
+#ifdef Q_OS_WIN
+                    filePath.remove(0, 1); //on windows: /C:/file_path is returned from mime
+#endif // Q_OS_WIN
+                    checkDeviceRole();
+                    openWallet(filePath);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasFormat("text/uri-list")) {
+        if (ui->stackedWidget->currentIndex() == 0)
+            event->acceptProposedAction();
+    }
 }
 
 void MainWindow::aboutQtActionTriggered()
@@ -301,7 +333,8 @@ void MainWindow::updateErrorSlot()
 
 void MainWindow::clipboardGuardCheck()
 {
-    if (m_settingsManager->isClipboardGuardEnabled()) {
+    if (m_settingsManager->isClipboardGuardEnabled() &&
+            (m_settingsManager->getDeviceRole() == UtilsIOTA::OnlineSigner)) {
         static QString previousAddress = "";
         static bool hideWarning = false;
         if (hideWarning) return;

@@ -10,6 +10,9 @@
     <height>385</height>
    </rect>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>IOTAcooler</string>
   </property>
@@ -18,6 +21,9 @@
     <normaloff>:/icons/iotacooler.png</normaloff>:/icons/iotacooler.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">

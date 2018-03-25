@@ -39,6 +39,8 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
 
 private slots:
     void aboutQtActionTriggered();
