@@ -296,6 +296,11 @@ NOTE: may show temporarily 0 during unconfirmed transfers</string>
              <string>To</string>
             </property>
            </column>
+           <column>
+            <property name="text">
+             <string>Tag</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>

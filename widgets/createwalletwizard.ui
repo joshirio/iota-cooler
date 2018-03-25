@@ -422,8 +422,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>458</width>
-            <height>112</height>
+            <width>98</width>
+            <height>37</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -499,8 +499,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>445</width>
-            <height>322</height>
+            <width>120</width>
+            <height>1310</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -565,7 +565,7 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
        <item>
         <widget class="QLabel" name="label_17">
          <property name="text">
-          <string>Please backup and store the following information securely offline</string>
+          <string>Please write down or store the following information securely offline</string>
          </property>
         </widget>
        </item>

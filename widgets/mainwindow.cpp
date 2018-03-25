@@ -254,6 +254,7 @@ void MainWindow::newWalletWizardCancelled()
 void MainWindow::walletCreationCompleted()
 {
     ui->stackedWidget->setCurrentIndex(0);
+    statusBar()->showMessage(tr("Wallet successfully created!"));
 }
 
 void MainWindow::closeWallet()

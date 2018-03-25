@@ -120,7 +120,10 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-	padding:15px;
+	padding: 15px;
+}
+QPushButton::focus{
+	outline: none;
 }</string>
           </property>
           <property name="text">

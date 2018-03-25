@@ -27,6 +27,23 @@ bool UtilsIOTA::isValidAddress(const QString &address)
     return reg.match(address).hasMatch();
 }
 
+QString UtilsIOTA::getEasyReadableTag(const QString &tag)
+{
+    QString t = tag;
+    int lastCharIndex, i = 0;
+    foreach (QChar c, t) {
+        if (c != '9') {
+            lastCharIndex = i;
+        }
+        i++;
+    }
+    if (lastCharIndex < t.length()) {
+        t.truncate(lastCharIndex+1);
+    }
+
+    return t;
+}
+
 UtilsIOTA::UtilsIOTA()
 {
 

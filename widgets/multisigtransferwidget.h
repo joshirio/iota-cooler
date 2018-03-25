@@ -83,6 +83,7 @@ private:
     QStringList m_receiverList;
     QStringList m_amountList;
     QString m_walletBalance;
+    QString m_tag;
 };
 
 #endif // MULTISIGTRANSFERWIDGET_H

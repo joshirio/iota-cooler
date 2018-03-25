@@ -104,6 +104,7 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         QStringList transferList = argList;
         command = "multisig";
         extraArgs.append("transfer");
+        QString tag = transferList.takeLast();
         seed = transferList.takeLast();
         QString balance = transferList.takeLast();
         QString id = transferList.takeLast();
@@ -112,6 +113,8 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         extraArgs.append(m_smidgenMultisigFilePath); //smidgen multisig wallet file
         extraArgs.append("--balance");
         extraArgs.append(balance);
+        extraArgs.append("--tag");
+        extraArgs.append(tag);
     }
         break;
     }

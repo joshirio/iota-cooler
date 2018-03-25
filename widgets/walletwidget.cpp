@@ -257,11 +257,13 @@ void WalletWidget::loadPastTxs()
         QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
         QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
         QTableWidgetItem *to = new QTableWidgetItem(tx.receivingAddress);
+        QTableWidgetItem *tag = new QTableWidgetItem(UtilsIOTA::getEasyReadableTag(tx.tag));
         ui->pastTxTableWidget->setItem(currentRow, 0, date);
         ui->pastTxTableWidget->setItem(currentRow, 1, amount);
         ui->pastTxTableWidget->setItem(currentRow, 2, txHash);
         ui->pastTxTableWidget->setItem(currentRow, 3, from);
         ui->pastTxTableWidget->setItem(currentRow, 4, to);
+        ui->pastTxTableWidget->setItem(currentRow, 5, tag);
     }
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(0,
                                                                     QHeaderView::ResizeToContents);

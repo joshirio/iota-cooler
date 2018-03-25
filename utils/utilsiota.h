@@ -26,6 +26,14 @@ public:
      * Check if the address format is valid */
     static bool isValidAddress(const QString &address);
 
+    /**
+     * @brief Transforms a tag (iota obsolete tag) to a
+     * more readable format, by removing trailing 9s
+     * @param tag
+     * @return tag as a firendly string
+     */
+    static QString getEasyReadableTag(const QString &tag);
+
     /** The current IOTA node URL used for API requests */
     static QString currentNodeUrl;
 
