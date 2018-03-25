@@ -30,7 +30,8 @@ bool UtilsIOTA::isValidAddress(const QString &address)
 QString UtilsIOTA::getEasyReadableTag(const QString &tag)
 {
     QString t = tag;
-    int lastCharIndex, i = 0;
+    int lastCharIndex, i;
+    lastCharIndex = i = 0;
     foreach (QChar c, t) {
         if (c != '9') {
             lastCharIndex = i;
@@ -39,6 +40,9 @@ QString UtilsIOTA::getEasyReadableTag(const QString &tag)
     }
     if (lastCharIndex < t.length()) {
         t.truncate(lastCharIndex+1);
+    }
+    if (lastCharIndex == 0) {
+        t = "";
     }
 
     return t;

@@ -136,6 +136,26 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>Optional tag:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="tagLinEdit">
+           <property name="maxLength">
+            <number>27</number>
+           </property>
+           <property name="placeholderText">
+            <string>(A-Z9, max 27 long)</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -175,36 +195,12 @@
             <x>0</x>
             <y>0</y>
             <width>417</width>
-            <height>81</height>
+            <height>120</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="scrollAreaLayout"/>
          </widget>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_11">
-         <item>
-          <widget class="QLabel" name="label_14">
-           <property name="text">
-            <string>Optional tag:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="tagLinEdit">
-           <property name="maxLength">
-            <number>27</number>
-           </property>
-           <property name="placeholderText">
-            <string>(optional A-Z9, max 27 long)</string>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
