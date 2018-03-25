@@ -55,6 +55,11 @@ void SettingsDialog::updatesComboBoxChanged(int index)
     sm->setCheckUpdates(!index);
 }
 
+void SettingsDialog::clipboardGuardComboboxChanged(int index)
+{
+    sm->setClipboardGuardEnabled(!index);
+}
+
 void SettingsDialog::createConnections()
 {
     connect(ui->defaultNodeButton, &QPushButton::clicked,
@@ -67,6 +72,9 @@ void SettingsDialog::createConnections()
     connect(ui->updatesComboBox,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
             this, &SettingsDialog::updatesComboBoxChanged);
+    connect(ui->clipboardGuardCombobox,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+            this, &SettingsDialog::clipboardGuardComboboxChanged);
 }
 
 void SettingsDialog::loadSettings()
@@ -76,4 +84,5 @@ void SettingsDialog::loadSettings()
 
     ui->deviceRoleComboBox->setCurrentIndex((int) sm->getDeviceRole());
     ui->updatesComboBox->setCurrentIndex((sm->getCheckUpdates() ? 0 : 1));
+    ui->clipboardGuardCombobox->setCurrentIndex((sm->isClipboardGuardEnabled() ? 0 : 1));
 }

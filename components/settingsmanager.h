@@ -81,6 +81,18 @@ public:
     /** Restore the state property for the specified object */
     QByteArray restoreState(const QString& objectName) const;
 
+    /**
+     * @brief Check whether or not clipboard guard is enabled
+     * @return bool
+     */
+    bool isClipboardGuardEnabled();
+
+    /**
+     * @brief Set clipboard guard state
+     * @param enabled - bool
+     */
+    void setClipboardGuardEnabled(bool enabled);
+
 private:
     QSettings *m_settings;
 };

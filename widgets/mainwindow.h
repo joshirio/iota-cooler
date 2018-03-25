@@ -38,6 +38,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
 
 private slots:
     void aboutQtActionTriggered();
@@ -59,6 +60,7 @@ private slots:
     void checkForUpdatesSlot();
     void noUpdateFoundSlot();
     void updateErrorSlot();
+    void clipboardGuardCheck();
 
 private:
     void loadWidgets();

@@ -20,6 +20,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QFileDialog>
+#include <QtGui/QClipboard>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     createConnections();
     loadSettings();
     checkForUpdatesSlot();
+
+    //install eventfilter for clipboard guard on macOS
+    centralWidget()->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -123,6 +127,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     saveSettings();
 
     event->accept();
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::WindowActivate)
+    {
+        //macOS doesn't allow clipboard monitoring
+        //when window is not active
+        //so when focus is back check
+        clipboardGuardCheck();
+    }
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWindow::aboutQtActionTriggered()
@@ -283,6 +299,55 @@ void MainWindow::updateErrorSlot()
     statusBar()->showMessage(tr("Error while checking for software updates"));
 }
 
+void MainWindow::clipboardGuardCheck()
+{
+    if (m_settingsManager->isClipboardGuardEnabled()) {
+        static QString previousAddress = "";
+        static bool hideWarning = false;
+        if (hideWarning) return;
+
+        QString clipData = qApp->clipboard()->text().trimmed();
+        if (UtilsIOTA::isValidAddress(clipData)) {
+            if (!previousAddress.isEmpty()) {
+                if (previousAddress != clipData) {
+                    //make addresses more readable
+                    QString prevReadable, clipReadable;
+                    prevReadable = previousAddress;
+                    prevReadable.insert((previousAddress.length() == 90 ? 30 : 27), "<br />");
+                    prevReadable.insert((previousAddress.length() == 90 ? 66 : 60), "<br />");
+                    clipReadable = clipData;
+                    clipReadable.insert((clipReadable.length() == 90 ? 30 : 27), "<br />");
+                    clipReadable.insert((clipReadable.length() == 90 ? 66 : 60), "<br />");
+
+                    QMessageBox box(this);
+                    box.setIcon(QMessageBox::Warning);
+                    box.setWindowTitle(tr("Clipboard Guard"));
+                    box.setText(tr("A clipboard data change has been detected!<br />"
+                                   "Please check the data to make sure no third-party "
+                                   "application like a malware secretly altered "
+                                   "your copied IOTA address.<br /><br />"
+                                   "<b>Previous:</b><br />%1<br />"
+                                   "<b>Current:</b><br />%2")
+                                .arg(prevReadable)
+                                .arg(clipReadable));
+                    QPushButton *disableButton = box.addButton(tr("Don't show this again for this session"),
+                                                               QMessageBox::RejectRole);
+                    QPushButton *okButton = box.addButton(tr("OK"),
+                                                          QMessageBox::AcceptRole);
+                    box.setDefaultButton(okButton);
+                    box.setWindowModality(Qt::WindowModal);
+                    box.exec();
+                    if (box.clickedButton() == disableButton) {
+                        hideWarning = true;
+                    }
+                }
+            }
+            //set new address
+            previousAddress = clipData;
+        }
+    }
+}
+
 void MainWindow::loadWidgets()
 {
     m_createWalletWidget = new CreateWalletWizard(this);
@@ -383,6 +448,10 @@ void MainWindow::createConnections()
             this, &MainWindow::multisigTransferCancelled);
     connect(m_multisigTransferWidget, &MultisigTransferWidget::transferCompleted,
             this, &MainWindow::multisigTransferCompleted);
+
+    //clipboard guard
+    connect(qApp->clipboard(), &QClipboard::dataChanged,
+            this, &MainWindow::clipboardGuardCheck);
 }
 
 void MainWindow::loadSettings()

@@ -23,6 +23,7 @@ bool UtilsIOTA::isValidAddress(const QString &address)
 {
     QRegularExpression reg("^[A-Z9]{81}$|^[A-Z9]{90}$"); //81 or 90 (checksum) length
     //checksum is not checked at this time
+    //TODO: if 90 length, check checksum
     return reg.match(address).hasMatch();
 }
 

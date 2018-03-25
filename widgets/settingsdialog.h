@@ -29,6 +29,7 @@ private slots:
     void nodeLineEditEdited();
     void deviceRoleComboBoxChanged(int index);
     void updatesComboBoxChanged(int index);
+    void clipboardGuardComboboxChanged(int index);
 
 private:
     void createConnections();

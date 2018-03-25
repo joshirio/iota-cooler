@@ -127,3 +127,21 @@ QByteArray SettingsManager::restoreState(const QString &objectName) const
 
     return s;
 }
+
+bool SettingsManager::isClipboardGuardEnabled()
+{
+    bool b;
+
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    b = m_settings->value("cGuard", true).toBool();
+    m_settings->endGroup();
+
+    return b;
+}
+
+void SettingsManager::setClipboardGuardEnabled(bool b)
+{
+    m_settings->beginGroup(DefinitionHolder::NAME.toLower());
+    m_settings->setValue("cGuard", b);
+    m_settings->endGroup();
+}
