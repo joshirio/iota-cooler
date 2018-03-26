@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>494</width>
-    <height>277</height>
+    <width>570</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -350,9 +350,9 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="offlineInitWalletButton">
+          <widget class="QPushButton" name="offlineInitNexttoSeedButton">
            <property name="text">
-            <string>&amp;Initialize wallet</string>
+            <string>&amp;Next</string>
            </property>
            <property name="autoDefault">
             <bool>false</bool>
@@ -719,6 +719,143 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_9">
+      <layout class="QVBoxLayout" name="verticalLayout_13">
+       <item>
+        <widget class="QLabel" name="label_19">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;&amp;#10104; Wallet file initialization [offline]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>Please select your multisig seed generation method. For more information and how to securely generate a seed visit the &lt;a href='https://github.com/joshirio/iota-cooler/wiki/Generating-IOTA-seeds-securely'&gt;project wiki&lt;/a&gt;.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Method</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QRadioButton" name="autoSeedRadio">
+            <property name="text">
+             <string>A&amp;utomatic (recommended)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="manualSeedRadio">
+            <property name="text">
+             <string>&amp;Manual</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="manualSeedGroupBox">
+         <property name="title">
+          <string>Manual seed input</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>Online seed:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="manualOnlineSeedLineEdit">
+            <property name="placeholderText">
+             <string>A-Z9 online signing seed</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>Offline seed</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="manualOfflineSeedLineEdit">
+            <property name="placeholderText">
+             <string>A-Z9 offline signing seed</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>12</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="seedConfCancelButton">
+           <property name="text">
+            <string>&amp;Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="offlineInitWalletButton">
+           <property name="text">
+            <string>&amp;Initialize wallet</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -732,12 +869,12 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
-     <y>151</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>422</x>
-     <y>240</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>
@@ -748,12 +885,44 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>186</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>433</x>
-     <y>239</y>
+     <x>108</x>
+     <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>manualOfflineSeedLineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>offlineInitWalletButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>245</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>478</x>
+     <y>332</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>manualOnlineSeedLineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>offlineInitWalletButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>507</x>
+     <y>332</y>
     </hint>
    </hints>
   </connection>

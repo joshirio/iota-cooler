@@ -50,11 +50,13 @@ private slots:
     void offlineInitWalletButtonClicked();
     void offlineInitProgressCancelled();
     void nextWInitProgressButtonClicked();
+    void offlineInitNexttoSeedButtonClicked();
     void savePDFButtonClicked();
     void wBackupNextButton();
     void wBackupconfirmBackButtonClicked();
     void wConfirmButtonClicked();
     void wBackupInfoNextButtonClicked();
+    void seedMethodRadioButtonsChanged();
     void walletError(const QString &message);
     void walletParseError(const QString &message);
     void walletPassError();
@@ -64,6 +66,8 @@ private slots:
                                const QString &errorMessage);
 
 private:
+    void startCreateMultisigFileRequestWithOfflineSeed();
+
     Ui::CreateWalletWizard *ui;
     WalletManager *m_walletManager;
     AbstractTangleAPI *m_tangleAPI;

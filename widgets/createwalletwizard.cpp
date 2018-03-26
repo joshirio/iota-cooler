@@ -16,6 +16,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QTextEdit>
 #include <QtPrintSupport/QPrinter>
+#include <QtWidgets/QRadioButton>
 
 CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
     QWidget(parent),
@@ -53,6 +54,10 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::offlineInitProgressCancelled);
     connect(ui->nextWInitProgressButton, &QPushButton::clicked,
             this, &CreateWalletWizard::nextWInitProgressButtonClicked);
+    connect(ui->offlineInitNexttoSeedButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::offlineInitNexttoSeedButtonClicked);
+    connect(ui->seedConfCancelButton, &QPushButton::clicked,
+            this, &CreateWalletWizard::infoCancelButtonClicked);
     connect(ui->wBackupInfoNextButton, &QPushButton::clicked,
             this, &CreateWalletWizard::wBackupInfoNextButtonClicked);
     connect(ui->savePDFButton, &QPushButton::clicked,
@@ -67,6 +72,11 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
             this, &CreateWalletWizard::tangleAPIRequestFinished);
     connect(m_tangleAPI, &AbstractTangleAPI::requestError,
             this, &CreateWalletWizard::tangleAPIRequestError);
+    connect(ui->manualSeedRadio, &QRadioButton::toggled,
+            this, &CreateWalletWizard::seedMethodRadioButtonsChanged);
+
+    //hide optional manual seed entries
+    ui->manualSeedGroupBox->hide();
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -80,7 +90,7 @@ void CreateWalletWizard::setOfflineWalletInitStep(const QString &walletFilePath)
     if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
         m_currentWalletFilePath = walletFilePath;
         ui->stackedWidget->setCurrentIndex(3);
-        ui->offlineInitWalletButton->setFocus();
+        ui->offlineInitNexttoSeedButton->setFocus();
     } else {
         ui->stackedWidget->setCurrentIndex(2);
     }
@@ -153,25 +163,50 @@ void CreateWalletWizard::wInitOnlineQuitButtonClicked()
 
 void CreateWalletWizard::offlineInitWalletButtonClicked()
 {
+    //check manual seeds
+    QString onlineSeed, offlineSeed;
+    bool manualSeeds = ui->manualSeedRadio->isChecked();
+    if (manualSeeds) {
+        onlineSeed = ui->manualOnlineSeedLineEdit->text().simplified()
+                .replace(" ", "").trimmed().toUpper();
+        offlineSeed = ui->manualOfflineSeedLineEdit->text().simplified()
+                .replace(" ", "").trimmed().toUpper();
+        if (!((UtilsIOTA::isValidSeed(onlineSeed) && UtilsIOTA::isValidSeed(offlineSeed)))
+                || (onlineSeed == offlineSeed)) {
+            QMessageBox::warning(this, tr("Invalid Seed Format"),
+                                 tr("Your entered seeds are not valid, please check "
+                                    "your input and try again!"));
+            return;
+        }
+    }
+
     m_walletInitStepResults.clear();
     ui->stackedWidget->setCurrentIndex(4);
 
-    //status update
     //5 steps:
     //seed gen offline
     //seed gen online
     //multisig create
     //multisig add
     //multisig finalize
+
     ui->wInitProgressBar->setRange(0, 5);
     ui->wInitProgressBar->setValue(1);
     ui->wInitProgressResultLabel->hide();
     ui->wInitProgressStatusLabel->setText(tr("Generating offline signer seed..."));
 
-    QStringList args;
-    args.append("offline");
-    m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateSeed,
-                                 args);
+    if (!manualSeeds) {
+        QStringList args;
+        args.append("offline");
+        m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateSeed,
+                                     args);
+    } else {
+        //add seeds and skip generation
+        m_walletInitStepResults.append(offlineSeed);
+        m_walletInitStepResults.append(onlineSeed);
+        startCreateMultisigFileRequestWithOfflineSeed();
+        ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 2);
+    }
 }
 
 void CreateWalletWizard::offlineInitProgressCancelled()
@@ -183,6 +218,12 @@ void CreateWalletWizard::offlineInitProgressCancelled()
 void CreateWalletWizard::nextWInitProgressButtonClicked()
 {
     ui->stackedWidget->setCurrentIndex(5);
+}
+
+void CreateWalletWizard::offlineInitNexttoSeedButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(8);
+    ui->offlineInitWalletButton->setFocus();
 }
 
 void CreateWalletWizard::wBackupInfoNextButtonClicked()
@@ -199,6 +240,11 @@ void CreateWalletWizard::wBackupInfoNextButtonClicked()
                 .arg(m_walletManager->getCurrentWalletPassphrase()));
     ui->walletBackupTextArea->setText(data);
     ui->stackedWidget->setCurrentIndex(6);
+}
+
+void CreateWalletWizard::seedMethodRadioButtonsChanged()
+{
+    ui->manualSeedGroupBox->setVisible(ui->manualSeedRadio->isChecked());
 }
 
 void CreateWalletWizard::savePDFButtonClicked()
@@ -307,13 +353,7 @@ void CreateWalletWizard::tangleAPIRequestFinished(AbstractTangleAPI::RequestType
             m_walletInitStepResults.append(response.split(":").at(2));
 
             //create multisig file
-            ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
-            ui->wInitProgressStatusLabel->setText(tr("Creating multisig file..."));
-            QStringList args;
-            args.append("offline"); //pass multisig party
-            args.append(m_walletInitStepResults.at(0)); //pass offline seed
-            m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateMultisigWallet,
-                                         args);
+            startCreateMultisigFileRequestWithOfflineSeed();
         }
         break;
     case AbstractTangleAPI::CreateMultisigWallet:
@@ -385,4 +425,16 @@ void CreateWalletWizard::tangleAPIRequestError(AbstractTangleAPI::RequestType re
     ui->wInitProgressStatusLabel->hide();
     ui->wInitProgressResultLabel->show();
     ui->wInitProgressResultLabel->setText(tr("Error: \n") + errorMessage);
+}
+
+void CreateWalletWizard::startCreateMultisigFileRequestWithOfflineSeed()
+{
+    //create multisig file
+    ui->wInitProgressBar->setValue(ui->wInitProgressBar->value() + 1);
+    ui->wInitProgressStatusLabel->setText(tr("Creating multisig file..."));
+    QStringList args;
+    args.append("offline"); //pass multisig party
+    args.append(m_walletInitStepResults.at(0)); //pass offline seed
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::CreateMultisigWallet,
+                                 args);
 }
