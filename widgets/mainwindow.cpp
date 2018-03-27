@@ -340,7 +340,7 @@ void MainWindow::clipboardGuardCheck()
         static bool hideWarning = false;
         if (hideWarning) return;
 
-        QString clipData = qApp->clipboard()->text().trimmed();
+        QString clipData = qApp->clipboard()->text().trimmed().toUpper();
         if (UtilsIOTA::isValidAddress(clipData)) {
             if (!previousAddress.isEmpty()) {
                 if (previousAddress != clipData) {

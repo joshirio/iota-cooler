@@ -65,7 +65,7 @@ MultisigTransferWidget::MultisigTransferWidget(QWidget *parent) :
             this, &MultisigTransferWidget::requestError);
 
     //tag input
-    QRegExp tagRe("^[A-Z9]{27}$|^[a-z9]{27}$");
+    QRegExp tagRe("^[A-Za-z9]{27}$");
     QRegExpValidator *tagValidator = new QRegExpValidator(tagRe, this);
     ui->tagLinEdit->setValidator(tagValidator);
 }
