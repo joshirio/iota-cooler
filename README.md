@@ -13,8 +13,8 @@ The multisig signing is handled by [smidgen](https://github.com/bitfinexcom/smid
 
 ### Limitations
 - Only one receiving address a time. A new address is generated automatically on transfers.
-- Requires to always backup the wallet file after each transfer. Store and sync it in the cloud to be safe (wallet is encrypted and doesn't hold the offline signing key). (development fix in progress)
-- At this time, restoring funds from only the multisig seeds without the wallet file is tricky and only possible with smidgen, the command line utility for multisig transfers. (development fix in progress)
+- Requires to always backup the wallet file after each transfer. Store and sync it in the cloud to be safe (wallet is encrypted and doesn't hold the offline signing key).
+- At this time, restoring funds from only the multisig seeds without the wallet file is tricky and only possible with smidgen, the command line utility for multisig transfers. **(development fix in progress)**
 
 ### How it looks
 ![Screenshot](https://raw.githubusercontent.com/joshirio/iota-cooler/master/stuff/screenshots/mainwindow.png "Wallet screenshot")
