@@ -26,13 +26,18 @@ public:
         NoRequest, /**< Invalid request status */
         CreateSeed, /**< Generate a seed */
         GetBalance, /**< Get balance of an address */
+        GenerateAddresses, /**< Generate multisig addresses */
+        IsAddressSpent, /**< Whether an address had outgoing
+                             transfers (also pre snapshot) */
         Promote, /**< Promote a transaction */
         Reattach, /**< Reattach a transaction */
         MultisigTransfer, /**< Make a transfer from a multisig address */
         CreateMultisigWallet, /**< Create a multisig file with 1 signing party */
         AddMultisigParty, /**< Add a signing party to the multisig file.
                                Can only be used until multisig file finalization */
-        FinalizeMultsigWallet/**< Finalize mutisig file */
+        FinalizeMultsigWallet, /**< Finalize mutisig file */
+        RecoverFundsSign, /**< Sign a tx to ecover funds from a multisig address */
+        RecoverFundsSend /**< Send a signed tx to recover funds, after RecoverFundsSign */
     };
 
     /**
@@ -61,6 +66,14 @@ signals:
      * @param errorMessage - error output of the API request
      */
     void requestError(RequestType request, const QString &errorMessage);
+
+    /**
+     * @brief Progress signal informing about current step and total steps
+     * in multisig address generation process (GenerateAddresses)
+     * @param currentIndex - current progress (current step)
+     * @param endIndex - last address index (last step), tot steps = endIndex + 1
+     */
+    void addressGenerationProgress(int currentIndex, int endIndex);
 };
 
 #endif // ABSTRACTTANGLEAPI_H

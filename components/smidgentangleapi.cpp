@@ -117,6 +117,37 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         extraArgs.append(tag);
     }
         break;
+    case RecoverFundsSign:
+    {
+        //QStringList transferList = argList;
+        command = "iotacooler";
+        extraArgs.append("recover-funds-sign");
+        //TODO args index, rec addr, balance
+    }
+        break;
+    case RecoverFundsSend:
+    {
+        //TODO
+    }
+        break;
+    case GenerateAddresses:
+    {
+        QString startIndex = argList.at(0);
+        QString endIndex = argList.at(1);
+        //FIXME: just to speed up for testing
+        startIndex = "0";
+        endIndex = "5";
+        command = "iotacooler";
+        extraArgs.append("get-addresses");
+        extraArgs.append(startIndex);
+        extraArgs.append(endIndex);
+    }
+        break;
+    case IsAddressSpent:
+    {
+        //TODO
+    }
+        break;
     }
 
     //init args
@@ -138,9 +169,16 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
             m_process->write(seed.toLatin1());
             m_process->waitForBytesWritten();
         }
+    } else if (m_currentRequest == GenerateAddresses) {
+        QString onlineSeed = argList.at(2);
+        QString offlineSeed = argList.at(3);
+        QString combinedSeeds = onlineSeed + ":" + offlineSeed;
+        m_process->waitForReadyRead();
+        m_process->write(combinedSeeds.toLatin1());
+        m_process->waitForBytesWritten();
     }
 
-            //close write channel to allow
+    //close write channel to allow
     //ready output signals, see docs
     m_process->closeWriteChannel();
 }
@@ -355,6 +393,19 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 error = true;
             }
             break;
+        case GenerateAddresses:
+            if (result.contains("Done:")) {
+                QString addresses;
+                QStringList l = result.split(";", QString::SkipEmptyParts);
+                l.removeFirst(); //rm input prompt
+                l.removeLast(); //rm last newline (\n) char
+                foreach (QString s, l) {
+                    QString sf = s.split(":").at(2);
+                    addresses.append(sf.append(":"));
+                }
+                message = "GenAddr:OK:" + addresses;
+            }
+            break;
         default:
             //unexpected response
             errorMessage = result;
@@ -382,19 +433,18 @@ void SmidgenTangleAPI::processReadyReadOutput()
     newOutput.append(m_process->readAllStandardOutput());
     m_processOutput.append(newOutput);
 
-    //NOTE: smidgen currently has no progress status output
-    /*switch (m_currentRequest) {
-    case Promote:
-        if (xyz) {
-            if (m_processOutput.contains("Promoting:")) {
-                emit uploadedChunkReady(m_chunksUploaded, m_totUploadChunks);
-                m_chunksUploaded++;
-            }
+    switch (m_currentRequest) {
+    case GenerateAddresses:
+        if (newOutput.contains("Done:")) {
+            QStringList progressList = newOutput.split(":").at(1).split("-");
+            int currentIndex = progressList.at(0).toInt();
+            int endIndex = progressList.at(1).toInt();
+            emit addressGenerationProgress(currentIndex, endIndex);
         }
         break;
     default:
         break;
-    }*/
+    }
 }
 
 bool SmidgenTangleAPI::clearSmidgenMultisigFile()

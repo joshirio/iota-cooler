@@ -56,6 +56,7 @@ private slots:
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,
                       const QString &errorMessage);
+    void addressGenerationProgress(int currentIndex, int endIndex);
 
 private:
     void nextPage();
@@ -65,8 +66,8 @@ private:
     QStringList m_currentRecoveryStepResults;
     AbstractTangleAPI *m_tangleAPI;
     WalletManager *m_walletManager;
-    int m_currentIndex;
-    int m_maxIndex;
+    int m_startIndex;
+    int m_endIndex;
 };
 
 #endif // RESTOREWALLETWIDGET_H

@@ -13,8 +13,8 @@
 RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RestoreWalletWidget),
-    m_currentIndex(0),
-    m_maxIndex(0)
+    m_startIndex(0),
+    m_endIndex(0)
 {
     ui->setupUi(this);
 
@@ -38,9 +38,11 @@ RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
     connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
-            this, &MultisigTransferWidget::requestFinished);
+            this, &RestoreWalletWidget::requestFinished);
     connect(m_tangleAPI, &AbstractTangleAPI::requestError,
-            this, &MultisigTransferWidget::requestError);
+            this, &RestoreWalletWidget::requestError);
+    connect(m_tangleAPI, &AbstractTangleAPI::addressGenerationProgress,
+            this, &RestoreWalletWidget::addressGenerationProgress);
 }
 
 RestoreWalletWidget::~RestoreWalletWidget()
@@ -63,15 +65,15 @@ void RestoreWalletWidget::showContinueWithOnlineSigner(const QString &walletPath
 void RestoreWalletWidget::prepareColdRecovery(const QString &walletPath)
 {
     m_currentWalletPath = walletPath;
-    m_currentIndex = m_maxIndex = 0;
+    m_startIndex = m_endIndex = 0;
     ui->stackedWidget->setCurrentIndex(2);
 
     //read wallet op args
     QVariantList opArgs;
     m_walletManager->getCurrentWalletOp(opArgs);
     if (opArgs.size() >= 2) {
-        m_currentIndex = opArgs.at(0).toInt();
-        m_maxIndex = opArgs.at(1).toInt();
+        m_startIndex = opArgs.at(0).toInt();
+        m_endIndex = opArgs.at(1).toInt();
     }
 }
 
@@ -110,12 +112,22 @@ void RestoreWalletWidget::offlineSeedsNextButtonClicked()
     onlineSeed.replace(" ", "");
     offlineSeed = ui->onlineSeedLineEdit->text().simplified().trimmed().toUpper();
     offlineSeed.replace(" ", "");
+    m_currentRecoveryStepResults.append(onlineSeed);
+    m_currentRecoveryStepResults.append(offlineSeed);
 
     if (UtilsIOTA::isValidSeed(onlineSeed) && UtilsIOTA::isValidSeed(offlineSeed)) {
         nextPage();
+        ui->genAddrProgressBar->setRange(m_startIndex, m_endIndex);
         ui->genAddressStatusLabel->setText(tr("Generating %1/%2")
-                                           .arg(m_currentIndex).arg(m_maxIndex));
-        //TODO start api request
+                                           .arg(m_startIndex).arg(m_endIndex));
+        //get addresses
+        QStringList args;
+        args.append(QString::number(m_startIndex));
+        args.append(QString::number(m_endIndex));
+        args.append(onlineSeed);
+        args.append(offlineSeed);
+        m_tangleAPI->startAPIRequest(AbstractTangleAPI::GenerateAddresses,
+                                     args);
     } else {
         QMessageBox::warning(this,
                              tr("IOTA Seeds Invalid"),
@@ -134,6 +146,11 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
                                           const QString &responseMessage)
 {
     switch (request) {
+    case AbstractTangleAPI::GenerateAddresses:
+        if (responseMessage.contains("GenAddr:OK:")) {
+            //TODO extract addresses and add to step results
+        }
+        break;
     default:
         break;
     }
@@ -149,6 +166,13 @@ void RestoreWalletWidget::requestError(AbstractTangleAPI::RequestType request,
                               errorMessage);
         break;
     }
+}
+
+void RestoreWalletWidget::addressGenerationProgress(int currentIndex, int endIndex)
+{
+    ui->genAddressStatusLabel->setText(tr("Generating %1/%2")
+                                       .arg(currentIndex).arg(endIndex));
+    ui->genAddrProgressBar->setValue(currentIndex);
 }
 
 void RestoreWalletWidget::nextPage()
