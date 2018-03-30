@@ -170,20 +170,6 @@ Please close the application and open the current wallet file with IOTAcooler on
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Online signer seed:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="onlineSeedLineEdit">
-           <property name="placeholderText">
-            <string>A-Z9 online signing seed</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_7">
            <property name="text">
@@ -195,6 +181,26 @@ Please close the application and open the current wallet file with IOTAcooler on
           <widget class="QLineEdit" name="offlineSeedLineEdit">
            <property name="placeholderText">
             <string>A-Z9 online signing seed</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Online signer seed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="onlineSeedLineEdit">
+           <property name="placeholderText">
+            <string>A-Z9 online signing seed</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -326,6 +332,9 @@ Please close the application and open the current wallet file with IOTAcooler on
          </item>
          <item>
           <widget class="QPushButton" name="cancelGenAddrButton">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string>&amp;Cancel</string>
            </property>
@@ -350,5 +359,22 @@ Please close the application and open the current wallet file with IOTAcooler on
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>onlineSeedLineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>offlineSeedsNextButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>285</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>407</x>
+     <y>265</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -9,10 +9,13 @@
 #define RESTOREWALLETWIDGET_H
 
 #include <QWidget>
+#include "../components/abstracttangleapi.h"
 
 namespace Ui {
 class RestoreWalletWidget;
 }
+
+class WalletManager;
 
 class RestoreWalletWidget : public QWidget
 {
@@ -47,12 +50,23 @@ signals:
 private slots:
     void quitButtonClicked();
     void restoreInfoNextButtonClicked();
+    void offlineSeedsNextButtonClicked();
+    void cancelGenAddrButtonClicked();
+    void requestFinished(AbstractTangleAPI::RequestType request,
+                         const QString &responseMessage);
+    void requestError(AbstractTangleAPI::RequestType request,
+                      const QString &errorMessage);
 
 private:
     void nextPage();
 
     Ui::RestoreWalletWidget *ui;
     QString m_currentWalletPath;
+    QStringList m_currentRecoveryStepResults;
+    AbstractTangleAPI *m_tangleAPI;
+    WalletManager *m_walletManager;
+    int m_currentIndex;
+    int m_maxIndex;
 };
 
 #endif // RESTOREWALLETWIDGET_H
