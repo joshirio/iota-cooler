@@ -77,6 +77,9 @@ CreateWalletWizard::CreateWalletWizard(QWidget *parent) :
 
     //hide optional manual seed entries
     ui->manualSeedGroupBox->hide();
+
+    //hide restore info label
+    ui->restoreFundsInfoLabel->hide();
 }
 
 CreateWalletWizard::~CreateWalletWizard()
@@ -91,6 +94,15 @@ void CreateWalletWizard::setOfflineWalletInitStep(const QString &walletFilePath)
         m_currentWalletFilePath = walletFilePath;
         ui->stackedWidget->setCurrentIndex(3);
         ui->offlineInitNexttoSeedButton->setFocus();
+
+        //check if wallet restoring was selecting as next step after wallet creation
+        m_restoreWalletNext = false;
+        QVariantList opArgs;
+        m_walletManager->getCurrentWalletOp(opArgs);
+        if (opArgs.size() > 0) {
+            if (opArgs.at(0).toString() == "recover")
+                m_restoreWalletNext = true;
+        }
     } else {
         ui->stackedWidget->setCurrentIndex(2);
     }
@@ -133,9 +145,11 @@ void CreateWalletWizard::wConfUpdateNextButtonState()
 
 void CreateWalletWizard::wConfNextButtonClicked()
 {
+    m_restoreWalletNext = ui->restoreWalletRadio->isChecked();
     m_walletManager->unlockWallet(ui->wpLineEdit->text());
     WalletManager::WalletError error;
     bool ok = m_walletManager->createAndInitWallet(ui->wPathLineEdit->text().trimmed(),
+                                                   m_restoreWalletNext,
                                                    error);
     m_walletManager->lockWallet();
 
@@ -299,15 +313,25 @@ void CreateWalletWizard::wConfirmButtonClicked()
                                 "Please try again"));
     } else {
         //set wallet init as complete
-        m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::NoOp,
-                                            QVariantList());
+        if (m_restoreWalletNext) {
+            //if restore funds selected, prepare next step
+            QVariantList opArgs;
+            opArgs.append(0); //start address index for recovery
+            opArgs.append(200); //end index
+            m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::RecoverOffline,
+                                                opArgs);
+        } else {
+            m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::NoOp,
+                                                QVariantList());
+        }
+
         WalletManager::WalletError error;
         bool w = m_walletManager->saveWallet(m_currentWalletFilePath,
                                              false,
                                              false,
                                              error);
         if (w)
-            emit walletCreationCompleted();
+            emit walletCreationCompleted(m_restoreWalletNext);
         else
             walletError(error.errorString);
     }

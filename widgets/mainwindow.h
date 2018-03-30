@@ -18,6 +18,7 @@ class CreateWalletWizard;
 class WalletWidget;
 class WalletManager;
 class MultisigTransferWidget;
+class RestoreWalletWidget;
 class UpdateManager;
 class SettingsManager;
 
@@ -53,12 +54,14 @@ private slots:
     void showWalletJsonActionTriggered();
     void openWalletButtonClicked();
     void newWalletWizardCancelled();
-    void walletCreationCompleted();
+    void walletCreationCompleted(bool restoreWallet);
     void closeWallet();
     void showStatusMessage(const QString &message);
     void makeNewTransaction();
     void multisigTransferCancelled();
     void multisigTransferCompleted();
+    void restoreWalletCancelled();
+    void restoreWalletCompleted();
     void checkForUpdatesSlot();
     void noUpdateFoundSlot();
     void updateErrorSlot();
@@ -97,6 +100,8 @@ private:
     CreateWalletWizard *m_createWalletWidget;
     WalletWidget *m_walletWidget;
     MultisigTransferWidget *m_multisigTransferWidget;
+    RestoreWalletWidget *m_restoreWalletWidget;
+
     WalletManager *m_walletManager;
     QString m_currentWalletPath;
     UpdateManager *m_updateManager;

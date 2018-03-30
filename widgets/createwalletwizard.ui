@@ -186,6 +186,48 @@ Your offline multisig seed is never stored in the wallet file.</string>
         </layout>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Wallet type</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_14">
+          <item>
+           <widget class="QRadioButton" name="newWalletRadio">
+            <property name="toolTip">
+             <string>Create a new and empty wallet</string>
+            </property>
+            <property name="text">
+             <string>New wallet</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="restoreWalletRadio">
+            <property name="toolTip">
+             <string>Create a new wallet and import funds from previous seeds, which were previously used with IOTAcooler</string>
+            </property>
+            <property name="text">
+             <string>Restore wallet from seeds</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="restoreFundsInfoLabel">
+         <property name="text">
+          <string>&lt;i&gt;Your funds will be moved to the new wallet after its creation&lt;/i&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -422,8 +464,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>37</height>
+            <width>534</width>
+            <height>205</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -499,8 +541,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>120</width>
-            <height>1310</height>
+            <width>534</width>
+            <height>265</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -508,11 +550,11 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
             <widget class="QLabel" name="label_15">
              <property name="text">
               <string>IOTAcooler uses standard IOTA seeds to implement multisig, which are compatible with other multisig applications based on the official IOTA API.&lt;br /&gt;&lt;br /&gt;
-IOTAcooler, at this point, can restore your funds &lt;b&gt;only&lt;/b&gt; if you also backup your &lt;b&gt;encrypted IOTAcooler wallet file&lt;/b&gt; alongside with the  wallet encryption password and the multisig seeds, which are displayed on the next page. The wallet file is stateful, meaning that all addresses and balances are remembered, even after a snapshot.
+IOTAcooler is able to &lt;b&gt;restore&lt;/b&gt; your funds from the two multisig seeds, which are displayed on the next page, so please keep them safe.
+&lt;br /&gt;&lt;br /&gt;
+The wallet file is stateful, meaning that all addresses and balances are remembered, even after a snapshot. This also means that after each transaction the state changes and thus the latest wallet file is always required for new transactons.
 &lt;br /&gt;
-Restoring your funds from only the IOTA multisig seeds is possible by using the command line utility &lt;a href=&quot;https://github.com/bitfinexcom/smidgen&quot;&gt;smidgen&lt;/a&gt;. But this is still tricky and not recommended.
-&lt;br /&gt;
-&lt;b&gt;&lt;i&gt;Just store your wallet file, that is encrypted and doesn't contain the offline signing keys, on a cloud service or make regularly backups of it, after each transaction, and you will be safe&lt;/i&gt;&lt;/b&gt;
+&lt;b&gt;&lt;i&gt;It's recommended to store your wallet file, that is encrypted and doesn't contain the offline signing keys, on a cloud service or make regularly backups of it, after each transaction to be safe.&lt;/i&gt;&lt;/b&gt;
 </string>
              </property>
              <property name="wordWrap">
@@ -869,12 +911,12 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>38</y>
+     <x>262</x>
+     <y>164</y>
     </hint>
     <hint type="destinationlabel">
-     <x>108</x>
-     <y>38</y>
+     <x>550</x>
+     <y>350</y>
     </hint>
    </hints>
   </connection>
@@ -885,12 +927,12 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>38</y>
+     <x>264</x>
+     <y>203</y>
     </hint>
     <hint type="destinationlabel">
-     <x>108</x>
-     <y>38</y>
+     <x>550</x>
+     <y>350</y>
     </hint>
    </hints>
   </connection>
@@ -901,12 +943,12 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>245</x>
-     <y>264</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>478</x>
-     <y>332</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
    </hints>
   </connection>
@@ -917,12 +959,28 @@ Restoring your funds from only the IOTA multisig seeds is possible by using the 
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>329</x>
-     <y>228</y>
+     <x>108</x>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>507</x>
-     <y>332</y>
+     <x>108</x>
+     <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>restoreWalletRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>restoreFundsInfoLabel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>237</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>

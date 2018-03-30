@@ -37,8 +37,11 @@ signals:
     /** Emitted when user cancels the wizard */
     void walletCreationCancelled();
 
-    /** Emitted when user completes the wizard */
-    void walletCreationCompleted();
+    /**
+     * @brief Emitted when user completes the wizard
+     * @param restoreWallet - true if restoring wallet option was selected
+     */
+    void walletCreationCompleted(bool restoreWallet);
 
 private slots:
     void infoNextButtonClicked();
@@ -73,6 +76,7 @@ private:
     AbstractTangleAPI *m_tangleAPI;
     QStringList m_walletInitStepResults;
     QString m_currentWalletFilePath;
+    bool m_restoreWalletNext;
 };
 
 #endif // CREATEWALLETWIZARD_H

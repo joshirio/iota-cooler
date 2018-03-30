@@ -62,7 +62,7 @@ QString WalletManager::getCurrentWalletPassphrase()
     return m_encryptionKey;
 }
 
-bool WalletManager::createAndInitWallet(const QString &filePath,
+bool WalletManager::createAndInitWallet(const QString &filePath, bool recoverFunds,
                                         WalletError &error)
 {
     checkLock();
@@ -71,8 +71,10 @@ bool WalletManager::createAndInitWallet(const QString &filePath,
     QString defaultJson = "{\"onlineSeed\":\"\",\"currentColdWallet\":\"\",\"cleanColdWalletBackup"
                           "\":\"\",\"currentOperation\":1,\"currentOpArgs\":[],\"currentAddress"
                           "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions\":[]}";
-    m_jsonObject = QJsonDocument::fromJson(defaultJson.toUtf8()).object();
+    if (recoverFunds)
+        defaultJson.replace("\"currentOpArgs\":[]", "\"currentOpArgs\":[\"recover\"]");
 
+    m_jsonObject = QJsonDocument::fromJson(defaultJson.toUtf8()).object();
     return writeWalletToFile(filePath, error);
 }
 
@@ -243,6 +245,8 @@ bool WalletManager::restoreWallet(const QString &walletFilePath,
 void WalletManager::setCurrentWalletOp(WalletOp op,
                                        const QVariantList &opArgs)
 {
+    checkLock();
+
     int i = (int) op;
     m_jsonObject.insert("currentOperation", i);
     m_jsonObject.insert("currentOpArgs", QJsonArray::fromVariantList(opArgs));
@@ -250,6 +254,8 @@ void WalletManager::setCurrentWalletOp(WalletOp op,
 
 WalletManager::WalletOp WalletManager::getCurrentWalletOp(QVariantList &opArgs)
 {
+    checkLock();
+
     int i = m_jsonObject.value("currentOperation").toInt();
     opArgs = m_jsonObject.value("currentOpArgs").toArray().toVariantList();
     WalletOp op = (WalletOp) i;
@@ -258,11 +264,15 @@ WalletManager::WalletOp WalletManager::getCurrentWalletOp(QVariantList &opArgs)
 
 QVariantList WalletManager::getPastUsedAddresses()
 {
+    checkLock();
+
     return m_jsonObject.value("pastUsedAdresses").toArray().toVariantList();
 }
 
 void WalletManager::addPastUsedAddress(const QString &address)
 {
+    checkLock();
+
     QJsonArray array = m_jsonObject.value("pastUsedAdresses").toArray();
     array.append(address);
     m_jsonObject.insert("pastUsedAdresses", array);
@@ -270,26 +280,36 @@ void WalletManager::addPastUsedAddress(const QString &address)
 
 QString WalletManager::getCurrentAddress()
 {
+    checkLock();
+
     return m_jsonObject.value("currentAddress").toString();
 }
 
 void WalletManager::setCurrentAddress(const QString &address)
 {
+    checkLock();
+
     m_jsonObject.insert("currentAddress", address);
 }
 
 QString WalletManager::getOnlineSeed()
 {
+    checkLock();
+
     return m_jsonObject.value("onlineSeed").toString();
 }
 
 void WalletManager::setOnlineSeed(const QString &seed)
 {
+    checkLock();
+
     m_jsonObject.insert("onlineSeed", seed);
 }
 
 void WalletManager::addPastSpendingTx(const UtilsIOTA::Transation &transaction)
 {
+    checkLock();
+
     QJsonArray txListArray = m_jsonObject.value("pastSpendingTransactions").toArray();
 
     QJsonObject jsonTx;
@@ -306,6 +326,8 @@ void WalletManager::addPastSpendingTx(const UtilsIOTA::Transation &transaction)
 
 QList<UtilsIOTA::Transation> WalletManager::getPastSpendingTxs()
 {
+    checkLock();
+
     QList<UtilsIOTA::Transation> txList;
     QJsonArray txsJsonArray = m_jsonObject.value("pastSpendingTransactions").toArray();
 
@@ -328,24 +350,32 @@ QList<UtilsIOTA::Transation> WalletManager::getPastSpendingTxs()
 
 void WalletManager::backupMultisigFileAsClean()
 {
+    checkLock();
+
     m_jsonObject.insert("cleanColdWalletBackup",
                         m_jsonObject.value("currentColdWallet"));
 }
 
 void WalletManager::restoreCleanMultisigFileBackup()
 {
+    checkLock();
+
     m_jsonObject.insert("currentColdWallet",
                         m_jsonObject.value("cleanColdWalletBackup"));
 }
 
 QString WalletManager::getRawJsonData() const
 {
+    checkLock();
+
     QString s = QString::fromUtf8(QJsonDocument(m_jsonObject).toJson());
     return s;
 }
 
 bool WalletManager::importMultisigFile()
 {
+    checkLock();
+
     QFile tmpFile(getTmpMultisigSignFilePath());
     if (!tmpFile.open(QIODevice::ReadOnly))
         return false;
@@ -364,6 +394,8 @@ bool WalletManager::importMultisigFile()
 
 bool WalletManager::importMultisigFileAsCleanBackup()
 {
+    checkLock();
+
     QFile tmpFile(getTmpMultisigSignFilePath());
     if (!tmpFile.open(QIODevice::ReadOnly))
         return false;
@@ -382,6 +414,8 @@ bool WalletManager::importMultisigFileAsCleanBackup()
 
 bool WalletManager::exportMultisigFile()
 {
+    checkLock();
+
     QFile tmpFile(getTmpMultisigSignFilePath());
     if (!tmpFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
@@ -395,6 +429,8 @@ bool WalletManager::exportMultisigFile()
 
 bool WalletManager::exportCleanBackupMultisigFile()
 {
+    checkLock();
+
     QFile tmpFile(getTmpMultisigSignFilePath());
     if (!tmpFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         return false;
@@ -406,7 +442,7 @@ bool WalletManager::exportCleanBackupMultisigFile()
     return writeOK;
 }
 
-void WalletManager::checkLock()
+void WalletManager::checkLock() const
 {
     if (m_encryptionKey.isEmpty())
         qFatal("[FATAL ERROR:] encryption key not set, call WalletManager::unlockWallet() first!");

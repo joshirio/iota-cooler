@@ -11,6 +11,7 @@
 #include "../components/walletmanager.h"
 #include "walletpassphrasedialog.h"
 #include "multisigtransferwidget.h"
+#include "restorewalletwidget.h"
 #include "../components/updatemanager.h"
 #include "walletrawdatadialog.h"
 
@@ -28,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_createWalletWidget(0),
     m_walletWidget(0),
+    m_multisigTransferWidget(0),
+    m_restoreWalletWidget(0),
     m_updateManager(0),
     m_settingsManager(0)
 {
@@ -73,6 +76,22 @@ void MainWindow::openWallet(const QString &filePath)
             case WalletManager::InitOffline:
                 ui->stackedWidget->setCurrentWidget(m_createWalletWidget);
                 m_createWalletWidget->setOfflineWalletInitStep(filePath);
+                break;
+            case WalletManager::RecoverOffline:
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
+                    m_restoreWalletWidget->prepareColdRecovery(m_currentWalletPath);
+                } else {
+                    m_restoreWalletWidget->showContinueWithOfflineSigner(m_currentWalletPath);
+                }
+                ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
+                break;
+            case WalletManager::RecoverOnline:
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OnlineSigner) {
+                    m_restoreWalletWidget->prepareHotRecovery(m_currentWalletPath);
+                } else {
+                    m_restoreWalletWidget->showContinueWithOnlineSigner(m_currentWalletPath);
+                }
+                ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
                 break;
             case WalletManager::ColdSign:
                 if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
@@ -251,10 +270,16 @@ void MainWindow::newWalletWizardCancelled()
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-void MainWindow::walletCreationCompleted()
+void MainWindow::walletCreationCompleted(bool restoreWallet)
 {
-    ui->stackedWidget->setCurrentIndex(0);
     statusBar()->showMessage(tr("Wallet successfully created!"));
+
+    if (!restoreWallet) {
+        ui->stackedWidget->setCurrentIndex(0);
+    } else {
+        m_restoreWalletWidget->prepareHotRecoveryInfo(m_currentWalletPath);
+        ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
+    }
 }
 
 void MainWindow::closeWallet()
@@ -295,6 +320,16 @@ void MainWindow::multisigTransferCompleted()
     } else {
         ui->stackedWidget->setCurrentIndex(0);
     }
+}
+
+void MainWindow::restoreWalletCancelled()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::restoreWalletCompleted()
+{
+    //TODO
 }
 
 void MainWindow::checkForUpdatesSlot()
@@ -390,6 +425,8 @@ void MainWindow::loadWidgets()
     ui->stackedWidget->addWidget(m_walletWidget);
     m_multisigTransferWidget = new MultisigTransferWidget(this);
     ui->stackedWidget->addWidget(m_multisigTransferWidget);
+    m_restoreWalletWidget = new RestoreWalletWidget(this);
+    ui->stackedWidget->addWidget(m_restoreWalletWidget);
 }
 
 void MainWindow::createMenus()
@@ -482,6 +519,12 @@ void MainWindow::createConnections()
             this, &MainWindow::multisigTransferCancelled);
     connect(m_multisigTransferWidget, &MultisigTransferWidget::transferCompleted,
             this, &MainWindow::multisigTransferCompleted);
+
+    //restore wallet widget
+    connect(m_restoreWalletWidget, &RestoreWalletWidget::restoreWalletCancelled,
+            this, &MainWindow::restoreWalletCancelled);
+    connect(m_restoreWalletWidget, &RestoreWalletWidget::restoreWalletCompleted,
+            this, &MainWindow::restoreWalletCompleted);
 
     //clipboard guard
     connect(qApp->clipboard(), &QClipboard::dataChanged,

@@ -100,10 +100,13 @@ public:
      * to InitOffline for the next step which is offline init.
      * Emits walletWriteError()
      * @param filePath - the new wallet file saving path
+     * @param recoverFunds - true if current op args should indicate the intention
+     * to recover funds from previous seeds (only an intention marker)
      * @param error - WalletError, containing error info on failure
      * @return bool - true on success
      */
-    bool createAndInitWallet(const QString &filePath, WalletError &error);
+    bool createAndInitWallet(const QString &filePath, bool recoverFunds,
+                             WalletError &error);
 
     /**
      * @brief Save and write internal wallet structure to an encrypted file
@@ -284,7 +287,7 @@ private:
     /**
      * @brief Make sure wallet is unlocked, if not crash with error
      */
-    void checkLock();
+    void checkLock() const;
 
     /**
      * @brief Get a random string for the IV vector for CBC AES
