@@ -55,6 +55,11 @@ void WalletManager::lockWallet()
     m_jsonObject = QJsonObject();
 }
 
+bool WalletManager::isLocked()
+{
+    return m_encryptionKey.isEmpty();
+}
+
 QString WalletManager::getCurrentWalletPassphrase()
 {
     checkLock();

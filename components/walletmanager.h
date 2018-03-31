@@ -89,6 +89,12 @@ public:
     void lockWallet();
 
     /**
+     * @brief Check if the wallet is locked, ie. no cached encryption passphrase
+     * @return true if locked
+     */
+    bool isLocked();
+
+    /**
      * @brief Get the wallet passphrase
      * @return wallet password
      */
