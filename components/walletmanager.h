@@ -92,7 +92,7 @@ public:
      * @brief Check if the wallet is locked, ie. no cached encryption passphrase
      * @return true if locked
      */
-    bool isLocked();
+    bool isLocked() const;
 
     /**
      * @brief Get the wallet passphrase

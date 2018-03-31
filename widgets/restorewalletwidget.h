@@ -52,6 +52,7 @@ private slots:
     void restoreInfoNextButtonClicked();
     void offlineSeedsNextButtonClicked();
     void cancelGenAddrButtonClicked();
+    void nextGenAddrButtonClicked();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,

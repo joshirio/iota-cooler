@@ -34,6 +34,10 @@ RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
             this, &RestoreWalletWidget::offlineSeedsNextButtonClicked);
     connect(ui->cancelGenAddrButton, &QPushButton::clicked,
             this, &RestoreWalletWidget::cancelGenAddrButtonClicked);
+    connect(ui->nextGenAddrButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::nextGenAddrButtonClicked);
+    connect(ui->quitAddressCheckInfoOffline, &QPushButton::clicked,
+            this, &RestoreWalletWidget::quitButtonClicked);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -59,7 +63,7 @@ void RestoreWalletWidget::showContinueWithOfflineSigner(const QString &walletPat
 void RestoreWalletWidget::showContinueWithOnlineSigner(const QString &walletPath)
 {
     m_currentWalletPath = walletPath;
-    //TODO
+    ui->stackedWidget->setCurrentIndex(4);
 }
 
 void RestoreWalletWidget::prepareColdRecovery(const QString &walletPath)
@@ -87,6 +91,7 @@ void RestoreWalletWidget::prepareHotRecoveryInfo(const QString &walletPath)
 void RestoreWalletWidget::prepareHotRecovery(const QString &walletPath)
 {
     m_currentWalletPath = walletPath;
+    ui->stackedWidget->setCurrentIndex(5);
     //TODO
 }
 
@@ -106,11 +111,12 @@ void RestoreWalletWidget::restoreInfoNextButtonClicked()
 
 void RestoreWalletWidget::offlineSeedsNextButtonClicked()
 {
+    ui->nextGenAddrButton->setEnabled(false);
     m_currentRecoveryStepResults.clear();
     QString onlineSeed, offlineSeed;
     onlineSeed = ui->onlineSeedLineEdit->text().simplified().trimmed().toUpper();
     onlineSeed.replace(" ", "");
-    offlineSeed = ui->onlineSeedLineEdit->text().simplified().trimmed().toUpper();
+    offlineSeed = ui->offlineSeedLineEdit->text().simplified().trimmed().toUpper();
     offlineSeed.replace(" ", "");
     m_currentRecoveryStepResults.append(onlineSeed);
     m_currentRecoveryStepResults.append(offlineSeed);
@@ -142,13 +148,43 @@ void RestoreWalletWidget::cancelGenAddrButtonClicked()
     emit restoreWalletCancelled();
 }
 
+void RestoreWalletWidget::nextGenAddrButtonClicked()
+{
+    nextPage();
+}
+
 void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
                                           const QString &responseMessage)
 {
     switch (request) {
     case AbstractTangleAPI::GenerateAddresses:
         if (responseMessage.contains("GenAddr:OK:")) {
-            //TODO extract addresses and add to step results
+            //extract addresses and add to wallet op args
+            QStringList addressList = responseMessage.split(":", QString::SkipEmptyParts);
+            addressList.removeFirst(); //rm GenAddr:OK:
+            addressList.removeFirst();
+            QVariantList opArgs;
+            opArgs.append(m_startIndex); //add key index range
+            opArgs.append(m_endIndex);
+            foreach (QString s, addressList) {
+                opArgs.append(s);
+            }
+            m_walletManager->setCurrentWalletOp(WalletManager::RecoverOnline,
+                                                opArgs);
+            //write wallet
+            WalletManager::WalletError wError;
+            m_walletManager->saveWallet(m_currentWalletPath,
+                                        false,
+                                        false,
+                                        wError);
+            if (wError.errorType != WalletManager::WalletError::NoError) {
+                QMessageBox::critical(this,
+                                      tr("Wallet Save Error"),
+                                      wError.errorString);
+            } else {
+                ui->genAddressStatusLabel->setText(tr("Finished!"));
+                ui->nextGenAddrButton->setEnabled(true);
+            }
         }
         break;
     default:

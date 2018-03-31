@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>370</height>
+    <width>614</width>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -220,7 +220,7 @@ Your offline multisig seed is never stored in the wallet file.</string>
        <item>
         <widget class="QLabel" name="restoreFundsInfoLabel">
          <property name="text">
-          <string>&lt;i&gt;Your funds will be moved to the new wallet after its creation&lt;/i&gt;</string>
+          <string>&lt;i&gt;First, a fresh wallet will be created during this wizard. Your funds will be moved to the new wallet by following an additional recovery wizard afterwards, which will ask you for your previous IOTAcooler wallet backup seeds.&lt;/i&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -464,8 +464,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>534</width>
-            <height>205</height>
+            <width>98</width>
+            <height>37</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -541,8 +541,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>534</width>
-            <height>265</height>
+            <width>117</width>
+            <height>1234</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -773,7 +773,7 @@ The wallet file is stateful, meaning that all addresses and balances are remembe
        <item>
         <widget class="QLabel" name="label_23">
          <property name="text">
-          <string>Please select your multisig seed generation method. For more information and how to securely generate a seed visit the &lt;a href='https://github.com/joshirio/iota-cooler/wiki/Generating-IOTA-seeds-securely'&gt;project wiki&lt;/a&gt;.</string>
+          <string>Please select your multisig seed generation method. For more information and how to securely generate a new seed visit the &lt;a href='https://github.com/joshirio/iota-cooler/wiki/Generating-IOTA-seeds-securely'&gt;project wiki&lt;/a&gt;.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -814,37 +814,51 @@ The wallet file is stateful, meaning that all addresses and balances are remembe
          <property name="title">
           <string>Manual seed input</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_24">
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_24">
+              <property name="text">
+               <string>Online seed:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="manualOnlineSeedLineEdit">
+              <property name="placeholderText">
+               <string>A-Z9 online signing seed</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>Offline seed</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="manualOfflineSeedLineEdit">
+              <property name="placeholderText">
+               <string>A-Z9 offline signing seed</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>Online seed:</string>
+             <string>&lt;b&gt;Warning&lt;/b&gt;: do not enter already &lt;b&gt;used&lt;/b&gt; seeds to avoid loss of funds, instead use wallet recovery for this purpose</string>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="manualOnlineSeedLineEdit">
-            <property name="placeholderText">
-             <string>A-Z9 online signing seed</string>
-            </property>
-            <property name="clearButtonEnabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_25">
-            <property name="text">
-             <string>Offline seed</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="manualOfflineSeedLineEdit">
-            <property name="placeholderText">
-             <string>A-Z9 offline signing seed</string>
-            </property>
-            <property name="clearButtonEnabled">
+            <property name="wordWrap">
              <bool>true</bool>
             </property>
            </widget>

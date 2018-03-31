@@ -59,6 +59,9 @@ signals:
      * @param responseMessage - output of the API request
      */
     void requestFinished(RequestType request, const QString &responseMessage);
+    //NOTE: because of lazyness each request doesn't have a custom response signal
+    //instead checkout smidgen implementation for parsing arguments in the
+    //responseMessage. Might change this in future if an alternative impl is needed
 
     /**
      * @brief Current request failed with error

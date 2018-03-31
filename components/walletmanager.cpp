@@ -55,7 +55,7 @@ void WalletManager::lockWallet()
     m_jsonObject = QJsonObject();
 }
 
-bool WalletManager::isLocked()
+bool WalletManager::isLocked() const
 {
     return m_encryptionKey.isEmpty();
 }
@@ -371,9 +371,13 @@ void WalletManager::restoreCleanMultisigFileBackup()
 
 QString WalletManager::getRawJsonData() const
 {
-    checkLock();
+    QString s;
 
-    QString s = QString::fromUtf8(QJsonDocument(m_jsonObject).toJson());
+    if (isLocked())
+        s = "no wallet loaded";
+    else
+        s = QString::fromUtf8(QJsonDocument(m_jsonObject).toJson());
+
     return s;
 }
 
@@ -476,7 +480,9 @@ QByteArray WalletManager::serializeAndEncryptWallet(const QByteArray &iv)
     data = doc.toJson(QJsonDocument::Compact);
 
     //encrypt data
-    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
+    QAESEncryption encryption(QAESEncryption::AES_256,
+                              QAESEncryption::CBC,
+                              QAESEncryption::ZERO);
     QByteArray hashKey = QCryptographicHash::hash(m_encryptionKey.toLocal8Bit(),
                                                   QCryptographicHash::Sha256);
 
@@ -493,14 +499,17 @@ bool WalletManager::decryptAndDeserializeWallet(const QByteArray &aesData,
     m_jsonObject = QJsonObject();
 
     //decrypt data
-    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
+    QAESEncryption encryption(QAESEncryption::AES_256,
+                              QAESEncryption::CBC,
+                              QAESEncryption::ZERO);
     QByteArray hashKey = QCryptographicHash::hash(m_encryptionKey.toLocal8Bit(),
                                                   QCryptographicHash::Sha256);
 
     QByteArray rawJson = encryption.decode(aesData, hashKey, iv);
-    QString cleanJson(rawJson); //remove \0 to make a valid string
+    rawJson = encryption.removePadding(rawJson);
+    QString jsonString = QString::fromUtf8(rawJson);
     QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(cleanJson.toUtf8(), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
         if (parseError.error == QJsonParseError::IllegalValue) {

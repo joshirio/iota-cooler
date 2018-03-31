@@ -134,9 +134,6 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     {
         QString startIndex = argList.at(0);
         QString endIndex = argList.at(1);
-        //FIXME: just to speed up for testing
-        startIndex = "0";
-        endIndex = "5";
         command = "iotacooler";
         extraArgs.append("get-addresses");
         extraArgs.append(startIndex);
