@@ -53,6 +53,8 @@ private slots:
     void offlineSeedsNextButtonClicked();
     void cancelGenAddrButtonClicked();
     void nextGenAddrButtonClicked();
+    void checkAddrNextButtonClicked();
+    void checkAddrCancelButtonClicked();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,
@@ -61,6 +63,8 @@ private slots:
 
 private:
     void nextPage();
+    void stopRequestAndCancelRecovery();
+    void recoverFundsIsAddrSpentRequest();
 
     Ui::RestoreWalletWidget *ui;
     QString m_currentWalletPath;
@@ -69,6 +73,7 @@ private:
     WalletManager *m_walletManager;
     int m_startIndex;
     int m_endIndex;
+    int m_currentIndex;
 };
 
 #endif // RESTOREWALLETWIDGET_H

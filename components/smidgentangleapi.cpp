@@ -141,9 +141,9 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     }
         break;
     case IsAddressSpent:
-    {
-        //TODO
-    }
+        command = "iotacooler";
+        extraArgs.append("is-address-spent");
+        extraArgs.append(argList.at(0));
         break;
     }
 
@@ -185,8 +185,15 @@ void SmidgenTangleAPI::stopCurrentAPIRequest()
     if (m_currentRequest == RequestType::NoRequest) return;
 
     if (m_process->state() != QProcess::NotRunning) {
+        //disable crash signal errors
+        this->blockSignals(true);
+
+        //stop process
         m_process->kill();
         m_process->waitForFinished();
+
+        this->blockSignals(false);
+
         m_currentRequest = NoRequest;
     }
 }
@@ -401,6 +408,14 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                     addresses.append(sf.append(":"));
                 }
                 message = "GenAddr:OK:" + addresses;
+            }
+            break;
+        case IsAddressSpent:
+            if (result.contains("AddressSpent")) {
+                message = result;
+            } else {
+                errorMessage = result;
+                error = true;
             }
             break;
         default:

@@ -177,6 +177,11 @@ void CreateWalletWizard::wInitOnlineQuitButtonClicked()
 
 void CreateWalletWizard::offlineInitWalletButtonClicked()
 {
+    ui->wInitProgressBar->show();
+    ui->wInitProgressWaitLabel->show();
+    ui->wInitProgressStatusLabel->show();
+    ui->wInitProgressResultLabel->hide();
+
     //check manual seeds
     QString onlineSeed, offlineSeed;
     bool manualSeeds = ui->manualSeedRadio->isChecked();

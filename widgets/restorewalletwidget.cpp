@@ -14,7 +14,8 @@ RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RestoreWalletWidget),
     m_startIndex(0),
-    m_endIndex(0)
+    m_endIndex(0),
+    m_currentIndex(0)
 {
     ui->setupUi(this);
 
@@ -38,6 +39,10 @@ RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
             this, &RestoreWalletWidget::nextGenAddrButtonClicked);
     connect(ui->quitAddressCheckInfoOffline, &QPushButton::clicked,
             this, &RestoreWalletWidget::quitButtonClicked);
+    connect(ui->checkAddrNextButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::checkAddrNextButtonClicked);
+    connect(ui->checkAddrCancelButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::checkAddrCancelButtonClicked);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -90,9 +95,28 @@ void RestoreWalletWidget::prepareHotRecoveryInfo(const QString &walletPath)
 
 void RestoreWalletWidget::prepareHotRecovery(const QString &walletPath)
 {
+    m_currentRecoveryStepResults.clear();
     m_currentWalletPath = walletPath;
     ui->stackedWidget->setCurrentIndex(5);
-    //TODO
+    ui->checkAddrNextButton->setEnabled(false);
+    ui->checkAddrResultLabel->hide();
+
+    //load addresses and indexes
+    QVariantList opArgs;
+    m_walletManager->getCurrentWalletOp(opArgs);
+    if (opArgs.size() > 2) {
+        m_startIndex = opArgs.takeFirst().toInt();
+        m_endIndex = opArgs.takeFirst().toInt();
+        m_currentIndex = m_startIndex;
+        foreach (QVariant v, opArgs) {
+            m_currentRecoveryStepResults.append(v.toString());
+        }
+        recoverFundsIsAddrSpentRequest();
+    } else {
+        ui->checkAddrStatusLabel->clear();
+        ui->checkAddrResultLabel->setText(tr("Error: Missing opArgs!"));
+        ui->checkAddrResultLabel->show();
+    }
 }
 
 void RestoreWalletWidget::quitButtonClicked()
@@ -144,13 +168,22 @@ void RestoreWalletWidget::offlineSeedsNextButtonClicked()
 
 void RestoreWalletWidget::cancelGenAddrButtonClicked()
 {
-    m_tangleAPI->stopCurrentAPIRequest();
-    emit restoreWalletCancelled();
+    stopRequestAndCancelRecovery();
 }
 
 void RestoreWalletWidget::nextGenAddrButtonClicked()
 {
     nextPage();
+}
+
+void RestoreWalletWidget::checkAddrNextButtonClicked()
+{
+    //TODO prepare recovery op and save wallet state etc...
+}
+
+void RestoreWalletWidget::checkAddrCancelButtonClicked()
+{
+    stopRequestAndCancelRecovery();
 }
 
 void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
@@ -187,6 +220,46 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
             }
         }
         break;
+    case AbstractTangleAPI::IsAddressSpent:
+        if (responseMessage.contains("AddressSpent:false")) {
+            //clean address found
+            m_currentRecoveryStepResults.append(responseMessage.split(":").at(2));
+            //check balance
+            QStringList args;
+            args.append(m_currentRecoveryStepResults.last());
+            ui->checkAddrStatusLabel->setText(tr("Checking balance..."));
+            ui->checkAddrStatusProgressBar->setRange(0, 0);
+            m_tangleAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
+                                         args);
+        } else if (responseMessage.contains("AddressSpent:true")) {
+            //address was already used
+            if (m_currentIndex < m_endIndex) {
+                m_currentIndex++; //check next address index
+                recoverFundsIsAddrSpentRequest();
+            } else {
+                //current address batch were all used
+                //request another 200 address batch
+                //the redo this check
+                //TODO
+            }
+        }
+        break;
+    case AbstractTangleAPI::GetBalance:
+        if (responseMessage.contains("Balance:")) {
+            QString balanceString = responseMessage.split(":").at(2);
+            QString balanceReadableString =
+                    responseMessage.split(":").at(3);
+            m_currentRecoveryStepResults.append(balanceString);
+            ui->checkAddrStatusProgressBar->setRange(0, 100);
+            ui->checkAddrStatusProgressBar->setValue(100);
+            ui->checkAddrNextButton->setEnabled(true);
+            ui->checkAddrNextButton->setFocus();
+            ui->checkAddrStatusLabel->setText(tr("Finished!"));
+            ui->checkAddrResultLabel->setText(tr("Wallet balance: <b>%1</b>")
+                                              .arg(balanceReadableString));
+            ui->checkAddrResultLabel->show();
+        }
+        break;
     default:
         break;
     }
@@ -214,4 +287,24 @@ void RestoreWalletWidget::addressGenerationProgress(int currentIndex, int endInd
 void RestoreWalletWidget::nextPage()
 {
     ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void RestoreWalletWidget::stopRequestAndCancelRecovery()
+{
+    m_tangleAPI->stopCurrentAPIRequest();
+    emit restoreWalletCancelled();
+}
+
+void RestoreWalletWidget::recoverFundsIsAddrSpentRequest()
+{
+    ui->checkAddrStatusLabel->setText(tr("Checking %1/%2")
+                                      .arg(m_currentIndex).arg(m_endIndex));
+    ui->checkAddrStatusProgressBar->setRange(m_startIndex, m_endIndex);
+    ui->checkAddrStatusProgressBar->setValue(m_currentIndex);
+
+    QStringList args;
+    //check address at current index
+    args.append(m_currentRecoveryStepResults.at(m_currentIndex - m_startIndex));
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::IsAddressSpent,
+                                 args);
 }
