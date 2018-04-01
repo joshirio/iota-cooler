@@ -110,6 +110,9 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
     updateBalance();
     //setup balance periodic check
     startBalanceRefresher();
+
+    //check if address/wallet has been misused (main address is spent)
+    checkAddressDirty();
 }
 
 void WalletWidget::updateBalance()
@@ -194,6 +197,30 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
 
     }
         break;
+    case AbstractTangleAPI::IsAddressSpent:
+    {
+        if (responseMessage.contains("AddressSpent:true")) {
+            QMessageBox::warning(this, tr("Wallet Inconsistent"),
+                                 tr("The wallet state is inconsistent!<br />"
+                                    "<b>Do not receive or spend funds, otherwise "
+                                    "your risk losing all your funds.</b> "
+                                    "The current wallet address has already "
+                                    "been spent. Please make sure you are using "
+                                    "the latest wallet file and that no other "
+                                    "software is using the same multisig seeds."
+                                    "<br /><br />"
+                                    "If this error persists, try recovering your "
+                                    "wallet balance from seeds backup."));
+            closeWalletButtonClicked();
+        }
+
+        //delete sender, see checkAddressDirty()
+        QObject *o = this->sender();
+        if (o != nullptr) {
+            o->deleteLater();
+        }
+    }
+        break;
     default:
         break;
     }
@@ -269,4 +296,17 @@ void WalletWidget::loadPastTxs()
                                                                     QHeaderView::ResizeToContents);
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(1,
                                                                     QHeaderView::ResizeToContents);
+}
+
+void WalletWidget::checkAddressDirty()
+{
+    AbstractTangleAPI *a = new SmidgenTangleAPI(this);
+    connect(a, &AbstractTangleAPI::requestFinished,
+            this, &WalletWidget::requestFinished);
+    connect(a, &AbstractTangleAPI::requestError,
+            this, &WalletWidget::requestError);
+
+    QStringList args;
+    args.append(m_walletManager->getCurrentAddress());
+    a->startAPIRequest(AbstractTangleAPI::IsAddressSpent, args);
 }

@@ -71,6 +71,7 @@ private:
     void startBalanceRefresher();
     void stopBalanceRefresher();
     void loadPastTxs();
+    void checkAddressDirty();
 
     Ui::WalletWidget *ui;
     QString m_currentWalletFilePath;
