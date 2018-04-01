@@ -322,8 +322,7 @@ void CreateWalletWizard::wConfirmButtonClicked()
             //if restore funds selected, prepare next step
             QVariantList opArgs;
             opArgs.append(0); //start address index for recovery
-            //opArgs.append(200); //end index
-            opArgs.append(5); //FIXME: just to faster testing revert when done
+            opArgs.append(200); //end index
             m_walletManager->setCurrentWalletOp(WalletManager::WalletOp::RecoverOffline,
                                                 opArgs);
         } else {

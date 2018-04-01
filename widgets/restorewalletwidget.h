@@ -31,6 +31,12 @@ public:
     /** Prepare UI about next online step from online signer */
     void showContinueWithOnlineSigner(const QString &walletPath);
 
+    /** Prepare UI about next offline transfer signing step */
+    void showContinueWithRecoveryColdSign(const QString &walletPath);
+
+    /** Prepare UI about next online transfer sending step */
+    void showContinueWithRecoveryHotSend(const QString &walletPath);
+
     /** Prepare UI for offline wallet recovery */
     void prepareColdRecovery(const QString &walletPath);
 
@@ -39,6 +45,12 @@ public:
 
     /** Prepare UI for online wallet recovery and tx broadcasting */
     void prepareHotRecovery(const QString &walletPath);
+
+    /** Prepare UI for offline recovery transfer signing */
+    void prepareRecoveryColdSign(const QString &walletPath);
+
+    /** Prepare UI for online recovery transfer sending */
+    void prepareRecoveryHotSend(const QString &walletPath);
 
 signals:
     /** Emitted when this wizard is cancelled */
@@ -55,6 +67,9 @@ private slots:
     void nextGenAddrButtonClicked();
     void checkAddrNextButtonClicked();
     void checkAddrCancelButtonClicked();
+    void recoverSignSeedsCancelButtonClicked();
+    void recoveryColdSignNextButtonClicked();
+    void recoverSignSeedsNextButtonClicked();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,

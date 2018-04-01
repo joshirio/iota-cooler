@@ -31,7 +31,9 @@ public:
         ColdSign, /**< Sign transaction on offline device */
         HotSign, /**< Sign transaction on online device and broadcast it */
         RecoverOffline, /**< Recover wallet from seeds, offline step */
-        RecoverOnline /**< Recover wallet from seeds, online step */
+        RecoverOnline, /**< Recover wallet from seeds, online step */
+        RecoverSign, /**< Recover wallet funds, offline signing step */
+        RecoverSend /**< Recover wallet funds, online broadcasting step */
     };
 
     /**

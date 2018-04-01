@@ -93,6 +93,22 @@ void MainWindow::openWallet(const QString &filePath)
                 }
                 ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
                 break;
+            case WalletManager::RecoverSign:
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
+                    m_restoreWalletWidget->prepareRecoveryColdSign(m_currentWalletPath);
+                } else {
+                    m_restoreWalletWidget->showContinueWithRecoveryColdSign(m_currentWalletPath);
+                }
+                ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
+                break;
+            case WalletManager::RecoverSend:
+                if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OnlineSigner) {
+                    m_restoreWalletWidget->prepareRecoveryHotSend(m_currentWalletPath);
+                } else {
+                    m_restoreWalletWidget->showContinueWithRecoveryHotSend(m_currentWalletPath);
+                }
+                ui->stackedWidget->setCurrentWidget(m_restoreWalletWidget);
+                break;
             case WalletManager::ColdSign:
                 if (sm.getDeviceRole() == UtilsIOTA::DeviceRole::OfflineSigner) {
                     m_multisigTransferWidget->prepareColdTransferSign(m_currentWalletPath);
@@ -329,7 +345,13 @@ void MainWindow::restoreWalletCancelled()
 
 void MainWindow::restoreWalletCompleted()
 {
-    //TODO
+    SettingsManager sm(this);
+    if (sm.getDeviceRole() == UtilsIOTA::OnlineSigner) {
+        ui->stackedWidget->setCurrentWidget(m_walletWidget);
+        m_walletWidget->setCurrentWalletPath(m_currentWalletPath);
+    } else {
+        ui->stackedWidget->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::checkForUpdatesSlot()

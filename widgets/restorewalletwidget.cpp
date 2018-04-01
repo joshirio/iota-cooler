@@ -43,6 +43,18 @@ RestoreWalletWidget::RestoreWalletWidget(QWidget *parent) :
             this, &RestoreWalletWidget::checkAddrNextButtonClicked);
     connect(ui->checkAddrCancelButton, &QPushButton::clicked,
             this, &RestoreWalletWidget::checkAddrCancelButtonClicked);
+    connect(ui->recoverSignOfflineInfoQuitButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::quitButtonClicked);
+    connect(ui->recoverSignSeedsNextButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::recoverSignSeedsNextButtonClicked);
+    connect(ui->recoverSignSeedsCancelButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::recoverSignSeedsCancelButtonClicked);
+    connect(ui->recoveryOnlineStepInfoQuitButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::quitButtonClicked);
+    connect(ui->recoveryColdSignNextButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::recoveryColdSignNextButtonClicked);
+    connect(ui->recoveryBroadcastFinishButton, &QPushButton::clicked,
+            this, &RestoreWalletWidget::restoreWalletCompleted);
 
     //tangle api
     m_tangleAPI = new SmidgenTangleAPI(this);
@@ -69,6 +81,18 @@ void RestoreWalletWidget::showContinueWithOnlineSigner(const QString &walletPath
 {
     m_currentWalletPath = walletPath;
     ui->stackedWidget->setCurrentIndex(4);
+}
+
+void RestoreWalletWidget::showContinueWithRecoveryColdSign(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    ui->stackedWidget->setCurrentIndex(6);
+}
+
+void RestoreWalletWidget::showContinueWithRecoveryHotSend(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    ui->stackedWidget->setCurrentIndex(9);
 }
 
 void RestoreWalletWidget::prepareColdRecovery(const QString &walletPath)
@@ -119,6 +143,33 @@ void RestoreWalletWidget::prepareHotRecovery(const QString &walletPath)
     }
 }
 
+void RestoreWalletWidget::prepareRecoveryColdSign(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    m_currentRecoveryStepResults.clear();
+    ui->stackedWidget->setCurrentIndex(7);
+}
+
+void RestoreWalletWidget::prepareRecoveryHotSend(const QString &walletPath)
+{
+    m_currentWalletPath = walletPath;
+    m_currentRecoveryStepResults.clear();
+    ui->stackedWidget->setCurrentIndex(10);
+
+    ui->recoveryBroadcastFinishButton->setEnabled(false);
+    ui->recoveryBroadcastResultLabel->hide();
+    ui->recoveryBroadcastProgressBar->show();
+    ui->recoveryBroadcastStatusLabel->show();
+
+    QVariantList opArgs;
+    m_walletManager->getCurrentWalletOp(opArgs);
+    QStringList args;
+    args.append(m_walletManager->getCurrentAddress()); //receiving address
+    args.append(opArgs.at(0).toString()); //trytes
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::RecoverFundsSend,
+                                 args);
+}
+
 void RestoreWalletWidget::quitButtonClicked()
 {
     qApp->quit();
@@ -144,6 +195,17 @@ void RestoreWalletWidget::offlineSeedsNextButtonClicked()
     offlineSeed.replace(" ", "");
     m_currentRecoveryStepResults.append(onlineSeed);
     m_currentRecoveryStepResults.append(offlineSeed);
+
+    //check that online seed is different than the one from newly created wallet
+    if (onlineSeed == m_walletManager->getOnlineSeed()) {
+        QMessageBox::warning(this,
+                             tr("IOTA Seeds Invalid"),
+                             tr("The entered online signer seed is the same "
+                                "as the one from the newly created wallet!<br />"
+                                "Please enter the actual seeds of your previous wallet "
+                                "to recover and try again"));
+        return;
+    }
 
     if (UtilsIOTA::isValidSeed(onlineSeed) && UtilsIOTA::isValidSeed(offlineSeed)) {
         nextPage();
@@ -178,12 +240,119 @@ void RestoreWalletWidget::nextGenAddrButtonClicked()
 
 void RestoreWalletWidget::checkAddrNextButtonClicked()
 {
-    //TODO prepare recovery op and save wallet state etc...
+    bool ok;
+    QString indexString, address;
+    QString balanceStr = m_currentRecoveryStepResults.takeLast();
+    quint64 balance = balanceStr.toULongLong(&ok);
+    if (!ok) {
+        QMessageBox::critical(this,
+                              tr("Reading Balance Error"),
+                              tr("Error while converting balance to number!"));
+        return;
+    }
+
+    WalletManager::WalletOp op;
+    QVariantList opArgs;
+    if (balance == 0) {
+        QMessageBox::information(this,
+                                 tr("Zero Balance"),
+                                 tr("It appears that your previous "
+                                    "IOTAcooler wallet balance is zero. "
+                                    "<b>No funds will be transferred!</b><br /><br />"
+                                    "If this is wrong, please restart the recovery process "
+                                    "again and make sure your seeds are correct and "
+                                    "that they were exclusively used by IOTAcooler, "
+                                    "otherwise change addresses and balances are not "
+                                    "correctly identified."));
+        op = WalletManager::NoOp;
+    } else {
+        op = WalletManager::RecoverSign;
+        address = m_currentRecoveryStepResults.takeLast();
+        indexString = m_currentRecoveryStepResults.takeLast();
+        opArgs.append(indexString);
+        opArgs.append(m_walletManager->getCurrentAddress()); //receiving address
+        opArgs.append(balanceStr);
+    }
+
+    m_walletManager->setCurrentWalletOp(op, opArgs);
+    //write wallet
+    WalletManager::WalletError wError;
+    m_walletManager->saveWallet(m_currentWalletPath,
+                                false,
+                                false,
+                                wError);
+    if (wError.errorType != WalletManager::WalletError::NoError) {
+        QMessageBox::critical(this,
+                              tr("Wallet Save Error"),
+                              wError.errorString);
+        emit restoreWalletCancelled();
+    } else {
+        if (op == WalletManager::NoOp)
+            emit restoreWalletCompleted();
+        else
+            nextPage();
+    }
 }
 
 void RestoreWalletWidget::checkAddrCancelButtonClicked()
 {
     stopRequestAndCancelRecovery();
+}
+
+void RestoreWalletWidget::recoverSignSeedsCancelButtonClicked()
+{
+    stopRequestAndCancelRecovery();
+}
+
+void RestoreWalletWidget::recoveryColdSignNextButtonClicked()
+{
+    nextPage();
+}
+
+void RestoreWalletWidget::recoverSignSeedsNextButtonClicked()
+{
+    QString onlineSeed, offlineSeed;
+    onlineSeed = ui->onlineSeedLineEdit_2->text().simplified().trimmed().toUpper();
+    onlineSeed.replace(" ", "");
+    offlineSeed = ui->offlineSeedLineEdit_2->text().simplified().trimmed().toUpper();
+    offlineSeed.replace(" ", "");
+    m_currentRecoveryStepResults.append(onlineSeed);
+    m_currentRecoveryStepResults.append(offlineSeed);
+
+    //check that online seed is different than the one from newly created wallet
+    if (onlineSeed == m_walletManager->getOnlineSeed()) {
+        QMessageBox::warning(this,
+                             tr("IOTA Seeds Invalid"),
+                             tr("The entered online signer seed is the same "
+                                "as the one from the newly created wallet!<br />"
+                                "Please enter the actual seeds of your previous wallet "
+                                "to recover and try again"));
+        return;
+    }
+
+    if (UtilsIOTA::isValidSeed(onlineSeed) && UtilsIOTA::isValidSeed(offlineSeed)) {
+        ui->recoveryColdSignNextButton->setEnabled(false);
+        ui->recoveryColdSignResultLabel->hide();
+        ui->recoveryColdSignProgressBar->show();
+        nextPage();
+
+        QVariantList opArgs;
+        m_walletManager->getCurrentWalletOp(opArgs);
+        QStringList args;
+        args.append(opArgs.takeFirst().toString()); //address key index
+        args.append(opArgs.takeFirst().toString()); //receiving address
+        args.append(opArgs.takeFirst().toString()); //balance
+        args.append(onlineSeed);
+        args.append(offlineSeed);
+
+        m_tangleAPI->startAPIRequest(AbstractTangleAPI::RecoverFundsSign,
+                                     args);
+    } else {
+        QMessageBox::warning(this,
+                             tr("IOTA Seeds Invalid"),
+                             tr("The entered seeds are not a valid format!<br />"
+                                "Please check your inputs and try again"));
+    }
 }
 
 void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
@@ -217,6 +386,7 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
             } else {
                 ui->genAddressStatusLabel->setText(tr("Finished!"));
                 ui->nextGenAddrButton->setEnabled(true);
+                ui->nextGenAddrButton->setFocus();
             }
         }
         break;
@@ -239,16 +409,48 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
             } else {
                 //current address batch were all used
                 //request another 200 address batch
-                //the redo this check
-                //TODO
+                //then redo this check
+                int nextStartIndex = m_endIndex + 1;
+                int nextEndIndex = nextStartIndex + 199;
+                QVariantList opArgs;
+                opArgs.append(nextStartIndex);
+                opArgs.append(nextEndIndex);
+                m_walletManager->setCurrentWalletOp(WalletManager::RecoverOffline,
+                                                    opArgs);
+                //write wallet
+                WalletManager::WalletError wError;
+                m_walletManager->saveWallet(m_currentWalletPath,
+                                            false,
+                                            false,
+                                            wError);
+                if (wError.errorType != WalletManager::WalletError::NoError) {
+                    QMessageBox::critical(this,
+                                          tr("Wallet Save Error"),
+                                          wError.errorString);
+                } else {
+                    QMessageBox::information(this,
+                                             tr("Next Addresses Batch"),
+                                             tr("The current batch of 200 addresses "
+                                                "was insufficient to determine the "
+                                                "wallet balance. The wallet has been "
+                                                "configured to generate the next batch"
+                                                " of 200 addresses. Please open "
+                                                "the current wallet file with the "
+                                                "<b>offline signing</b> device to proceed!"));
+                    qApp->quit();
+                }
             }
         }
         break;
     case AbstractTangleAPI::GetBalance:
         if (responseMessage.contains("Balance:")) {
+            QString address = responseMessage.split(":").at(1);
             QString balanceString = responseMessage.split(":").at(2);
             QString balanceReadableString =
                     responseMessage.split(":").at(3);
+            m_currentRecoveryStepResults.clear();
+            m_currentRecoveryStepResults.append(QString::number(m_currentIndex));
+            m_currentRecoveryStepResults.append(address);
             m_currentRecoveryStepResults.append(balanceString);
             ui->checkAddrStatusProgressBar->setRange(0, 100);
             ui->checkAddrStatusProgressBar->setValue(100);
@@ -258,6 +460,64 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
             ui->checkAddrResultLabel->setText(tr("Wallet balance: <b>%1</b>")
                                               .arg(balanceReadableString));
             ui->checkAddrResultLabel->show();
+        }
+        break;
+    case AbstractTangleAPI::RecoverFundsSign:
+        if (responseMessage.at(0) == "[") {
+            //save trytes to op args and set next wallet op to send
+            QVariantList opArgs;
+            opArgs.append(responseMessage);
+            m_walletManager->setCurrentWalletOp(WalletManager::RecoverSend,
+                                                opArgs);
+            //write wallet
+            WalletManager::WalletError wError;
+            m_walletManager->saveWallet(m_currentWalletPath,
+                                        false,
+                                        false,
+                                        wError);
+            if (wError.errorType != WalletManager::WalletError::NoError) {
+                QMessageBox::critical(this,
+                                      tr("Wallet Save Error"),
+                                      wError.errorString);
+            } else {
+                ui->recoveryColdSignNextButton->setEnabled(true);
+                ui->recoveryColdSignResultLabel->show();
+                ui->recoveryColdSignProgressBar->hide();
+                ui->recoveryColdSignResultLabel->setText(tr("Recovery transaction successfully signed!"));
+            }
+        }
+        break;
+    case AbstractTangleAPI::RecoverFundsSend:
+        if (responseMessage.contains("RecoveryOK")) {
+            QString txHash = responseMessage.split(":", QString::SkipEmptyParts).at(1);
+
+            QString resultMessage = tr("Transaction successfully sent!<br />"
+                                       "Transaction hash: <a href='https://thetangle.org/transaction/")
+                    .append(txHash).append("'>").append(txHash).append("</a>");
+            resultMessage.append(tr("<br /><br /><b>NOTE:</b> Your wallet balance will be "
+                                    "temporarily zero until the transaction is confirmed"));
+            ui->recoveryBroadcastResultLabel->setText(resultMessage);
+
+            m_walletManager->setCurrentWalletOp(WalletManager::NoOp,
+                                                QVariantList());
+            //write wallet
+            WalletManager::WalletError wError;
+            m_walletManager->saveWallet(m_currentWalletPath,
+                                        false,
+                                        false,
+                                        wError);
+            if (wError.errorType != WalletManager::WalletError::NoError) {
+                QMessageBox::critical(this,
+                                      tr("Wallet Save Error"),
+                                      wError.errorString);
+                emit restoreWalletCancelled();
+            } else {
+                ui->recoveryBroadcastFinishButton->setEnabled(true);
+                ui->recoveryBroadcastFinishButton->setFocus();
+                ui->recoveryBroadcastResultLabel->show();
+                ui->recoveryBroadcastProgressBar->hide();
+                ui->recoveryBroadcastStatusLabel->hide();
+            }
         }
         break;
     default:

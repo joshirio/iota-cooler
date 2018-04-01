@@ -119,15 +119,22 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         break;
     case RecoverFundsSign:
     {
-        //QStringList transferList = argList;
+        QString addressKeyIndex = argList.at(0);
+        QString receivingAddr = argList.at(1);
+        QString balance = argList.at(2);
         command = "iotacooler";
         extraArgs.append("recover-funds-sign");
-        //TODO args index, rec addr, balance
+        extraArgs.append(addressKeyIndex);
+        extraArgs.append(receivingAddr);
+        extraArgs.append(balance);
     }
         break;
     case RecoverFundsSend:
     {
-        //TODO
+        command = "iotacooler";
+        extraArgs.append("recover-funds-send");
+        extraArgs.append(argList.at(0));
+        extraArgs.append(argList.at(1));
     }
         break;
     case GenerateAddresses:
@@ -169,6 +176,13 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
     } else if (m_currentRequest == GenerateAddresses) {
         QString onlineSeed = argList.at(2);
         QString offlineSeed = argList.at(3);
+        QString combinedSeeds = onlineSeed + ":" + offlineSeed;
+        m_process->waitForReadyRead();
+        m_process->write(combinedSeeds.toLatin1());
+        m_process->waitForBytesWritten();
+    } else if (m_currentRequest == RecoverFundsSign) {
+        QString onlineSeed = argList.at(3);
+        QString offlineSeed = argList.at(4);
         QString combinedSeeds = onlineSeed + ":" + offlineSeed;
         m_process->waitForReadyRead();
         m_process->write(combinedSeeds.toLatin1());
@@ -408,11 +422,37 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                     addresses.append(sf.append(":"));
                 }
                 message = "GenAddr:OK:" + addresses;
+            }  else {
+                errorMessage = result;
+                error = true;
             }
             break;
         case IsAddressSpent:
             if (result.contains("AddressSpent")) {
                 message = result;
+            } else {
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case RecoverFundsSign:
+            if (result.contains("SignValid:true:")) {
+                message = result.split("SignValid:true: ", QString::SkipEmptyParts).at(1);
+            } else if (result.contains("SignValid:false")) {
+                errorMessage = tr("Bundle signature invalid!");
+                error = true;
+            } else {
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case RecoverFundsSend:
+            if (result.contains("Transaction sent")) {
+                //return ok as RecoveryOK:tailTxHash
+                message = "RecoveryOK:";
+                QString txHash = result.split("hash: ").at(1);
+                txHash = txHash.split("\ninfo").at(0);
+                message.append(txHash);
             } else {
                 errorMessage = result;
                 error = true;
