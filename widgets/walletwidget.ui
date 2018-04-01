@@ -103,6 +103,9 @@ NOTE: may show temporarily 0 during unconfirmed transfers</string>
            </item>
            <item>
             <widget class="QPushButton" name="tangleExplorerButton">
+             <property name="toolTip">
+              <string>View the selected transaction on the tangle explorer. If none is selected, current address is shown.</string>
+             </property>
              <property name="text">
               <string>Tangle &amp;explorer</string>
              </property>
