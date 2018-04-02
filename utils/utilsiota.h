@@ -58,6 +58,16 @@ public:
         QDateTime dateTime; /**< Date and time of the transaction */
     };
 
+    /**
+     * @brief Parse json to transactions, jsonString is the output
+     * of iotacooler-smidgen get-address-transfers-quick
+     * which misses tail tx hashes and address (source/receivers)
+     * but is fast in terms of API response time
+     * @param jsonString
+     * @return list of value-only transactions
+     */
+    static QList<Transation> parseAddrTransfersQuickJson(const QString &jsonString);
+
 private:
     UtilsIOTA();
 };

@@ -24,7 +24,7 @@ The decrypted JSON contains the online seed (2nd multisig party), current receiv
 past used addresses, a backup of a clean state smidgen wallet file (ie. no pending txs), which
 is restored when a pending multisig tx is cancelled, current smidgen wallet file with pending txs 
 that must be signed offline (if any), current wallet operation (enum) and current op arguments,
-list of past spending transactions (signed outgoing multisig txs).
+list of past spending transactions (signed outgoing multisig txs), past incoming transactions.
 
 ##### Example:
 
@@ -45,6 +45,24 @@ list of past spending transactions (signed outgoing multisig txs).
     "NVYUGAQTT9AQJZZ9UKVKFCNTAZUASGCKARFMCZIDFVBASGNTAGSEPRL9CTJLWUVENA9UQWY9UVMEPFLLWNPEXDL9PD"
   ],
   "pastSpendingTransactions": [
+    {
+      "tailTxHash": "SUGDOXURVKGCNCBRRLEXKGTBRRUHF9FHVDZGJOBHACMMIZM9YKSTBPDUMHMFHY9POVKDNRXBFWYZ99999",
+      "amount": "123456",
+      "spendingAddress": "ENSOEVANAVZTHUTIT9DWRCPLZDNUQKSBICPHNNYYGSNZX9TWZPRDKXCLJVWZYABPDBXYAUQEZLDZUENDX",
+      "receivingAdress": "NUULVNNSPJXH9DYYPFSVCR9BOWKXLOEGHBUREDABZ9MZMHWLAFMHNFUNWLKMMPDIYHKCQZQVKKLTXNZPF",
+      "tag": "",
+      "dateTime": "2012-04-23T18:25:43Z"
+    },
+    {
+      "tailTxHash": "SUGDOXURVKGCNCBRRLEXKGTBRRUHF9FHVDZGJOBHACMMIZM9YKSTBPDUMHMFHY9POVKDNRXBFWYZ99999",
+      "amount": "123456",
+      "spendingAddress": "ENSOEVANAVZTHUTIT9DWRCPLZDNUQKSBICPHNNYYGSNZX9TWZPRDKXCLJVWZYABPDBXYAUQEZLDZUENDX",
+      "receivingAdress": "NUULVNNSPJXH9DYYPFSVCR9BOWKXLOEGHBUREDABZ9MZMHWLAFMHNFUNWLKMMPDIYHKCQZQVKKLTXNZPF",
+      "tag": "",
+      "dateTime": "2014-04-23T18:25:43Z"
+    }
+  ],
+  "pastIncomingTransactions": [
     {
       "tailTxHash": "SUGDOXURVKGCNCBRRLEXKGTBRRUHF9FHVDZGJOBHACMMIZM9YKSTBPDUMHMFHY9POVKDNRXBFWYZ99999",
       "amount": "123456",

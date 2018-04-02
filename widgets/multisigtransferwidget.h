@@ -11,6 +11,7 @@
 
 #include <QWidget>
 #include "../components/abstracttangleapi.h"
+#include "../utils/utilsiota.h"
 
 class WalletManager;
 class QLabel;
@@ -84,6 +85,7 @@ private:
     QStringList m_amountList;
     QString m_walletBalance;
     QString m_tag;
+    QList<UtilsIOTA::Transation> m_currentAddrIncomingTxList;
 };
 
 #endif // MULTISIGTRANSFERWIDGET_H

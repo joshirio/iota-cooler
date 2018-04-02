@@ -152,6 +152,11 @@ void SmidgenTangleAPI::startAPIRequest(RequestType request, const QStringList &a
         extraArgs.append("is-address-spent");
         extraArgs.append(argList.at(0));
         break;
+    case GetAddrTransfersQuick:
+        command = "iotacooler";
+        extraArgs.append("get-address-transfers-quick");
+        extraArgs.append(argList.at(0));
+        break;
     }
 
     //init args
@@ -453,6 +458,15 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
                 QString txHash = result.split("hash: ").at(1);
                 txHash = txHash.split("\ninfo").at(0);
                 message.append(txHash);
+            } else {
+                errorMessage = result;
+                error = true;
+            }
+            break;
+        case GetAddrTransfersQuick:
+            if (result.contains("Transfers:")) {
+                //return ok as Transfers:address:jsondata
+                message = result;
             } else {
                 errorMessage = result;
                 error = true;

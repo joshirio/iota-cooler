@@ -19,7 +19,8 @@
 WalletWidget::WalletWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WalletWidget),
-    m_BalanceRefreshTimer(0)
+    m_tangleRefreshTimer(0),
+    m_lastCheckedBalance(0)
 {
     ui->setupUi(this);
     m_currentWalletFilePath = "/invalid";
@@ -52,10 +53,15 @@ WalletWidget::WalletWidget(QWidget *parent) :
             this, &WalletWidget::addressesViewTangleButtonClicked);
 
     //tangle api
-    m_tangleAPI = new SmidgenTangleAPI(this);
-    connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
+    m_tangleBalanceCheckAPI = new SmidgenTangleAPI(this);
+    connect(m_tangleBalanceCheckAPI, &AbstractTangleAPI::requestFinished,
             this, &WalletWidget::requestFinished);
-    connect(m_tangleAPI, &AbstractTangleAPI::requestError,
+    connect(m_tangleBalanceCheckAPI, &AbstractTangleAPI::requestError,
+            this, &WalletWidget::requestError);
+    m_tangleHistoryCheckAPI = new SmidgenTangleAPI(this);
+    connect(m_tangleHistoryCheckAPI, &AbstractTangleAPI::requestFinished,
+            this, &WalletWidget::requestFinished);
+    connect(m_tangleHistoryCheckAPI, &AbstractTangleAPI::requestError,
             this, &WalletWidget::requestError);
 
     //fix fonts for addresses to use monospace (except on linux)
@@ -75,16 +81,21 @@ WalletWidget::WalletWidget(QWidget *parent) :
     ui->addressesListWidget->setStyleSheet(s);
 #endif
 
+    ui->unconfirmedBalanceLabel->hide();
 }
 
 WalletWidget::~WalletWidget()
 {
-    //stopBalanceRefresher();
     delete ui;
 }
 
 void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
 {
+    ui->unconfirmedBalanceLabel->hide();
+    m_incomingTxList.clear();
+    m_currentAddrTxList.clear();
+    m_outgoingTxList.clear();
+    m_lastCheckedBalance = 0;
     m_currentWalletFilePath = walletFilePath;
 
     //main wallet address
@@ -108,8 +119,12 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
 
     //check balance
     updateBalance();
-    //setup balance periodic check
-    startBalanceRefresher();
+
+    //check history
+    updateCurrentAddrTxHistory();
+
+    //setup balance and history periodic check
+    startTangleRefreshers();
 
     //check if address/wallet has been misused (main address is spent)
     checkAddressDirty();
@@ -123,15 +138,52 @@ void WalletWidget::updateBalance()
         if (UtilsIOTA::isValidAddress(a)) {
             QStringList args;
             args.append(a);
-            m_tangleAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
-                                         args);
+            m_tangleBalanceCheckAPI->stopCurrentAPIRequest(); //stop any stuck request
+            m_tangleBalanceCheckAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
+                                                     args);
+        }
+    }
+}
+
+void WalletWidget::updateUnconfirmedBalance()
+{
+    //only for incoming tx (when spending a new empty main addr is used)
+    //deduct unconfirmed balance for current address
+    //by comparing actual balance and tx history
+    quint64 balanceFromHistory= 0;
+
+    foreach (UtilsIOTA::Transation tx, m_currentAddrTxList) {
+        balanceFromHistory += tx.amount.toULongLong();
+    }
+
+    if (balanceFromHistory > m_lastCheckedBalance) {
+        quint64 unconfirmed = balanceFromHistory - m_lastCheckedBalance;
+        ui->unconfirmedBalanceLabel->setText(tr("Unconfirmed (iota): %1")
+                                             .arg(QString::number(unconfirmed)));
+        ui->unconfirmedBalanceLabel->show();
+    } else {
+        ui->unconfirmedBalanceLabel->hide();
+    }
+}
+
+void WalletWidget::updateCurrentAddrTxHistory()
+{
+    if (m_currentWalletFilePath != "/invalid") {
+        ui->txloadingLabel->show();
+        QString a = m_walletManager->getCurrentAddress();
+        if (UtilsIOTA::isValidAddress(a)) {
+            QStringList args;
+            args.append(a);
+            m_tangleHistoryCheckAPI->stopCurrentAPIRequest(); //stop any stuck request
+            m_tangleHistoryCheckAPI->startAPIRequest(AbstractTangleAPI::GetAddrTransfersQuick,
+                                                     args);
         }
     }
 }
 
 void WalletWidget::closeWalletButtonClicked()
 {
-    stopBalanceRefresher();
+    stopTangleRefreshers();
     emit walletClosed();
 }
 
@@ -148,7 +200,7 @@ void WalletWidget::tangleExplorerButtonClicked()
     if (ui->pastTxTableWidget->selectionModel()->hasSelection()) {
         v = "transaction";
         int i = ui->pastTxTableWidget->currentRow();
-        h = ui->pastTxTableWidget->item(i, 2)->text();
+        h = ui->pastTxTableWidget->item(i, 3)->text();
     } else {
         v = "address";
         h = m_walletManager->getCurrentAddress();
@@ -159,7 +211,15 @@ void WalletWidget::tangleExplorerButtonClicked()
 
 void WalletWidget::sendButtonClicked()
 {
-    stopBalanceRefresher();
+    if (ui->unconfirmedBalanceLabel->isVisible()) {
+        int r = QMessageBox::warning(this, tr("Unconfirmed Balance"),
+                             tr("Your current address has pending transactions!<br />"
+                                "Please wait before sending funds to avoid "
+                                "<b>losing the unconfirmed balance</b>."),
+                             QMessageBox::Ignore | QMessageBox::Ok);
+        if (r == QMessageBox::Ok) return;
+    }
+    stopTangleRefreshers();
     emit makeNewTransactionSignal();
 }
 
@@ -194,6 +254,7 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
     {
         QString balanceHumanReadable = responseMessage.split(":").at(3);
         ui->balanceLabel->setText(balanceHumanReadable);
+        m_lastCheckedBalance = responseMessage.split(":").at(2).toULongLong();
 
     }
         break;
@@ -221,6 +282,16 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
         }
     }
         break;
+    case AbstractTangleAPI::GetAddrTransfersQuick:
+    {
+        ui->txloadingLabel->hide();
+        QString json = responseMessage;
+        json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
+        m_currentAddrTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
+        loadPastTxs();
+        updateUnconfirmedBalance();
+        break;
+    }
     default:
         break;
     }
@@ -249,22 +320,28 @@ void WalletWidget::requestError(AbstractTangleAPI::RequestType request,
     }
 }
 
-void WalletWidget::startBalanceRefresher()
+void WalletWidget::startTangleRefreshers()
 {
-    if (!m_BalanceRefreshTimer) {
-        m_BalanceRefreshTimer = new QTimer(this);
+    if (!m_tangleRefreshTimer) {
+        m_tangleRefreshTimer = new QTimer(this);
     }
-    connect(m_BalanceRefreshTimer, &QTimer::timeout,
+    connect(m_tangleRefreshTimer, &QTimer::timeout,
             this, &WalletWidget::updateBalance);
-    m_BalanceRefreshTimer->start(30000); //every 30sec
+    connect(m_tangleRefreshTimer, &QTimer::timeout,
+            this, &WalletWidget::updateCurrentAddrTxHistory);
+    m_tangleRefreshTimer->start(30000); //every 30sec
 }
 
-void WalletWidget::stopBalanceRefresher()
+void WalletWidget::stopTangleRefreshers()
 {
-    if (m_BalanceRefreshTimer) {
-        m_BalanceRefreshTimer->stop();
-        disconnect(m_BalanceRefreshTimer, &QTimer::timeout,
+    if (m_tangleRefreshTimer) {
+        m_tangleRefreshTimer->stop();
+        disconnect(m_tangleRefreshTimer, &QTimer::timeout,
                    this, &WalletWidget::updateBalance);
+        disconnect(m_tangleRefreshTimer, &QTimer::timeout,
+                   this, &WalletWidget::updateCurrentAddrTxHistory);
+        m_tangleBalanceCheckAPI->stopCurrentAPIRequest();
+        m_tangleHistoryCheckAPI->stopCurrentAPIRequest();
     }
 }
 
@@ -273,29 +350,67 @@ void WalletWidget::loadPastTxs()
     ui->pastTxTableWidget->clearContents();
     ui->pastTxTableWidget->setRowCount(0);
 
-    QList<UtilsIOTA::Transation> pastTxList = m_walletManager->getPastSpendingTxs();
-    foreach (UtilsIOTA::Transation tx, pastTxList) {
+    if (m_outgoingTxList.isEmpty())
+        m_outgoingTxList = m_walletManager->getPastSpendingTxs();
+    foreach (UtilsIOTA::Transation tx, m_outgoingTxList) {
         int rows = ui->pastTxTableWidget->rowCount() + 1;
         int currentRow = rows - 1;
         ui->pastTxTableWidget->setRowCount(rows);
         QTableWidgetItem *date = new QTableWidgetItem(tx.dateTime
-                                                      .toString(Qt::DefaultLocaleShortDate));
-        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount);
+                                                      .toString("yyyy-MM-dd hh:mm"));
+        QTableWidgetItem *type = new QTableWidgetItem(tr("Sent"));
+        type->setIcon(QIcon(":/icons/outgoing.png"));
+        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount.prepend("-"));
+        amount->setTextColor(Qt::darkRed);
         QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
         QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
         QTableWidgetItem *to = new QTableWidgetItem(tx.receivingAddress);
         QTableWidgetItem *tag = new QTableWidgetItem(UtilsIOTA::getEasyReadableTag(tx.tag));
         ui->pastTxTableWidget->setItem(currentRow, 0, date);
-        ui->pastTxTableWidget->setItem(currentRow, 1, amount);
-        ui->pastTxTableWidget->setItem(currentRow, 2, txHash);
-        ui->pastTxTableWidget->setItem(currentRow, 3, from);
-        ui->pastTxTableWidget->setItem(currentRow, 4, to);
-        ui->pastTxTableWidget->setItem(currentRow, 5, tag);
+        ui->pastTxTableWidget->setItem(currentRow, 1, type);
+        ui->pastTxTableWidget->setItem(currentRow, 2, amount);
+        ui->pastTxTableWidget->setItem(currentRow, 3, txHash);
+        ui->pastTxTableWidget->setItem(currentRow, 4, from);
+        ui->pastTxTableWidget->setItem(currentRow, 5, to);
+        ui->pastTxTableWidget->setItem(currentRow, 6, tag);
     }
+
+    if (m_incomingTxList.isEmpty())
+        m_incomingTxList = m_walletManager->getPastIncomingTxs();
+    QList<UtilsIOTA::Transation> incomingTxList;
+    incomingTxList.append(m_incomingTxList);
+    incomingTxList.append(m_currentAddrTxList);
+    foreach (UtilsIOTA::Transation tx, incomingTxList) {
+        if (tx.amount == "0") continue; //skip non value
+        int rows = ui->pastTxTableWidget->rowCount() + 1;
+        int currentRow = rows - 1;
+        ui->pastTxTableWidget->setRowCount(rows);
+        QTableWidgetItem *date = new QTableWidgetItem(tx.dateTime
+                                                      .toString("yyyy-MM-dd hh:mm"));
+        QTableWidgetItem *type = new QTableWidgetItem(tr("Received"));
+        type->setIcon(QIcon(":/icons/incoming.png"));
+        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount.prepend("+"));
+        amount->setTextColor(Qt::darkGreen);
+        QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
+        QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
+        QTableWidgetItem *to = new QTableWidgetItem(tx.receivingAddress);
+        QTableWidgetItem *tag = new QTableWidgetItem(UtilsIOTA::getEasyReadableTag(tx.tag));
+        ui->pastTxTableWidget->setItem(currentRow, 0, date);
+        ui->pastTxTableWidget->setItem(currentRow, 1, type);
+        ui->pastTxTableWidget->setItem(currentRow, 2, amount);
+        ui->pastTxTableWidget->setItem(currentRow, 3, txHash);
+        ui->pastTxTableWidget->setItem(currentRow, 4, from);
+        ui->pastTxTableWidget->setItem(currentRow, 5, to);
+        ui->pastTxTableWidget->setItem(currentRow, 6, tag);
+    }
+
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(0,
                                                                     QHeaderView::ResizeToContents);
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(1,
                                                                     QHeaderView::ResizeToContents);
+    ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(2,
+                                                                    QHeaderView::ResizeToContents);
+    ui->pastTxTableWidget->sortItems(0, Qt::DescendingOrder);
 }
 
 void WalletWidget::checkAddressDirty()
