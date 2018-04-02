@@ -75,7 +75,8 @@ bool WalletManager::createAndInitWallet(const QString &filePath, bool recoverFun
     //init JSON empty wallet
     QString defaultJson = "{\"onlineSeed\":\"\",\"currentColdWallet\":\"\",\"cleanColdWalletBackup"
                           "\":\"\",\"currentOperation\":1,\"currentOpArgs\":[],\"currentAddress"
-                          "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions\":[]}";
+                          "\":\"\",\"pastUsedAdresses\":[],\"pastSpendingTransactions"
+                          "\":[],\"pastIncomingTransactions\":[]}";
     if (recoverFunds)
         defaultJson.replace("\"currentOpArgs\":[]", "\"currentOpArgs\":[\"recover\"]");
 
@@ -329,12 +330,53 @@ void WalletManager::addPastSpendingTx(const UtilsIOTA::Transation &transaction)
     m_jsonObject.insert("pastSpendingTransactions", txListArray);
 }
 
+void WalletManager::addPastIncomingTx(const UtilsIOTA::Transation &transaction)
+{
+    checkLock();
+    QJsonArray txListArray = m_jsonObject.value("pastIncomingTransactions").toArray();
+
+    QJsonObject jsonTx;
+    jsonTx.insert("tailTxHash", transaction.tailTxHash);
+    jsonTx.insert("amount", transaction.amount);
+    jsonTx.insert("spendingAddress", transaction.spendingAddress);
+    jsonTx.insert("receivingAdress", transaction.receivingAddress);
+    jsonTx.insert("tag", transaction.tag);
+    jsonTx.insert("dateTime", transaction.dateTime.toString(Qt::ISODate));
+    txListArray.append(jsonTx);
+
+    m_jsonObject.insert("pastIncomingTransactions", txListArray);
+}
+
 QList<UtilsIOTA::Transation> WalletManager::getPastSpendingTxs()
 {
     checkLock();
 
     QList<UtilsIOTA::Transation> txList;
     QJsonArray txsJsonArray = m_jsonObject.value("pastSpendingTransactions").toArray();
+
+    foreach (QJsonValue jTx, txsJsonArray) {
+        QJsonObject jObj = jTx.toObject();
+        UtilsIOTA::Transation tx;
+        tx.tailTxHash = jObj.value("tailTxHash").toString();
+        tx.amount = jObj.value("amount").toString();
+        tx.spendingAddress = jObj.value("spendingAddress").toString();
+        tx.receivingAddress = jObj.value("receivingAdress").toString();
+        tx.tag = jObj.value("tag").toString();
+        tx.dateTime = QDateTime::fromString(jObj.value("dateTime").toString(),
+                                            Qt::ISODate);
+
+        txList.append(tx);
+    }
+
+    return txList;
+}
+
+QList<UtilsIOTA::Transation> WalletManager::getPastIncomingTxs()
+{
+    checkLock();
+
+    QList<UtilsIOTA::Transation> txList;
+    QJsonArray txsJsonArray = m_jsonObject.value("pastIncomingTransactions").toArray();
 
     foreach (QJsonValue jTx, txsJsonArray) {
         QJsonObject jObj = jTx.toObject();

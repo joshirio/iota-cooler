@@ -79,7 +79,7 @@ QList<UtilsIOTA::Transation> UtilsIOTA::parseAddrTransfersQuickJson(const QStrin
             qint64 amount = tx.amount.toLongLong();
             tx.spendingAddress = (amount < 0) ? jObj.value("address").toString()
                                               : QObject::tr("view on tangle explorer");
-            tx.receivingAddress = (amount > 0) ? jObj.value("address").toString()
+            tx.receivingAddress = (amount >= 0) ? jObj.value("address").toString()
                                                : QObject::tr("view on tangle explorer");
             tx.tag = jObj.value("tag").toString();
             QDateTime d;

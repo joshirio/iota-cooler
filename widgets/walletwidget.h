@@ -81,6 +81,7 @@ private:
     QTimer *m_tangleRefreshTimer;
     SettingsManager *m_settingsManager;
     QList<UtilsIOTA::Transation> m_incomingTxList;
+    QList<UtilsIOTA::Transation> m_currentAddrTxList;
     QList<UtilsIOTA::Transation> m_outgoingTxList;
     quint64 m_lastCheckedBalance;
 };

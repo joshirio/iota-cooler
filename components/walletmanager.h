@@ -261,7 +261,7 @@ public:
     QString getOnlineSeed();
 
     /**
-     * @brief Add a transaction entry to the past transaction object array.
+     * @brief Add a transaction entry to the past outgoing transaction object array.
      * If a transaction has multiple receivers, please add same tx multiple times
      * with updated amounts and receivers but same tail tx hash.
      * @param transaction (struct)
@@ -269,10 +269,22 @@ public:
     void addPastSpendingTx(const UtilsIOTA::Transation &transaction);
 
     /**
+     * @brief Add a transaction entry to the past incoming transaction object array.
+     * @param transaction (struct)
+     */
+    void addPastIncomingTx(const UtilsIOTA::Transation &transaction);
+
+    /**
      * @brief Get past spending transactions
      * @return list of transaction structs
      */
     QList<UtilsIOTA::Transation> getPastSpendingTxs();
+
+    /**
+     * @brief Get past incoming transactions
+     * @return list of transaction structs
+     */
+    QList<UtilsIOTA::Transation> getPastIncomingTxs();
 
     /**
      * @brief Make a clean state (no pending txs) backup of the multisig file

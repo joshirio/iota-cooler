@@ -379,18 +379,10 @@ void MultisigTransferWidget::txFinalNextButtonClicked()
     ui->broadcastFinishButton->setEnabled(false);
     nextPage();
 
-    QString onlineSeed = m_walletManager->getOnlineSeed();
+    //retrieve past incoming transactions to store within wallet file
     QStringList args;
-    for (int i = 0; i < m_receiverList.size(); i++) {
-        args.append(m_amountList.at(i));
-        args.append(m_receiverList.at(i));
-    }
-    args.append("online"); //online party
-    args.append(m_walletBalance);
-    args.append(onlineSeed);
-    args.append(m_tag);
-    m_walletManager->exportMultisigFile();
-    m_tangleAPI->startAPIRequest(AbstractTangleAPI::MultisigTransfer,
+    args.append(m_walletManager->getCurrentAddress());
+    m_tangleAPI->startAPIRequest(AbstractTangleAPI::GetAddrTransfersQuick,
                                  args);
 }
 
@@ -420,6 +412,39 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
         QString balanceIota = responseMessage.split(":").at(2);
         ui->rBalanceLabel->setText(balanceIota);
 
+    }
+        break;
+    case AbstractTangleAPI::GetAddrTransfersQuick:
+    {
+        //save icoming tx for the current (becoming old) address
+        QString json = responseMessage;
+        json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
+        m_currentAddrIncomingTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
+
+        //keep only zero and value transfers (positive, means incoming)
+        QList<UtilsIOTA::Transation>::iterator it = m_currentAddrIncomingTxList.begin();
+        while (it != m_currentAddrIncomingTxList.end()) {
+            if (it->amount.toLongLong() < 0) {
+                it = m_currentAddrIncomingTxList.erase(it);
+            } else {
+                it++;
+            }
+        }
+
+        //next, finalize transfer
+        QString onlineSeed = m_walletManager->getOnlineSeed();
+        QStringList args;
+        for (int i = 0; i < m_receiverList.size(); i++) {
+            args.append(m_amountList.at(i));
+            args.append(m_receiverList.at(i));
+        }
+        args.append("online"); //online party
+        args.append(m_walletBalance);
+        args.append(onlineSeed);
+        args.append(m_tag);
+        m_walletManager->exportMultisigFile();
+        m_tangleAPI->startAPIRequest(AbstractTangleAPI::MultisigTransfer,
+                                     args);
     }
         break;
     case AbstractTangleAPI::MultisigTransfer:
@@ -457,6 +482,7 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
             m_walletManager->setCurrentAddress(newAddress);
 
             //create and save past txs
+            //add current to outgoing transfers
             QVariantList prevArgs;
             m_walletManager->getCurrentWalletOp(prevArgs);
             QStringList receiverList = prevArgs.at(1).toStringList();
@@ -471,6 +497,11 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
                 tx.tag = tag;
                 tx.tailTxHash = tailTxHash;
                 m_walletManager->addPastSpendingTx(tx);
+            }
+
+            //add past incoming transfers to wallet
+            foreach (UtilsIOTA::Transation tx, m_currentAddrIncomingTxList) {
+                m_walletManager->addPastIncomingTx(tx);
             }
 
             //reset op

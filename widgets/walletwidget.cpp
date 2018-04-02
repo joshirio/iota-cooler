@@ -93,6 +93,7 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
 {
     ui->unconfirmedBalanceLabel->hide();
     m_incomingTxList.clear();
+    m_currentAddrTxList.clear();
     m_outgoingTxList.clear();
     m_lastCheckedBalance = 0;
     m_currentWalletFilePath = walletFilePath;
@@ -137,6 +138,7 @@ void WalletWidget::updateBalance()
         if (UtilsIOTA::isValidAddress(a)) {
             QStringList args;
             args.append(a);
+            m_tangleBalanceCheckAPI->stopCurrentAPIRequest(); //stop any stuck request
             m_tangleBalanceCheckAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
                                                      args);
         }
@@ -150,7 +152,7 @@ void WalletWidget::updateUnconfirmedBalance()
     //by comparing actual balance and tx history
     quint64 balanceFromHistory= 0;
 
-    foreach (UtilsIOTA::Transation tx, m_incomingTxList) {
+    foreach (UtilsIOTA::Transation tx, m_currentAddrTxList) {
         balanceFromHistory += tx.amount.toULongLong();
     }
 
@@ -172,6 +174,7 @@ void WalletWidget::updateCurrentAddrTxHistory()
         if (UtilsIOTA::isValidAddress(a)) {
             QStringList args;
             args.append(a);
+            m_tangleHistoryCheckAPI->stopCurrentAPIRequest(); //stop any stuck request
             m_tangleHistoryCheckAPI->startAPIRequest(AbstractTangleAPI::GetAddrTransfersQuick,
                                                      args);
         }
@@ -284,7 +287,7 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
         ui->txloadingLabel->hide();
         QString json = responseMessage;
         json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
-        m_incomingTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
+        m_currentAddrTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
         loadPastTxs();
         updateUnconfirmedBalance();
         break;
@@ -372,8 +375,12 @@ void WalletWidget::loadPastTxs()
         ui->pastTxTableWidget->setItem(currentRow, 6, tag);
     }
 
-    //TODO append to incoming tx from wallet manager saved ones
-    foreach (UtilsIOTA::Transation tx, m_incomingTxList) {
+    if (m_incomingTxList.isEmpty())
+        m_incomingTxList = m_walletManager->getPastIncomingTxs();
+    QList<UtilsIOTA::Transation> incomingTxList;
+    incomingTxList.append(m_incomingTxList);
+    incomingTxList.append(m_currentAddrTxList);
+    foreach (UtilsIOTA::Transation tx, incomingTxList) {
         int rows = ui->pastTxTableWidget->rowCount() + 1;
         int currentRow = rows - 1;
         ui->pastTxTableWidget->setRowCount(rows);
