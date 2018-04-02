@@ -52,6 +52,40 @@ QString UtilsIOTA::getEasyReadableTag(const QString &tag)
     return t;
 }
 
+QString UtilsIOTA::getEasyReadableBalance(const QString &balance)
+{
+    QString f;
+    double cb = balance.toDouble();
+
+    double Ki = 1000;
+    double Mi = 1000000;
+    double Gi = 1000000000;
+    double Ti = 1000000000000;
+    double Pi = 1000000000000000; //for the very, very rich ;)
+
+    if (cb >= Pi) {
+        cb /= Pi;
+        f = " Pi";
+    } else if (cb >= Ti) {
+        cb /= Ti;
+        f = " Ti";
+    } else if (cb >= Gi) {
+        cb /= Gi;
+        f = " Gi";
+    } else if (cb >= Mi) {
+        cb /= Mi;
+        f = " Mi";
+    } else if (cb >= Ki) {
+        cb /= Ki;
+        f = " Ki";
+    } else {
+        //i
+        f = " i";
+    }
+
+    return QString::number(cb, 'g', 9).append(f);
+}
+
 UtilsIOTA::UtilsIOTA()
 {
 

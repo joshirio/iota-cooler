@@ -34,6 +34,14 @@ public:
      */
     static QString getEasyReadableTag(const QString &tag);
 
+    /**
+     * @brief Creates a readable balance string by converting
+     * the raw amount in iota to Ti/Gi/Ki
+     * @param balance in iota as string
+     * @return readable balance string
+     */
+    static QString getEasyReadableBalance(const QString &balance);
+
     /** The current IOTA node URL used for API requests */
     static QString currentNodeUrl;
 

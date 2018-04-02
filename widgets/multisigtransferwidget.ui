@@ -116,6 +116,9 @@
            <property name="text">
             <string>checking...</string>
            </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
           </widget>
          </item>
          <item>
@@ -688,8 +691,8 @@ The next step requires the &lt;b&gt;online signing&lt;/b&gt; device to finalize 
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>419</width>
-            <height>131</height>
+            <width>98</width>
+            <height>83</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">

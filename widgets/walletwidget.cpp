@@ -158,8 +158,9 @@ void WalletWidget::updateUnconfirmedBalance()
 
     if (balanceFromHistory > m_lastCheckedBalance) {
         quint64 unconfirmed = balanceFromHistory - m_lastCheckedBalance;
-        ui->unconfirmedBalanceLabel->setText(tr("Unconfirmed (iota): %1")
-                                             .arg(QString::number(unconfirmed)));
+        QString rA = UtilsIOTA::getEasyReadableBalance(QString::number(unconfirmed));
+        ui->unconfirmedBalanceLabel->setText(tr("Unconfirmed: %1")
+                                             .arg(rA));
         ui->unconfirmedBalanceLabel->show();
     } else {
         ui->unconfirmedBalanceLabel->hide();
@@ -252,10 +253,10 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
     switch (request) {
     case AbstractTangleAPI::GetBalance:
     {
-        QString balanceHumanReadable = responseMessage.split(":").at(3);
-        ui->balanceLabel->setText(balanceHumanReadable);
-        m_lastCheckedBalance = responseMessage.split(":").at(2).toULongLong();
-
+        QString iotaString = responseMessage.split(":").at(2);
+        m_lastCheckedBalance = iotaString.toULongLong();
+        QString balanceHumanReadable = UtilsIOTA::getEasyReadableBalance(iotaString);
+        ui->balanceLabel->setText(iotaString.append(" (" + balanceHumanReadable + ")"));
     }
         break;
     case AbstractTangleAPI::IsAddressSpent:
@@ -360,7 +361,8 @@ void WalletWidget::loadPastTxs()
                                                       .toString("yyyy-MM-dd hh:mm"));
         QTableWidgetItem *type = new QTableWidgetItem(tr("Sent"));
         type->setIcon(QIcon(":/icons/outgoing.png"));
-        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount.prepend("-"));
+        QString rAmount = UtilsIOTA::getEasyReadableBalance(tx.amount);
+        QTableWidgetItem *amount = new QTableWidgetItem(rAmount.prepend("-"));
         amount->setTextColor(Qt::darkRed);
         QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
         QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
@@ -389,7 +391,8 @@ void WalletWidget::loadPastTxs()
                                                       .toString("yyyy-MM-dd hh:mm"));
         QTableWidgetItem *type = new QTableWidgetItem(tr("Received"));
         type->setIcon(QIcon(":/icons/incoming.png"));
-        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount.prepend("+"));
+        QString rAmount = UtilsIOTA::getEasyReadableBalance(tx.amount);
+        QTableWidgetItem *amount = new QTableWidgetItem(rAmount.prepend("+"));
         amount->setTextColor(Qt::darkGreen);
         QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash);
         QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
