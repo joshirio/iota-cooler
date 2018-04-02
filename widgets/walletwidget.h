@@ -53,6 +53,7 @@ private slots:
      * @brief Update balance of the main address
      */
     void updateBalance();
+    void updateUnconfirmedBalance();
     void updateCurrentAddrTxHistory();
     void closeWalletButtonClicked();
     void copyCurrentAddress();
@@ -81,6 +82,7 @@ private:
     SettingsManager *m_settingsManager;
     QList<UtilsIOTA::Transation> m_incomingTxList;
     QList<UtilsIOTA::Transation> m_outgoingTxList;
+    quint64 m_lastCheckedBalance;
 };
 
 #endif // WALLETWIDGET_H

@@ -66,6 +66,10 @@ QList<UtilsIOTA::Transation> UtilsIOTA::parseAddrTransfersQuickJson(const QStrin
 
     if (parseError.error == QJsonParseError::NoError) {
         QJsonArray txsJsonArray = doc.array();
+
+        //used to skip reattachments
+        QStringList bundleHashes;
+
         foreach (QJsonValue jTx, txsJsonArray) {
             QJsonObject jObj = jTx.toObject();
             UtilsIOTA::Transation tx;
@@ -82,7 +86,12 @@ QList<UtilsIOTA::Transation> UtilsIOTA::parseAddrTransfersQuickJson(const QStrin
             d.setSecsSinceEpoch(jObj.value("timestamp").toVariant().toString().toLongLong());
             tx.dateTime = d;
 
-            list.append(tx);
+            //add only if not yet seen (skip reattachments)
+            QString bundle = jObj.value("bundle").toString();
+            if (!bundleHashes.contains(bundle)) {
+                list.append(tx);
+                bundleHashes.append(bundle);
+            }
         }
     }
 

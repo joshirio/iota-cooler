@@ -3,5 +3,7 @@
         <file>icons/iotacooler.png</file>
         <file>icons/wallet_file.png</file>
         <file>icons/copy.png</file>
+        <file>icons/outgoing.png</file>
+        <file>icons/incoming.png</file>
     </qresource>
 </RCC>
