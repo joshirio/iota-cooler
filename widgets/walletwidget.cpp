@@ -19,7 +19,7 @@
 WalletWidget::WalletWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WalletWidget),
-    m_BalanceRefreshTimer(0)
+    m_tangleRefreshTimer(0)
 {
     ui->setupUi(this);
     m_currentWalletFilePath = "/invalid";
@@ -52,10 +52,15 @@ WalletWidget::WalletWidget(QWidget *parent) :
             this, &WalletWidget::addressesViewTangleButtonClicked);
 
     //tangle api
-    m_tangleAPI = new SmidgenTangleAPI(this);
-    connect(m_tangleAPI, &AbstractTangleAPI::requestFinished,
+    m_tangleBalanceCheckAPI = new SmidgenTangleAPI(this);
+    connect(m_tangleBalanceCheckAPI, &AbstractTangleAPI::requestFinished,
             this, &WalletWidget::requestFinished);
-    connect(m_tangleAPI, &AbstractTangleAPI::requestError,
+    connect(m_tangleBalanceCheckAPI, &AbstractTangleAPI::requestError,
+            this, &WalletWidget::requestError);
+    m_tangleHistoryCheckAPI = new SmidgenTangleAPI(this);
+    connect(m_tangleHistoryCheckAPI, &AbstractTangleAPI::requestFinished,
+            this, &WalletWidget::requestFinished);
+    connect(m_tangleHistoryCheckAPI, &AbstractTangleAPI::requestError,
             this, &WalletWidget::requestError);
 
     //fix fonts for addresses to use monospace (except on linux)
@@ -85,6 +90,8 @@ WalletWidget::~WalletWidget()
 
 void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
 {
+    m_incomingTxList.clear();
+    m_outgoingTxList.clear();
     m_currentWalletFilePath = walletFilePath;
 
     //main wallet address
@@ -108,8 +115,12 @@ void WalletWidget::setCurrentWalletPath(const QString &walletFilePath)
 
     //check balance
     updateBalance();
-    //setup balance periodic check
-    startBalanceRefresher();
+
+    //check history
+    updateCurrentAddrTxHistory();
+
+    //setup balance and history periodic check
+    startTangleRefreshers();
 
     //check if address/wallet has been misused (main address is spent)
     checkAddressDirty();
@@ -123,15 +134,29 @@ void WalletWidget::updateBalance()
         if (UtilsIOTA::isValidAddress(a)) {
             QStringList args;
             args.append(a);
-            m_tangleAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
-                                         args);
+            m_tangleBalanceCheckAPI->startAPIRequest(AbstractTangleAPI::GetAddrTransfersQuick,
+                                                     args);
+        }
+    }
+}
+
+void WalletWidget::updateCurrentAddrTxHistory()
+{
+    if (m_currentWalletFilePath != "/invalid") {
+        //ui->balanceLabel->setText(tr("checking..."));
+        QString a = m_walletManager->getCurrentAddress();
+        if (UtilsIOTA::isValidAddress(a)) {
+            QStringList args;
+            args.append(a);
+            m_tangleHistoryCheckAPI->startAPIRequest(AbstractTangleAPI::GetBalance,
+                                                     args);
         }
     }
 }
 
 void WalletWidget::closeWalletButtonClicked()
 {
-    stopBalanceRefresher();
+    stopTangleRefreshers();
     emit walletClosed();
 }
 
@@ -159,7 +184,7 @@ void WalletWidget::tangleExplorerButtonClicked()
 
 void WalletWidget::sendButtonClicked()
 {
-    stopBalanceRefresher();
+    stopTangleRefreshers();
     emit makeNewTransactionSignal();
 }
 
@@ -221,6 +246,14 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
         }
     }
         break;
+    case AbstractTangleAPI::GetAddrTransfersQuick:
+    {
+        QString json = responseMessage;
+        json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
+        m_incomingTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
+        loadPastTxs();
+        break;
+    }
     default:
         break;
     }
@@ -249,22 +282,26 @@ void WalletWidget::requestError(AbstractTangleAPI::RequestType request,
     }
 }
 
-void WalletWidget::startBalanceRefresher()
+void WalletWidget::startTangleRefreshers()
 {
-    if (!m_BalanceRefreshTimer) {
-        m_BalanceRefreshTimer = new QTimer(this);
+    if (!m_tangleRefreshTimer) {
+        m_tangleRefreshTimer = new QTimer(this);
     }
-    connect(m_BalanceRefreshTimer, &QTimer::timeout,
+    connect(m_tangleRefreshTimer, &QTimer::timeout,
             this, &WalletWidget::updateBalance);
-    m_BalanceRefreshTimer->start(30000); //every 30sec
+    connect(m_tangleRefreshTimer, &QTimer::timeout,
+            this, &WalletWidget::updateCurrentAddrTxHistory);
+    m_tangleRefreshTimer->start(30000); //every 30sec
 }
 
-void WalletWidget::stopBalanceRefresher()
+void WalletWidget::stopTangleRefreshers()
 {
-    if (m_BalanceRefreshTimer) {
-        m_BalanceRefreshTimer->stop();
-        disconnect(m_BalanceRefreshTimer, &QTimer::timeout,
+    if (m_tangleRefreshTimer) {
+        m_tangleRefreshTimer->stop();
+        disconnect(m_tangleRefreshTimer, &QTimer::timeout,
                    this, &WalletWidget::updateBalance);
+        disconnect(m_tangleRefreshTimer, &QTimer::timeout,
+                   this, &WalletWidget::updateCurrentAddrTxHistory);
     }
 }
 
@@ -273,8 +310,9 @@ void WalletWidget::loadPastTxs()
     ui->pastTxTableWidget->clearContents();
     ui->pastTxTableWidget->setRowCount(0);
 
-    QList<UtilsIOTA::Transation> pastTxList = m_walletManager->getPastSpendingTxs();
-    foreach (UtilsIOTA::Transation tx, pastTxList) {
+    if (m_outgoingTxList.isEmpty())
+        m_outgoingTxList = m_walletManager->getPastSpendingTxs();
+    foreach (UtilsIOTA::Transation tx, m_outgoingTxList) {
         int rows = ui->pastTxTableWidget->rowCount() + 1;
         int currentRow = rows - 1;
         ui->pastTxTableWidget->setRowCount(rows);
@@ -292,6 +330,27 @@ void WalletWidget::loadPastTxs()
         ui->pastTxTableWidget->setItem(currentRow, 4, to);
         ui->pastTxTableWidget->setItem(currentRow, 5, tag);
     }
+
+    //TODO append to incoming tx from wallet manager saved ones
+    foreach (UtilsIOTA::Transation tx, m_incomingTxList) {
+        int rows = ui->pastTxTableWidget->rowCount() + 1;
+        int currentRow = rows - 1;
+        ui->pastTxTableWidget->setRowCount(rows);
+        QTableWidgetItem *date = new QTableWidgetItem(tx.dateTime
+                                                      .toString(Qt::DefaultLocaleShortDate));
+        QTableWidgetItem *amount = new QTableWidgetItem(tx.amount);
+        QTableWidgetItem *txHash = new QTableWidgetItem(tx.tailTxHash); //not real tail when quick method
+        QTableWidgetItem *from = new QTableWidgetItem(tx.spendingAddress);
+        QTableWidgetItem *to = new QTableWidgetItem(tx.receivingAddress);
+        QTableWidgetItem *tag = new QTableWidgetItem(UtilsIOTA::getEasyReadableTag(tx.tag));
+        ui->pastTxTableWidget->setItem(currentRow, 0, date);
+        ui->pastTxTableWidget->setItem(currentRow, 1, amount);
+        ui->pastTxTableWidget->setItem(currentRow, 2, txHash);
+        ui->pastTxTableWidget->setItem(currentRow, 3, from);
+        ui->pastTxTableWidget->setItem(currentRow, 4, to);
+        ui->pastTxTableWidget->setItem(currentRow, 5, tag);
+    }
+
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(0,
                                                                     QHeaderView::ResizeToContents);
     ui->pastTxTableWidget->horizontalHeader()->setSectionResizeMode(1,

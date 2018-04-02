@@ -26,6 +26,10 @@ public:
         NoRequest, /**< Invalid request status */
         CreateSeed, /**< Generate a seed */
         GetBalance, /**< Get balance of an address */
+        GetAddrTransfersQuick, /**< Get history of an address,
+                                 * quick version has no addresses or tail tx hash
+                                 * but is fast
+                                 */
         GenerateAddresses, /**< Generate multisig addresses */
         IsAddressSpent, /**< Whether an address had outgoing
                              transfers (also pre snapshot) */

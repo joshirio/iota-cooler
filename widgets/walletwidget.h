@@ -12,6 +12,7 @@
 #include <QWidget>
 
 #include "../components/abstracttangleapi.h"
+#include "../utils/utilsiota.h"
 
 namespace Ui {
 class WalletWidget;
@@ -52,6 +53,7 @@ private slots:
      * @brief Update balance of the main address
      */
     void updateBalance();
+    void updateCurrentAddrTxHistory();
     void closeWalletButtonClicked();
     void copyCurrentAddress();
     void tangleExplorerButtonClicked();
@@ -65,20 +67,20 @@ private slots:
                       const QString &errorMessage);
 
 private:
-    /**
-     * @brief Periodically check main address balance
-     */
-    void startBalanceRefresher();
-    void stopBalanceRefresher();
+    void startTangleRefreshers();
+    void stopTangleRefreshers();
     void loadPastTxs();
     void checkAddressDirty();
 
     Ui::WalletWidget *ui;
     QString m_currentWalletFilePath;
     WalletManager *m_walletManager;
-    AbstractTangleAPI *m_tangleAPI;
-    QTimer *m_BalanceRefreshTimer;
+    AbstractTangleAPI *m_tangleBalanceCheckAPI;
+    AbstractTangleAPI *m_tangleHistoryCheckAPI;
+    QTimer *m_tangleRefreshTimer;
     SettingsManager *m_settingsManager;
+    QList<UtilsIOTA::Transation> m_incomingTxList;
+    QList<UtilsIOTA::Transation> m_outgoingTxList;
 };
 
 #endif // WALLETWIDGET_H

@@ -2,6 +2,10 @@
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QString>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonParseError>
 
 //later initialized with DefinitionHolder::DEFAULT_NODE to avoid static init dep cycle and crash
 QString UtilsIOTA::currentNodeUrl = "";
@@ -51,4 +55,36 @@ QString UtilsIOTA::getEasyReadableTag(const QString &tag)
 UtilsIOTA::UtilsIOTA()
 {
 
+}
+
+QList<UtilsIOTA::Transation> UtilsIOTA::parseAddrTransfersQuickJson(const QString &jsonString)
+{
+    QList<UtilsIOTA::Transation> list;
+
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
+
+    if (parseError.error == QJsonParseError::NoError) {
+        QJsonArray txsJsonArray = doc.array();
+        foreach (QJsonValue jTx, txsJsonArray) {
+            QJsonObject jObj = jTx.toObject();
+            UtilsIOTA::Transation tx;
+            tx.tailTxHash = jObj.value("hash").toString(); //not real tail hash (quick version)
+            tx.amount = jObj.value("value").toVariant().toString();
+            //addresses not available in quick version
+            qint64 amount = tx.amount.toLongLong();
+            tx.spendingAddress = (amount < 0) ? jObj.value("address").toString()
+                                              : QObject::tr("view on tangle explorer");
+            tx.receivingAddress = (amount > 0) ? jObj.value("address").toString()
+                                               : QObject::tr("view on tangle explorer");
+            tx.tag = jObj.value("tag").toString();
+            QDateTime d;
+            d.setSecsSinceEpoch(jObj.value("timestamp").toVariant().toString().toLongLong());
+            tx.dateTime = d;
+
+            list.append(tx);
+        }
+    }
+
+    return list;
 }
