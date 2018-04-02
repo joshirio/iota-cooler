@@ -381,6 +381,7 @@ void WalletWidget::loadPastTxs()
     incomingTxList.append(m_incomingTxList);
     incomingTxList.append(m_currentAddrTxList);
     foreach (UtilsIOTA::Transation tx, incomingTxList) {
+        if (tx.amount == "0") continue; //skip non value
         int rows = ui->pastTxTableWidget->rowCount() + 1;
         int currentRow = rows - 1;
         ui->pastTxTableWidget->setRowCount(rows);

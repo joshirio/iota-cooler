@@ -421,10 +421,10 @@ void MultisigTransferWidget::requestFinished(AbstractTangleAPI::RequestType requ
         json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
         m_currentAddrIncomingTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
 
-        //keep only zero and value transfers (positive, means incoming)
+        //keep only value transfers (positive, means incoming)
         QList<UtilsIOTA::Transation>::iterator it = m_currentAddrIncomingTxList.begin();
         while (it != m_currentAddrIncomingTxList.end()) {
-            if (it->amount.toLongLong() < 0) {
+            if (it->amount.toLongLong() <= 0) {
                 it = m_currentAddrIncomingTxList.erase(it);
             } else {
                 it++;
