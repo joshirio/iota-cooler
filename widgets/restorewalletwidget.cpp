@@ -446,8 +446,9 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
         if (responseMessage.contains("Balance:")) {
             QString address = responseMessage.split(":").at(1);
             QString balanceString = responseMessage.split(":").at(2);
-            QString balanceReadableString =
-                    responseMessage.split(":").at(3);
+            QString balanceReadableString = " (" +
+                    UtilsIOTA::getEasyReadableBalance(balanceString) +
+                    ")";
             m_currentRecoveryStepResults.clear();
             m_currentRecoveryStepResults.append(QString::number(m_currentIndex));
             m_currentRecoveryStepResults.append(address);
@@ -458,7 +459,7 @@ void RestoreWalletWidget::requestFinished(AbstractTangleAPI::RequestType request
             ui->checkAddrNextButton->setFocus();
             ui->checkAddrStatusLabel->setText(tr("Finished!"));
             ui->checkAddrResultLabel->setText(tr("Wallet balance: <b>%1</b>")
-                                              .arg(balanceReadableString));
+                                              .arg(balanceString.append(balanceReadableString)));
             ui->checkAddrResultLabel->show();
         }
         break;
