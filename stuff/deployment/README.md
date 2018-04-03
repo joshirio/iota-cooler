@@ -14,6 +14,7 @@ Build IOTAcooler:
 Prepare iotacooler-smidgen:
 1. Follow: https://github.com/joshirio/iota-cooler-smidgen/blob/master/DEPLOY.md
 2. Rename the executable to iotacooler-smidgen (linux/macOS) or iotacooler-smidgen.exe (windows)
+3. Make sure the windows smidgen exe was generated as a 32 bit binary.
 
 Windows:
 1. Place iotacooler-smidgen.exe in the same directory as the main exe.
