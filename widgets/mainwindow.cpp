@@ -434,7 +434,7 @@ void MainWindow::clipboardGuardCheck()
                 }
             }
             //set new address
-            previousAddress = clipData;
+            previousAddress = clipData; //FIXME: mv this up or otherwise qmessage box focus back causes loop
         }
     }
 }
