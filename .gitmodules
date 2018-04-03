@@ -3,4 +3,4 @@
 	url = https://github.com/joshirio/iota-cooler-smidgen
 [submodule "utils/Qt-AES"]
 	path = utils/Qt-AES
-	url = git@github.com:joshirio/Qt-AES.git
+	url = https://github.com/joshirio/Qt-AES

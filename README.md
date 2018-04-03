@@ -26,9 +26,10 @@ The multisig signing is handled by [smidgen](https://github.com/bitfinexcom/smid
 IOTAcooler works on Windows, macOS and Linux. Visit the [releases page](https://github.com/joshirio/iota-cooler/releases) and download the appropriate executable/installer for your OS. For Arch Linux based distributions, there's also an [AUR package](https://aur.archlinux.org/packages/iotacooler/) for building from source, this is also the most secure option, since you don't have to trust the precompiled binaries.
 
 ### Building from source
-Unpack archive and compile with
+Clone the source repository and compile with
 ```
-cd iotacooler
+git clone --recurse-submodules https://github.com/joshirio/iota-cooler.git
+cd iota-cooler
 qmake -config release
 make
 ```
