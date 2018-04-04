@@ -47,7 +47,7 @@ See [deployment](https://github.com/joshirio/iota-cooler/blob/master/stuff/deplo
 Please also check out the [PKGBUILD script](https://github.com/joshirio/iota-cooler/blob/master/stuff/deployment/linux/PKGBUILD) as an example.
 
 ### User Guide
-The [project wiki](https://github.com/joshirio/iota-cooler/wiki) includes an user guides and other useful information.
+The [project wiki](https://github.com/joshirio/iota-cooler/wiki) includes an user guide and other useful information.
 
 ### License
 MIT, see [LICENSE](https://github.com/joshirio/iota-cooler/blob/master/LICENSE) file.
