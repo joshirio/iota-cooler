@@ -1,6 +1,6 @@
 CHANGELOG
 
-Version x.x
+Version 1.1
 ===========
 
 2018-04-04
@@ -25,6 +25,17 @@ Version x.x
 ### Bug Fixes
 - Show correct address on wallet creation (Windows)
 - Correctly enforce device roles
+
+### iotacooler-smidgen Changes
+- use carriota field as default node
+- remove config file
+- add promote command
+- check address reuse also on multisig transfers
+- detect address reuse also after snapshots
+- cutom tag support (--tag)
+- iotacooler custom command for multisig address generation
+- iotacooler custom command check if an address was already spent
+- iotacooler custom commands to recover funds from multisig seeds
 
 Version 1.0
 ===========
