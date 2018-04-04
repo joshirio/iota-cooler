@@ -10,7 +10,7 @@ The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshi
 - Wallet encryption (AES-256) with password. Wallet file never stores the offline signing key.
 - Multiple receiving addresses per transaction (batching)
 - Address reuse detection when sending to addresses with outgoing transfers, even after snapshots
-- Snapshot proof [wallet recovery](https://github.com/joshirio/iota-cooler/wiki/Wallet-Recovery-from-IOTAcooler-Seeds) from seeds with offline signing process (recoery seeds remain safe)
+- Snapshot proof [wallet recovery](https://github.com/joshirio/iota-cooler/wiki/Wallet-Recovery-from-IOTAcooler-Seeds) from seeds with offline signing process (recovery seeds remain safe)
 - Two step transaction signing, online and offline
 - Clipboard guard to warn about possible unwanted changes (malware) to copied addresses
 - Support for [custom generated seeds](https://github.com/joshirio/iota-cooler/wiki/Generating-IOTA-Seeds-Securely)
