@@ -191,6 +191,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 #ifdef Q_OS_WIN
                     filePath.remove(0, 1); //on windows: /C:/file_path is returned from mime
 #endif // Q_OS_WIN
+                    event->acceptProposedAction();
                     checkDeviceRole();
                     openWallet(filePath);
                     break;
