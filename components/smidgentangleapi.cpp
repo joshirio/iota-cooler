@@ -363,7 +363,12 @@ void SmidgenTangleAPI::processFinished(int exitCode, QProcess::ExitStatus exitSt
         case FinalizeMultsigWallet:
             if (result.contains("Successfully")) {
                 //return ok as OK:main_address
-                QString mainAddress = result.simplified().split(":").at(1).trimmed();
+                int offset = 1; //position of address
+#ifdef Q_OS_WIN
+                //on windows add 1 to the offset because of C:// (having a colon)
+                offset++;
+#endif
+                QString mainAddress = result.simplified().split(":").at(offset).trimmed();
                 message = QString("Multisig finalize:OK:").append(mainAddress);
             } else {
                 //unexpected response

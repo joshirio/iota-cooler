@@ -286,7 +286,7 @@ Please close the application and open the current wallet file with IOTAcooler on
          <item>
           <widget class="QLabel" name="genAddressStatusLabel">
            <property name="text">
-            <string>s</string>
+            <string>checking...</string>
            </property>
           </widget>
          </item>
@@ -435,7 +435,7 @@ Please close the application and open the current wallet file with IOTAcooler on
          <item>
           <widget class="QLabel" name="checkAddrStatusLabel">
            <property name="text">
-            <string>s</string>
+            <string>checking...</string>
            </property>
           </widget>
          </item>

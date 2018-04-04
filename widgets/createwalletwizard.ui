@@ -444,7 +444,7 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
           <string notr="true">font-style: italic;</string>
          </property>
          <property name="text">
-          <string>s</string>
+          <string>Please wait...</string>
          </property>
         </widget>
        </item>
@@ -464,8 +464,8 @@ For best security make sure that the &lt;b&gt;offline signing&lt;/b&gt; device i
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>37</height>
+            <width>578</width>
+            <height>238</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
