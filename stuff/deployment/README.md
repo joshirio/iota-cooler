@@ -34,10 +34,12 @@ macOS:
    (alt link: https://web.archive.org/web/20150423212042/http://mac101.net/content/how-to/how-to-create-dmg-art-for-fancy-application-installations/)
 
 Ubuntu:
-1. Copy deb dir from installers dir
+1. Copy deb dir from stuff/deployment/linux dir
 2. Update DEBIAN/control as needed
-3. Copy executable to usr/bin
-4. Copy iotacooler-smidgen usr/share/bin/
+3. As with the AppImage building step, create an AppDir as deb/opt/iotacooler by copying the executables:
+   Copy executable to /opt/iotacooler/usr/bin
+   Copy iotacooler-smidgen /opt/iotacooler/usr/bin
+4. Run linuxdeployqt as from the AppImage step instructions
 5. Create deb package
    sudo chown root:root -R deb/
    sudo chmod -R 0755 deb/
@@ -60,9 +62,9 @@ AppImage:
 - Download AppImageKit from https://github.com/AppImage/AppImageKit:
    wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
    chmod a+x appimagetool-x86_64.AppImage
-- Create myappimg folder on desktop and place files from stuff/deb/ here:
+- Create myappimg folder on desktop and place files from stuff/deployment/linux/appimage/ here:
    copy the compiled iota-cooler binary to myappimg/usr/bin
-   copy the whole usr/share folder from stuff/deb to myappimg/usr/share
+   copy the whole usr/share folder from stuff/deployment/linux/appimage to myappimg/usr/share
 -> Create the AppDir with:
    ./linuxdeployqt-continuous-x86_64.AppImage /home/user/Desktop/myappimg/usr/share/applications/iotacooler.desktop  -bundle-non-qt-libs -no-translations -qmake=/home/user/Qt/5.9.2/gcc_64/bin/qmake
 - Integrate the iotacooler-smidgen binary from above (after step above to avoid missing lib errors, iotacooler-smidgen is already self contained):

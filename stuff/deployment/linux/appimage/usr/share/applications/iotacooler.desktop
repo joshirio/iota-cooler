@@ -2,7 +2,7 @@
 [Desktop Entry]
 Name=IOTAcooler
 GenericName=Iotacooler
-Exec=/opt/iotacooler/AppRun
+Exec=iota-cooler
 Icon=iotacooler
 Type=Application
 StartupNotify=false
