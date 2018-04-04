@@ -4,7 +4,7 @@ A cross-platform cold storage and spending wallet for IOTA. At its core, IOTAcoo
 
 IOTAcooler is designed with security and speed in mind. All sensitive steps are done completely offline, including the wallet recovery feature. IOTAcooler is really fast because the wallet is stateful, meaning that all past transactions, addresses and other states are saved into the wallet file, also because it uses light IOTA API requests for checking current transfers on the Tangle, which is very practical in case numerous or big transactions are part of the wallet history. The downside of this is that some specific information for incoming transactions is only visible on a tangle explorer.
 
-The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen), based on [smidgen](https://github.com/bitfinexcom/smidgen), a nodejs command line multisig utility using the official IOTA javascript library and created by Bitfinex.
+The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen), based on [smidgen](https://github.com/bitfinexcom/smidgen). Smidgen is a nodejs command line multisig utility using the official IOTA javascript library and created by Bitfinex.
 
 ### Features
 - Wallet encryption (AES-256) with password. Wallet file never stores the offline signing key.
@@ -23,6 +23,7 @@ The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshi
 ### Limitations
 - Only one receiving address a time. A new address is generated automatically on transfers. You can use traditional spending wallets with small amounts which then are periodically refilled from secure cold storage wallets.
 - Requires to always backup the wallet file after each transfer. Store and sync it in the cloud to be safe (wallet is encrypted and doesn't hold the offline signing key). If an old version is opened by mistake, IOTAcooler will detect this and show a warning.
+- Some information, like source addresses for incoming transfers, is only visible with a tangle explorer due to light API requests usage.
 
 ### How it looks
 ![Screenshot](https://raw.githubusercontent.com/joshirio/iota-cooler/master/stuff/screenshots/mainwindow.gif "Wallet screenshot")
@@ -41,16 +42,15 @@ cd iota-cooler
 qmake -config release
 make
 ```
-To run, [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen) is required (`/usr/bin/iotacooler-smidgen`). iotacooler-smidgen is a fork of smidgen with added functionality like promoting, address reuse checking on multisig transfers and changes to allow building nodejs binaries with `pkg`.
-See 
-[deployment](https://github.com/joshirio/iota-cooler/blob/master/stuff/deployment/README.md) 
-for building and packaging steps.
+To run, [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen) is required. iotacooler-smidgen is a fork of smidgen with added functionality like promoting, address reuse checking on multisig transfers, custom recovery commands and changes to allow building nodejs binaries with `pkg`.
+See [deployment](https://github.com/joshirio/iota-cooler/blob/master/stuff/deployment/README.md) for building and packaging steps.
 Please also check out the [PKGBUILD script](https://github.com/joshirio/iota-cooler/blob/master/stuff/deployment/linux/PKGBUILD) as an example.
 
-NOTE: The documentation is still a work in progress. The [project wiki](https://github.com/joshirio/iota-cooler/wiki) will include user guides and detailed instructions, including on contributing with code or translations.
+### User Guide
+The [project wiki](https://github.com/joshirio/iota-cooler/wiki) includes an user guides and other useful information.
 
 ### License
-MIT, see LICENSE file.
+MIT, see [LICENSE](https://github.com/joshirio/iota-cooler/blob/master/LICENSE) file.
 
 ### Support this project
 [Donate IOTA](https://github.com/joshirio/iota-cooler/blob/master/doc/donate.md)
