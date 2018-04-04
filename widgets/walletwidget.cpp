@@ -15,6 +15,7 @@
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QSystemTrayIcon>
 
 WalletWidget::WalletWidget(QWidget *parent) :
     QWidget(parent),
@@ -26,6 +27,10 @@ WalletWidget::WalletWidget(QWidget *parent) :
     m_currentWalletFilePath = "/invalid";
     m_walletManager = &WalletManager::getInstance();
     m_settingsManager = new SettingsManager(this);
+
+    m_tray = new QSystemTrayIcon(this);
+    m_tray->setIcon(QIcon(":/icons/iotacooler.png"));
+    m_tray->hide();
 
     connect(ui->closeWalletButton, &QPushButton::clicked,
             this, &WalletWidget::closeWalletButtonClicked);
@@ -247,6 +252,14 @@ void WalletWidget::addressesViewTangleButtonClicked()
                                    .arg(a)));
 }
 
+void WalletWidget::newTransactionsNotification()
+{
+
+    m_tray->show();
+    m_tray->showMessage(tr("Transfer"), tr("New incoming transaction!"));
+    QTimer::singleShot(15000, m_tray, &QSystemTrayIcon::hide);
+}
+
 void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
                                    const QString &responseMessage)
 {
@@ -288,7 +301,13 @@ void WalletWidget::requestFinished(AbstractTangleAPI::RequestType request,
         ui->txloadingLabel->hide();
         QString json = responseMessage;
         json.remove(0, json.indexOf("[") - 1); //rm garbage at beginning
+        int prevTransfersCount = m_currentAddrTxList.size();
         m_currentAddrTxList = UtilsIOTA::parseAddrTransfersQuickJson(json);
+
+        //show notification on new transfers
+        if ((prevTransfersCount > 0) && (prevTransfersCount < m_currentAddrTxList.size()))
+            newTransactionsNotification();
+
         loadPastTxs();
         updateUnconfirmedBalance();
         break;

@@ -20,6 +20,7 @@ class WalletWidget;
 
 class WalletManager;
 class SettingsManager;
+class QSystemTrayIcon;
 
 class WalletWidget : public QWidget
 {
@@ -62,6 +63,7 @@ private slots:
     void addressesButtonClicked();
     void addressesBackButtonClicked();
     void addressesViewTangleButtonClicked();
+    void newTransactionsNotification();
     void requestFinished(AbstractTangleAPI::RequestType request,
                          const QString &responseMessage);
     void requestError(AbstractTangleAPI::RequestType request,
@@ -84,6 +86,7 @@ private:
     QList<UtilsIOTA::Transation> m_currentAddrTxList;
     QList<UtilsIOTA::Transation> m_outgoingTxList;
     quint64 m_lastCheckedBalance;
+    QSystemTrayIcon *m_tray;
 };
 
 #endif // WALLETWIDGET_H

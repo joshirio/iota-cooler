@@ -399,16 +399,29 @@ void MainWindow::clipboardGuardCheck()
 
         QString clipData = qApp->clipboard()->text().trimmed().toUpper();
         if (UtilsIOTA::isValidAddress(clipData)) {
-            if (!previousAddress.isEmpty()) {
-                if (previousAddress != clipData) {
+            QString prevA = previousAddress;
+
+            //set new address before message box to
+            //avoid infinite focus event loop on macOS
+            previousAddress = clipData;
+
+            //check if new address belongs to iotacooler, in that case skip
+            bool isExternalAddress = true;
+            if (!m_walletManager->isLocked()) {
+                isExternalAddress = m_walletManager->getCurrentAddress() != clipData;
+            }
+            if ((!prevA.isEmpty()) && isExternalAddress) {
+                if (prevA != clipData) {
                     //make addresses more readable
                     QString prevReadable, clipReadable;
-                    prevReadable = previousAddress;
-                    prevReadable.insert((previousAddress.length() == 90 ? 30 : 27), "<br />");
-                    prevReadable.insert((previousAddress.length() == 90 ? 66 : 60), "<br />");
+                    prevReadable = prevA;
+                    prevReadable.insert((prevA.length() == 90 ? 30 : 27), "<br />");
+                    prevReadable.insert((prevA.length() == 90 ? 66 : 60), "<br />");
                     clipReadable = clipData;
                     clipReadable.insert((clipReadable.length() == 90 ? 30 : 27), "<br />");
                     clipReadable.insert((clipReadable.length() == 90 ? 66 : 60), "<br />");
+
+
 
                     QMessageBox box(this);
                     box.setIcon(QMessageBox::Warning);
@@ -433,8 +446,6 @@ void MainWindow::clipboardGuardCheck()
                     }
                 }
             }
-            //set new address
-            previousAddress = clipData; //FIXME: mv this up or otherwise qmessage box focus back causes loop
         }
     }
 }
