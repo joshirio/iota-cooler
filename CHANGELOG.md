@@ -26,7 +26,7 @@ Version 1.1
 - Show correct address on wallet creation (Windows)
 - Correctly enforce device roles
 
-### iotacooler-smidgen Changes
+### Changelog iotacooler-smidgen
 - use carriota field as default node
 - remove config file
 - add promote command
