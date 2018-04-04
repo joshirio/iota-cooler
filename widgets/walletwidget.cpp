@@ -256,7 +256,7 @@ void WalletWidget::newTransactionsNotification()
 {
 
     m_tray->show();
-    m_tray->showMessage(tr("Transfer"), tr("New incoming transaction!"));
+    m_tray->showMessage(tr("IOTAcooler"), tr("New incoming transaction!"));
     QTimer::singleShot(15000, m_tray, &QSystemTrayIcon::hide);
 }
 
