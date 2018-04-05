@@ -40,7 +40,7 @@ public:
         AddMultisigParty, /**< Add a signing party to the multisig file.
                                Can only be used until multisig file finalization */
         FinalizeMultsigWallet, /**< Finalize mutisig file */
-        RecoverFundsSign, /**< Sign a tx to ecover funds from a multisig address */
+        RecoverFundsSign, /**< Sign a tx to recover funds from a multisig address */
         RecoverFundsSend /**< Send a signed tx to recover funds, after RecoverFundsSign */
     };
 
