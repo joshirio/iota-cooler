@@ -180,7 +180,7 @@ Please close the application and open the current wallet file with IOTAcooler on
          <item row="1" column="1">
           <widget class="QLineEdit" name="offlineSeedLineEdit">
            <property name="placeholderText">
-            <string>A-Z9 online signing seed</string>
+            <string>A-Z9 offline signing seed</string>
            </property>
            <property name="clearButtonEnabled">
             <bool>true</bool>
@@ -601,7 +601,7 @@ Please close the application and open the current wallet file with IOTAcooler on
          <item row="0" column="1">
           <widget class="QLineEdit" name="offlineSeedLineEdit_2">
            <property name="placeholderText">
-            <string>A-Z9 online signing seed</string>
+            <string>A-Z9 offline signing seed</string>
            </property>
            <property name="clearButtonEnabled">
             <bool>true</bool>
