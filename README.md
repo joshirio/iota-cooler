@@ -29,7 +29,7 @@ The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshi
 ![Screenshot](https://raw.githubusercontent.com/joshirio/iota-cooler/master/stuff/screenshots/mainwindow.gif "Wallet screenshot")
 
 ### Demo video
-[Click here for a short YouTube demo](https://youtu.be/MegEEOyEkgk)
+[Click here for a short YouTube demo](https://youtu.be/hiqW3yzF36k)
 
 ### Download
 IOTAcooler works on Windows, macOS and Linux. Visit the [releases page](https://github.com/joshirio/iota-cooler/releases) and download the appropriate executable/installer for your OS. For Arch Linux based distributions, there's also an [AUR package](https://aur.archlinux.org/packages/iotacooler/) for building from source, this is also the most secure option, since you don't have to trust the precompiled binaries.
