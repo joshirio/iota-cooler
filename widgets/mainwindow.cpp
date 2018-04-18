@@ -132,6 +132,10 @@ void MainWindow::openWallet(const QString &filePath)
                 }
                 break;
             }
+
+            //remember last used directory
+            m_settingsManager->saveProperty("lastUsedDir", "mainWindow",
+                                            QFileInfo(filePath).dir().absolutePath());
         } else {
             switch (error.errorType) {
             case WalletManager::WalletError::WalletInvalidPassphrase:
@@ -271,10 +275,16 @@ void MainWindow::openWalletButtonClicked()
 {
     checkDeviceRole();
 
+    //restore last used directory
+    QString dirPath = m_settingsManager->restoreProperty("lastUsedDir", "mainWindow").toString();
+    if (dirPath.isEmpty()) {
+        dirPath = QStandardPaths::standardLocations(
+                    QStandardPaths::DocumentsLocation).at(0);
+    }
+
     QString file = QFileDialog::getOpenFileName(this,
                                                 tr("Open Wallet File"),
-                                                QStandardPaths::standardLocations(
-                                                    QStandardPaths::DocumentsLocation).at(0),
+                                                dirPath,
                                                 tr("IOTAcooler wallet (*.icwl)"));
 
     if (!file.isEmpty()) {
