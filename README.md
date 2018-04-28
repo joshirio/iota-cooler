@@ -4,7 +4,7 @@ A cross-platform cold storage and spending wallet for IOTA. At its core, IOTAcoo
 
 IOTAcooler is designed with security and speed in mind. All sensitive steps are done completely offline, including the wallet recovery feature. IOTAcooler is really fast because the wallet is stateful, meaning that all past transactions, addresses and other states are saved into the wallet file, also because it uses light IOTA API requests for checking current transfers on the Tangle, which is very practical in case numerous or big transactions are part of the wallet history. The downside of this is that some specific information for incoming transactions is only visible on a tangle explorer.
 
-The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen), based on [smidgen](https://github.com/bitfinexcom/smidgen). Smidgen is a nodejs command line multisig utility using the official IOTA javascript library and created by Bitfinex.
+The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshirio/iota-cooler-smidgen), based on [smidgen](https://github.com/bitfinexcom/smidgen). Smidgen is a nodejs command line multisig utility, created by Bitfinex, which uses the official IOTA javascript library.
 
 ### Features
 - Wallet encryption (AES-256) with password. Wallet file never stores the offline signing key.
