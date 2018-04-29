@@ -6,10 +6,9 @@ Build IOTAcooler:
 2. Check DefinitionHolder
 3. Check authors description in about dialog, see AUTHORS file
 4. Check and update CHANGELOG file
-5. Create archive of last commit:
-6  git archive -o iotacooler-1.0-src.tar.gz HEAD
-7. Uncompress and open project with release config (or just use QtCreator GUI)
-8. Compile
+5. Create archive of last commit: git archive -o iotacooler-1.0-src.tar.gz HEAD
+6. Uncompress and open project with release config (or just use QtCreator GUI)
+7. Compile
 
 Prepare iotacooler-smidgen:
 1. Follow: https://github.com/joshirio/iota-cooler-smidgen/blob/master/DEPLOY.md
