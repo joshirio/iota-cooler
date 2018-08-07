@@ -23,6 +23,6 @@ const bool DefinitionHolder::SNAP_PKG = false;
 const QString DefinitionHolder::COPYRIGHT =
         QString("Copyright &copy; 2018-%1 Oirio Joshi")
         .arg(QDate::currentDate().toString("yyyy"));
-const QString DefinitionHolder::DEFAULT_NODE = "https://field.carriota.com:443";
+const QString DefinitionHolder::DEFAULT_NODE = "https://field.deviota.com:443";
 const quint32 DefinitionHolder::WALLET_VERSION = 1;
 const QString DefinitionHolder::DONATE_URL = "https://github.com/joshirio/iota-cooler/blob/master/doc/donate.md";
