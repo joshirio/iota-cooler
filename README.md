@@ -15,7 +15,6 @@ The multisig signing is handled by [iotacooler-smidgen](https://github.com/joshi
 - Clipboard guard to warn about possible unwanted changes (malware) to copied addresses
 - Support for [custom generated seeds](https://github.com/joshirio/iota-cooler/wiki/Generating-IOTA-Seeds-Securely)
 - Built-in promote and reattach utility
-- Automatic promoting and reattaching thanks to [DevIOTA Field](https://field.deviota.com/)
 - Fast transaction history retrieval, even with big bundles (DevIOTA Field donations :)
 - Remote proof-of-work: fast transactions and less power usage
 - Detect and warn if an old wallet version is opened
