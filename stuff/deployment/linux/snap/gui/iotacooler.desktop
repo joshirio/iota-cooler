@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=IOTAcooler
+GenericName=IOTAcooler
+Exec=iota-cooler
+Icon=${SNAP}/meta/gui/iotacooler.png
+Type=Application
+StartupNotify=false
+Terminal=false
+Categories=Utility;
