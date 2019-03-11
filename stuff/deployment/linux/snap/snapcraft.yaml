@@ -28,14 +28,11 @@ apps:
 
 parts:
   iota-cooler:
-    source: https://github.com/joshirio/iota-cooler/releases/download/v$SNAP_VERSION/iotacooler-$SNAP_VERSION-x86_64.deb
+    source: https://github.com/joshirio/iota-cooler/releases/download/v1.1/iotacooler-1.1-x86_64.deb
     plugin: dump
     source-type: deb
-    override-pull: |
-      snapcraftctl pull
-      #mkdir $SNAPCRAFT_PART_INSTALL/bin
-      #cp iota-cooler $SNAPCRAFT_PART_INSTALL/bin
-      #cp -R stuff/deployment/linux/appimage/usr $SNAPCRAFT_PART_INSTALL/
+    override-build: |
+      snapcraftctl build
       #fix icon path
       sed -i 's|Icon=iotacooler|Icon=${SNAP}/usr/share/pixmaps/iotacooler.png|g' $SNAPCRAFT_PART_INSTALL/usr/share/applications/iotacooler.desktop
     stage-packages:
