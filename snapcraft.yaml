@@ -1,0 +1,103 @@
+name: iota-cooler
+version: '1.1'
+summary: IOTAcooler, the IOTA Cold Transaction Signer 
+description: |
+  A cross-platform cold storage and spending wallet for the IOTA crypto currency.
+
+icon: snap/gui/iotacooler.png
+grade: stable
+confinement: strict
+base: core18 # based on ubuntu 18.04 LTS
+
+apps:
+  iota-cooler:
+    command: desktop-launch iota-cooler
+    desktop: usr/share/applications/iotacooler.desktop
+    environment:
+      DISABLE_WAYLAND: 1
+    plugs:
+      - home
+      - network
+      - opengl
+      - removable-media
+      - unity7
+      - x11
+      - wayland
+      - desktop
+      - desktop-legacy
+
+parts:
+  iota-cooler:
+    source: https://github.com/joshirio/iota-cooler.git
+    source-tag: v1.1
+    plugin: qmake
+    qt-version: qt5
+    options:
+      - CONFIG+=release
+    override-build: | # enable snap deployment target and set app store
+      #sed -i 's#bool DefinitionHolder::SNAP_LINUX = false;#bool DefinitionHolder::SNAP_LINUX = true;#' utils/definitionholder.cpp
+      #sed -i 's#bool DefinitionHolder::APP_STORE = false;#bool DefinitionHolder::APP_STORE = true;#' utils/definitionholder.cpp
+      snapcraftctl build # call default snapcraft build
+      #custom install steps
+      mkdir $SNAPCRAFT_PART_INSTALL/bin
+      cp iota-cooler $SNAPCRAFT_PART_INSTALL/bin
+      cp -R stuff/deployment/linux/deb/usr $SNAPCRAFT_PART_INSTALL/
+      sed -i 's|Icon=iotacooler|Icon=${SNAP}/usr/share/pixmaps/iotacooler.png|g' $SNAPCRAFT_PART_INSTALL/usr/share/applications/iotacooler.desktop
+    build-packages:
+      - libqt5svg5-dev
+    stage-packages:
+      - zlib1g
+      - dbus
+    after: [qt]
+
+  qt:
+    plugin: qtbuilder
+    qt-version: 5.12.1
+    qt-source-git: https://code.qt.io/qt/qt5.git
+    qt-submodules: ['qtbase']
+    build-packages:
+      - libasound2-dev
+      - libdbusmenu-glib-dev
+      - libffi-dev
+      - liblzma-dev
+      - libpulse-dev
+      - libssl-dev
+      - libx11-xcb-dev
+      - libxcb-icccm4-dev
+      - libxcb-image0-dev
+      - libxcb-keysyms1-dev
+      - libxcb-randr0-dev
+      - libxcb-render-util0-dev
+      - libxcb-sync-dev
+      - libxcb-util0-dev
+      - libxcb-xfixes0-dev
+      - libxcb1-dev
+      - libxrender-dev
+    configflags:
+      - -prefix
+      - $SNAPCRAFT_STAGE
+      - -release
+      - -force-debug-info
+      - -opensource
+      - -confirm-license
+      - -qt-zlib
+      - -qt-libpng
+      - -qt-libjpeg
+      - -qt-freetype
+      - -qt-harfbuzz
+      - -qt-pcre
+      - -qt-xcb
+      - -qt-xkbcommon-x11
+      - -no-gstreamer
+      - -no-gtkstyle
+      - -no-mirclient
+      - -no-opengl
+      - -static
+      - -dbus-runtime
+      - -openssl-linked
+      - -nomake
+      - examples
+      - -nomake
+      - tests
+    prime: [-./*]
+
